@@ -1,0 +1,8 @@
+*.pyc
+ago-dic-2025-workspace.code-workspace
+\temp
+\scripts_local
+\notebooks_local
+local*
+\data_local
+datasets/total_18_data.csv
