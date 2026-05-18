@@ -5,7 +5,6 @@ This repository contains code examples, activities and external links related wi
 |ID | Open in Colab | Description |
 |---|---|---|
 | 1 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/widget_interactive_linear_regression.ipynb) | Interactive visualization of simple linear regression. |
-
 | 2 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/information_gain_in_restaurant_example.ipynb) | Example of how to compute information gain using the restaurant example. |
 
 <!--
