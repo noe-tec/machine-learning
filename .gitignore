@@ -6,3 +6,5 @@ ago-dic-2025-workspace.code-workspace
 local*
 \data_local
 datasets/total_18_data.csv
+notebooks/data/
+demos/data/
