@@ -32,7 +32,7 @@ This repository contains code examples, activities and external links related wi
 | 2 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/notebooks/activity_learning_and_validation_curves.ipynb) | Learning and validation curves - Regression Models |
 | 3 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/notebooks/activity_svm_moons.ipynb) | SVM with Moons dataset |
 | 4 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/notebooks/activity_grow_a_forest.ipynb) | Grow a forest |
-| 5 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/notebooks/actividad_desvanecimiento.ipynb) | Actividad desvanecimiento - Spanish! |
+| 5 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/notebooks/actividad_desvanecimiento_gradiente.ipynb) | Actividad desvanecimiento del gradiente - Spanish! |
 
 <!--
 | 5 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/notebooks/actividad-retropropagacion.ipynb) | Retropropagación | 
