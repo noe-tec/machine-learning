@@ -10,6 +10,8 @@ This repository contains code examples, activities and external links related wi
 | 4 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/artificial_neural_networks_architecture_regularization_hyperparameters_sklearn.ipynb) | Artificial Neural Networks - sklearn |
 | 5 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/artificial_neural_networks_pytorch.ipynb) | Artificial Neural Networks - PyTorch |
 | 6 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/ann_with_weights_and_biases.ipynb) | Artificial Neural Networks - PyTorch - Weights & Biases |
+| 7 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/bert_gpt_tutorial.ipynb) | A demo of BERT and GPT |
+| 8 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/toy_rag.ipynb) | A toy demo of RAG |
 
 <!--
 | 2 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/GANs_MNIST.ipynb) | GAN-MNIST |
