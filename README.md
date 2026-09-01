@@ -49,10 +49,13 @@ Standalone, single-purpose Python scripts (no notebook boilerplate) demonstratin
 ## External links
 |ID | Open in Colab | Description | Source |
 |---|---|---|---|
-| 1 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/jakevdp/PythonDataScienceHandbook/blob/master/notebooks/05.07-Support-Vector-Machines.ipynb) | Support Vector Machines | Jake VanderPlas's Python Data Science Handbook |
-| 2 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/third-party/05_08_Random_Forests.ipynb) | Random Forest | Jake VanderPlas's Python Data Science Handbook |
-| 3 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/third-party/05_08_Random_Forests_ES.ipynb) | Random Forest (traducción al español) | Jake VanderPlas's Python Data Science Handbook |
-| 4 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/aimacode/aima-python/blob/master/knowledge_version_space.ipynb#scrollTo=EKgDrTAnDwBj) | Version Space | AIMA code repository |
+| 1 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/third-party/05_07_Support_Vector_Machines.ipynb) | Support Vector Machines | Jake VanderPlas's Python Data Science Handbook |
+| 2 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/third-party/05_07_Support_Vector_Machines_ES.ipynb) | Support Vector Machines (traducción al español) | Jake VanderPlas's Python Data Science Handbook |
+| 3 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/third-party/05_08_Random_Forests.ipynb) | Random Forest | Jake VanderPlas's Python Data Science Handbook |
+| 4 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/third-party/05_08_Random_Forests_ES.ipynb) | Random Forest (traducción al español) | Jake VanderPlas's Python Data Science Handbook |
+| 5 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/third-party/07_ensemble_learning_and_random_forests.ipynb) | Ensemble Learning and Random Forests | Aurélien Géron's Hands-On Machine Learning (handson-ml3) |
+| 6 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/third-party/07_ensemble_learning_and_random_forests_ES.ipynb) | Ensemble Learning and Random Forests (traducción al español) | Aurélien Géron's Hands-On Machine Learning (handson-ml3) |
+| 7 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/aimacode/aima-python/blob/master/knowledge_version_space.ipynb#scrollTo=EKgDrTAnDwBj) | Version Space | AIMA code repository |
 
 
 ## Books / Tutorials
