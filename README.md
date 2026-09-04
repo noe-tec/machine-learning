@@ -41,6 +41,7 @@ Standalone, single-purpose Python scripts (no notebook boilerplate) demonstratin
 | 12 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad_multicolinealidad.ipynb) | Multicolinealidad — cuando dos variables cuentan la misma historia - Spanish! |
 | 13 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad_arbol_regresion.ipynb) | Árboles de regresión — sobreajuste y poda - Spanish! |
 | 14 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad_ridge_lasso.ipynb) | Ridge vs. Lasso - Spanish! |
+| 15 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad_xgboost.ipynb) | XGBoost — de la intuición del boosting a un modelo real - Spanish! |
 
 <!--
 | 11 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad-retropropagacion.ipynb) | Retropropagación | 
