@@ -15,6 +15,7 @@ This repository contains code examples, activities and external links related wi
 | 9 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/actividad_kmeans.ipynb) | DBSCAN clustering |
 | 10 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/linear_regression_closed_form.ipynb) | Linear regression: closed-form solution (normal equations) vs. scikit-learn |
 | 11 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/linear_regression_and_feature_selection.ipynb) | Linear regression: evaluation strategies and feature selection |
+| 12 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/retropropagacion.ipynb) | Retropropagación: red neuronal desde cero con NumPy |
 
 <!--
 | 2 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/GANs_MNIST.ipynb) | GAN-MNIST |
