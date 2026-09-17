@@ -16,7 +16,7 @@ This repository contains code examples, activities and external links related wi
 | 10 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/linear_regression_closed_form.ipynb) | Linear regression: closed-form solution (normal equations) vs. scikit-learn |
 | 11 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/linear_regression_and_feature_selection.ipynb) | Linear regression: evaluation strategies and feature selection |
 | 12 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/retropropagacion.ipynb) | Retropropagación: red neuronal desde cero con NumPy |
-| 13 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/demo_kmeans_dbscan_imagen.ipynb) | Compresión de imagen con K-means y comparación K-means vs. DBSCAN (solución resuelta) - Spanish! |
+| 13 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/demo_kmeans_dbscan_imagen.ipynb) | Demo compresión de imagen con K-means y comparación K-means vs. DBSCAN |
 
 <!--
 | 2 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/GANs_MNIST.ipynb) | GAN-MNIST |
