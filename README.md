@@ -12,10 +12,11 @@ This repository contains code examples, activities and external links related wi
 | 6 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/ann_with_weights_and_biases.ipynb) | Artificial Neural Networks - PyTorch - Weights & Biases |
 | 7 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/bert_gpt_tutorial.ipynb) | A demo of BERT and GPT |
 | 8 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/toy_rag.ipynb) | A toy demo of RAG |
-| 9 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/actividad_kmeans.ipynb) | DBSCAN clustering |
+| 9 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/demos_agrupamiento.ipynb) | Clustering methods: K-means, DBSCAN, hierarchical clustering, and SOM |
 | 10 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/linear_regression_closed_form.ipynb) | Linear regression: closed-form solution (normal equations) vs. scikit-learn |
 | 11 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/linear_regression_and_feature_selection.ipynb) | Linear regression: evaluation strategies and feature selection |
 | 12 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/retropropagacion.ipynb) | Retropropagación: red neuronal desde cero con NumPy |
+| 13 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/demo_kmeans_dbscan_imagen.ipynb) | Compresión de imagen con K-means y comparación K-means vs. DBSCAN (solución resuelta) - Spanish! |
 
 <!--
 | 2 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/GANs_MNIST.ipynb) | GAN-MNIST |
@@ -43,6 +44,9 @@ Standalone, single-purpose Python scripts (no notebook boilerplate) demonstratin
 | 13 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad_arbol_regresion.ipynb) | Árboles de regresión — sobreajuste y poda - Spanish! |
 | 14 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad_ridge_lasso.ipynb) | Ridge vs. Lasso - Spanish! |
 | 15 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad_xgboost.ipynb) | XGBoost — de la intuición del boosting a un modelo real - Spanish! |
+| 16 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad_kmeans_dbscan_imagen.ipynb) | Compresión de imagen con K-means y comparación K-means vs. DBSCAN - Spanish! |
+| 17 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad_agrupamiento_paises.ipynb) | Agrupamiento de países según indicadores socioeconómicos - Spanish! |
+| 18 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad_xgboost_clasificacion.ipynb) | XGBoost para clasificación — predicción de abandono de clientes - Spanish! |
 
 <!--
 | 11 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad-retropropagacion.ipynb) | Retropropagación | 
