@@ -62,6 +62,7 @@ Standalone, single-purpose Python scripts (no notebook boilerplate) demonstratin
 | 5 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/third-party/07_ensemble_learning_and_random_forests.ipynb) | Ensemble Learning and Random Forests | Aurélien Géron's Hands-On Machine Learning (handson-ml3) |
 | 6 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/third-party/07_ensemble_learning_and_random_forests_ES.ipynb) | Ensemble Learning and Random Forests (traducción al español) | Aurélien Géron's Hands-On Machine Learning (handson-ml3) |
 | 7 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/aimacode/aima-python/blob/master/knowledge_version_space.ipynb#scrollTo=EKgDrTAnDwBj) | Version Space | AIMA code repository |
+| 8 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/third-party/transfer_learning_tutorial.ipynb) | Transfer Learning for Computer Vision (ResNet18, ants vs. bees) | PyTorch Tutorials (Sasank Chilamkurthy) |
 
 
 ## Books / Tutorials
