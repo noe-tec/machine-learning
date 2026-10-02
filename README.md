@@ -47,6 +47,7 @@ Standalone, single-purpose Python scripts (no notebook boilerplate) demonstratin
 | 16 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad_kmeans_dbscan_imagen.ipynb) | Compresión de imagen con K-means y comparación K-means vs. DBSCAN - Spanish! |
 | 17 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad_agrupamiento_paises.ipynb) | Agrupamiento de países según indicadores socioeconómicos - Spanish! |
 | 18 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad_xgboost_clasificacion.ipynb) | XGBoost para clasificación — predicción de abandono de clientes - Spanish! |
+| 19 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad_monumentos.ipynb) | Clasificación de monumentos antiguos: transferencia de aprendizaje y aumentación de datos - Spanish! |
 
 <!--
 | 11 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad-retropropagacion.ipynb) | Retropropagación | 
