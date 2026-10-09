@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GRU: actualización del estado</title>
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1d2236; --muted:#5b6178; --line:#8a8fa3; --box:#ffffff; --boxline:#7c8196;
+    --op:#d9dbe3; --opfg:#ffffff; --sig:#7b3fe4; --tanh:#c9b3f5; --accent:#001391; --teal:#008080;
+    --card:#f4f5f9; --hl:#e9ecf8;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14161f; --fg:#e7e9f2; --muted:#a3a8bd; --line:#8d92a8; --box:#1c1f2b; --boxline:#8d92a8;
+      --op:#4a4e60; --opfg:#ffffff; --sig:#9a6bff; --tanh:#6a51a8; --accent:#8fa2ff; --teal:#3fc1c1;
+      --card:#1c1f2b; --hl:#232842;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14161f; --fg:#e7e9f2; --muted:#a3a8bd; --line:#8d92a8; --box:#1c1f2b; --boxline:#8d92a8;
+    --op:#4a4e60; --opfg:#ffffff; --sig:#9a6bff; --tanh:#6a51a8; --accent:#8fa2ff; --teal:#3fc1c1;
+    --card:#1c1f2b; --hl:#232842;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+  main{max-width:980px;margin:0 auto;padding:32px 16px 56px}
+  h1{color:var(--accent);font-size:2rem;margin:0 0 4px;line-height:1.2}
+  .sub{color:var(--teal);font-size:1.15rem;margin:0 0 24px}
+  h2{color:var(--accent);font-size:1.3rem;margin:36px 0 10px}
+  p{margin:8px 0}
+  figure{margin:0;background:var(--card);border-radius:12px;padding:12px}
+  .scroll{overflow-x:auto}
+  svg{width:100%;min-width:640px;height:auto;display:block}
+  figcaption{color:var(--muted);font-size:.9rem;margin-top:6px}
+  .legend{display:flex;flex-wrap:wrap;gap:16px;margin:12px 4px 0;font-size:.92rem;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:14px;height:14px;border-radius:50%;display:inline-block}
+  .eq{background:var(--card);border-radius:12px;padding:6px 18px;margin:12px 0}
+  .eq .name{font-weight:600;color:var(--accent);margin-top:12px}
+  .eq .katex-display, .eq math[display="block"]{margin:6px 0 4px;overflow-x:auto;overflow-y:hidden;padding:4px 0}
+  .eq p{color:var(--muted);margin:0 0 12px}
+  .note{background:var(--hl);border-radius:12px;padding:14px 18px;margin-top:12px}
+  table{border-collapse:collapse;width:100%;margin-top:8px;font-size:.95rem}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--op)}
+  th{color:var(--accent)}
+  .wrap{overflow-x:auto}
+  /* SVG */
+  .w{stroke:var(--line);stroke-width:2;fill:none}
+  .bx{fill:var(--box);stroke:var(--boxline);stroke-width:2}
+  .frame{fill:none;stroke:var(--line);stroke-width:2;stroke-dasharray:8 6}
+  .op{fill:var(--op)}
+  .opt{fill:var(--opfg);font-weight:700;font-size:15px;text-anchor:middle;dominant-baseline:central}
+  .sig{fill:var(--sig)} .tnh{fill:var(--tanh)}
+  .gt{fill:#ffffff;font-size:13px;font-weight:700;text-anchor:middle;dominant-baseline:central}
+  .lbl{fill:var(--fg);font-size:17px;font-style:italic;text-anchor:middle;dominant-baseline:central}
+  .sig-lbl{fill:var(--teal);font-size:15px;font-style:italic;font-weight:600}
+  .cap{fill:var(--muted);font-size:13px}
+  .wl{fill:var(--muted);font-size:12px;text-anchor:middle}
+  .split{display:block}
+  @media (min-width:1100px){
+    main{max-width:1440px}
+    .split{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:28px;align-items:start}
+    .split h2{margin-top:20px}
+    .col-eq .eq{padding:2px 16px;margin-top:0}
+    .col-eq .eq .name{margin-top:10px}
+    .col-eq .eq p{font-size:.88rem;line-height:1.45;margin-bottom:8px}
+    .col-eq math[display="block"]{margin:4px 0 2px}
+    .col-eq > p{font-size:.85rem}
+  }
+  math{font-size:1.1em} math[display="block"]{margin:10px 0 6px;overflow-x:auto;max-width:100%}
+</style>
+</head>
+<body>
+<main>
+  <h1>GRU: actualización del estado</h1>
+  <p class="sub">Gated Recurrent Unit</p>
+
+  <p>La GRU es una versión simplificada de la LSTM. No tiene una celda de memoria separada: el propio estado oculto <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">h_t</annotation></semantics></math></span> funciona como memoria. Dos compuertas deciden, en cada paso, cuánto del estado anterior se conserva y cuánto se reemplaza por información nueva.</p>
+
+  <div class="split">
+  <section class="col-fig">
+  <h2>Diagrama</h2>
+  <figure>
+    <div class="scroll"><svg viewBox="0 0 900 540" role="img" aria-label="Diagrama de una celda GRU con sus compuertas de reinicio y de actualización, el candidato y la combinación final del estado.">
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--line)"/>
+        </marker>
+      </defs>
+
+      <rect class="frame" x="200" y="40" width="540" height="410" rx="6"/>
+
+      <!-- Línea superior: h_{t-1} -> × -> + -> h_t -->
+      <line class="w" x1="140" y1="90" x2="540" y2="90" marker-end="url(#ar)"/>
+      <line class="w" x1="580" y1="90" x2="640" y2="90" marker-end="url(#ar)"/>
+      <line class="w" x1="680" y1="90" x2="768" y2="90" marker-end="url(#ar)"/>
+      <line class="w" x1="840" y1="90" x2="890" y2="90" marker-end="url(#ar)"/>
+      <line class="w" x1="10" y1="90" x2="58" y2="90" marker-end="url(#ar)"/>
+
+      <!-- h_{t-1} baja a la concatenación 1 -->
+      <polyline class="w" points="100,112 100,300 238,300" marker-end="url(#ar)"/>
+
+      <!-- Derivación desde la línea superior hacia el × del reinicio -->
+      <line class="w" x1="390" y1="90" x2="390" y2="183" marker-end="url(#ar)"/>
+
+      <!-- Concat 1 -> σ reinicio -->
+      <line class="w" x1="300" y1="280" x2="300" y2="226" marker-end="url(#ar)"/>
+      <!-- σ reinicio -> × -->
+      <line class="w" x1="322" y1="205" x2="368" y2="205" marker-end="url(#ar)"/>
+      <!-- × -> concat 2 -->
+      <line class="w" x1="390" y1="227" x2="390" y2="368" marker-end="url(#ar)"/>
+
+      <!-- Concat 1 -> σ actualización -->
+      <line class="w" x1="362" y1="300" x2="538" y2="300" marker-end="url(#ar)"/>
+      <!-- σ act -> 1- -> × superior -->
+      <line class="w" x1="560" y1="278" x2="560" y2="232" marker-end="url(#ar)"/>
+      <line class="w" x1="560" y1="188" x2="560" y2="112" marker-end="url(#ar)"/>
+      <!-- σ act -> × inferior -->
+      <line class="w" x1="582" y1="300" x2="638" y2="300" marker-end="url(#ar)"/>
+
+      <!-- Concat 2 -> tanh -> × inferior -> + -->
+      <line class="w" x1="482" y1="390" x2="638" y2="390" marker-end="url(#ar)"/>
+      <line class="w" x1="660" y1="368" x2="660" y2="322" marker-end="url(#ar)"/>
+      <line class="w" x1="660" y1="278" x2="660" y2="112" marker-end="url(#ar)"/>
+
+      <!-- x_t -->
+      <line class="w" x1="300" y1="478" x2="300" y2="322" marker-end="url(#ar)"/>
+      <polyline class="w" points="300,450 440,450 440,412" marker-end="url(#ar)"/>
+
+      <!-- Cajas -->
+      <rect class="bx" x="60" y="68" width="80" height="44" rx="5"/><text class="lbl" x="100" y="90">h<tspan dy="6" font-size="12">t−1</tspan></text>
+      <rect class="bx" x="770" y="68" width="70" height="44" rx="5"/><text class="lbl" x="805" y="90">h<tspan dy="6" font-size="12">t</tspan></text>
+      <rect class="bx" x="240" y="280" width="120" height="40" rx="5"/><text class="lbl" x="300" y="300" font-size="15">[x<tspan dy="5" font-size="11">t</tspan><tspan dy="-5">, h</tspan><tspan dy="5" font-size="11">t−1</tspan><tspan dy="-5">]</tspan></text>
+      <rect class="bx" x="340" y="370" width="140" height="40" rx="5"/><text class="lbl" x="410" y="390" font-size="15">[x<tspan dy="5" font-size="11">t</tspan><tspan dy="-5">, h′</tspan><tspan dy="5" font-size="11">t−1</tspan><tspan dy="-5">]</tspan></text>
+      <rect class="bx" x="265" y="480" width="70" height="44" rx="5"/><text class="lbl" x="300" y="502">x<tspan dy="6" font-size="12">t</tspan></text>
+
+      <!-- Capas con pesos -->
+      <circle class="sig" cx="300" cy="205" r="21"/><text class="gt" x="300" y="205">σ</text>
+      <text class="wl" x="262" y="182">W<tspan dy="4" font-size="9">r</tspan></text>
+      <circle class="sig" cx="560" cy="300" r="21"/><text class="gt" x="560" y="300">σ</text>
+      <text class="wl" x="560" y="340">W<tspan dy="4" font-size="9">z</tspan></text>
+      <circle class="tnh" cx="660" cy="390" r="21"/><text class="gt" x="660" y="390" font-size="11">tanh</text>
+      <text class="wl" x="700" y="420">W<tspan dy="4" font-size="9">h</tspan></text>
+
+      <!-- Operaciones -->
+      <circle class="op" cx="390" cy="205" r="17"/><text class="opt" x="390" y="205">×</text>
+      <circle class="op" cx="560" cy="210" r="19"/><text class="opt" x="560" y="210" font-size="13">1−</text>
+      <circle class="op" cx="560" cy="90" r="17"/><text class="opt" x="560" y="90">×</text>
+      <circle class="op" cx="660" cy="300" r="17"/><text class="opt" x="660" y="300">×</text>
+      <circle class="op" cx="660" cy="90" r="17"/><text class="opt" x="660" y="90">+</text>
+
+      <!-- Etiquetas de señales -->
+      <text class="sig-lbl" x="236" y="232">r<tspan dy="4" font-size="11">t</tspan></text>
+      <text class="cap" x="214" y="252">reinicio</text>
+      
+      <text class="sig-lbl" x="586" y="292">z<tspan dy="4" font-size="11">t</tspan></text>
+      <text class="cap" x="460" y="322">actualización</text>
+      <text class="sig-lbl" x="572" y="160">1 − z<tspan dy="4" font-size="11">t</tspan></text>
+      
+      <text class="sig-lbl" x="398" y="262">h′<tspan dy="4" font-size="11">t−1</tspan></text>
+      <text class="cap" x="398" y="284">= r<tspan dy="3" font-size="9">t</tspan><tspan dy="-3"> ⊙ h</tspan><tspan dy="3" font-size="9">t−1</tspan></text>
+      <text class="sig-lbl" x="670" y="352">h̃<tspan dy="4" font-size="11">t</tspan></text>
+      <text class="cap" x="600" y="432">candidato</text>
+      <text class="cap" x="672" y="232">z<tspan dy="3" font-size="9">t</tspan><tspan dy="-3"> ⊙ h̃</tspan><tspan dy="3" font-size="9">t</tspan></text>
+      <text class="cap" x="566" y="66">(1 − z<tspan dy="3" font-size="9">t</tspan><tspan dy="-3">) ⊙ h</tspan><tspan dy="3" font-size="9">t−1</tspan></text>
+      <text class="cap" x="215" y="66">memoria: el estado viaja por la línea superior</text>
+    </svg></div>
+    <div class="legend">
+      <span><i class="dot" style="background:var(--sig)"></i>capa con pesos y sigmoide (compuerta)</span>
+      <span><i class="dot" style="background:var(--tanh)"></i>capa con pesos y tanh (contenido)</span>
+      <span><i class="dot" style="background:var(--op)"></i>operación elemento a elemento, sin pesos</span>
+    </div>
+    <figcaption>Cada círculo morado es una capa densa: una matriz de pesos aplicada a la concatenación de entradas, más un sesgo, seguida de su activación. La GRU tiene tres: <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>W</mi><mi>r</mi></msub></mrow><annotation encoding="application/x-tex">W_r</annotation></semantics></math></span>, <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>W</mi><mi>z</mi></msub></mrow><annotation encoding="application/x-tex">W_z</annotation></semantics></math></span> y <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>W</mi><mi>h</mi></msub></mrow><annotation encoding="application/x-tex">W_h</annotation></semantics></math></span>.</figcaption>
+  </figure>
+  </section>
+  <section class="col-eq">
+  <h2>Ecuaciones</h2>
+  <div class="eq">
+    <div class="name">1. Compuerta de reinicio</div>
+    <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>r</mi><mi>t</mi></msub><mo>=</mo><mi>σ</mi><mrow><mo fence="true">(</mo><msub><mi>W</mi><mi>r</mi></msub><mtext> </mtext><mo stretchy="false">[</mo><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><mtext> </mtext><msub><mi>x</mi><mi>t</mi></msub><mo stretchy="false">]</mo><mo>+</mo><msub><mi>b</mi><mi>r</mi></msub><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">r_t = \sigma\left(W_r\,[h_{t-1},\, x_t] + b_r\right)</annotation></semantics></math></span>
+    <p>Decide qué parte del estado anterior se usa para proponer el contenido nuevo. Con valores cercanos a 0, el candidato se calcula casi solo con la entrada actual.</p>
+
+    <div class="name">2. Compuerta de actualización</div>
+    <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>z</mi><mi>t</mi></msub><mo>=</mo><mi>σ</mi><mrow><mo fence="true">(</mo><msub><mi>W</mi><mi>z</mi></msub><mtext> </mtext><mo stretchy="false">[</mo><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><mtext> </mtext><msub><mi>x</mi><mi>t</mi></msub><mo stretchy="false">]</mo><mo>+</mo><msub><mi>b</mi><mi>z</mi></msub><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">z_t = \sigma\left(W_z\,[h_{t-1},\, x_t] + b_z\right)</annotation></semantics></math></span>
+    <p>Decide, componente por componente, cuánto del estado se renueva. Controla las dos ramas a la vez: <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">z_t</annotation></semantics></math></span> pondera lo nuevo y <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><msub><mi>z</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">1 - z_t</annotation></semantics></math></span> pondera lo viejo.</p>
+
+    <div class="name">3. Candidato</div>
+    <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mover accent="true"><mi>h</mi><mo>~</mo></mover><mi>t</mi></msub><mo>=</mo><mi>tanh</mi><mo>⁡</mo><mrow><mo fence="true">(</mo><msub><mi>W</mi><mi>h</mi></msub><mtext> </mtext><mo stretchy="false">[</mo><mtext> </mtext><msub><mi>r</mi><mi>t</mi></msub><mo>⊙</mo><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo separator="true">,</mo><mtext>  </mtext><msub><mi>x</mi><mi>t</mi></msub><mtext> </mtext><mo stretchy="false">]</mo><mo>+</mo><msub><mi>b</mi><mi>h</mi></msub><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">\tilde{h}_t = \tanh\left(W_h\,[\,r_t \odot h_{t-1},\; x_t\,] + b_h\right)</annotation></semantics></math></span>
+    <p>Es la propuesta de nuevo estado. Usa el estado anterior ya filtrado por el reinicio, <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msubsup><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow><mo mathvariant="normal" lspace="0em" rspace="0em">′</mo></msubsup><mo>=</mo><msub><mi>r</mi><mi>t</mi></msub><mo>⊙</mo><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">h&#x27;_{t-1} = r_t \odot h_{t-1}</annotation></semantics></math></span>, y la tangente hiperbólica para producir valores con signo entre −1 y 1.</p>
+
+    <div class="name">4. Estado nuevo</div>
+    <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>h</mi><mi>t</mi></msub><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><msub><mi>z</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>⊙</mo><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>z</mi><mi>t</mi></msub><mo>⊙</mo><msub><mover accent="true"><mi>h</mi><mo>~</mo></mover><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">h_t = (1 - z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t</annotation></semantics></math></span>
+    <p>Combina lo que se conserva del pasado con lo que se admite del candidato. Como los dos pesos suman 1, lo que se le da a uno se le quita al otro.</p>
+  </div>
+  <p style="color:var(--muted);font-size:.92rem"><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>σ</mi></mrow><annotation encoding="application/x-tex">\sigma</annotation></semantics></math></span> es la función sigmoide, <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>⊙</mo></mrow><annotation encoding="application/x-tex">\odot</annotation></semantics></math></span> el producto elemento a elemento y <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">[</mo><mtext> </mtext><mo>⋅</mo><mtext> </mtext><mo separator="true">,</mo><mtext> </mtext><mo>⋅</mo><mtext> </mtext><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">[\,\cdot\,,\,\cdot\,]</annotation></semantics></math></span> la concatenación de vectores.</p>
+  </section>
+  </div>
+
+  <h2>¿Dónde está la memoria?</h2>
+  <p>En la línea superior del diagrama. Cuando <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mi>t</mi></msub><mo>≈</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">z_t \approx 0</annotation></semantics></math></span>, la ecuación 4 se reduce a <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>t</mi></msub><mo>≈</mo><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">h_t \approx h_{t-1}</annotation></semantics></math></span>: el estado se copia casi intacto al siguiente paso. La memoria de la GRU es el estado que la compuerta de actualización decide no modificar. Por ese mismo camino, que solo multiplica por <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><msub><mi>z</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">1 - z_t</annotation></semantics></math></span> y suma, el gradiente puede viajar hacia atrás muchos pasos sin desvanecerse, igual que en la cinta de memoria de la LSTM.</p>
+
+  <div class="note">
+    <strong>Nota sobre la convención en PyTorch.</strong> <code>torch.nn.GRU</code> intercambia el papel de <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">z_t</annotation></semantics></math></span>:
+    <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mi>h</mi><mi>t</mi></msub><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><msub><mi>z</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>⊙</mo><msub><mover accent="true"><mi>h</mi><mo>~</mo></mover><mi>t</mi></msub><mo>+</mo><msub><mi>z</mi><mi>t</mi></msub><mo>⊙</mo><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub></mrow><annotation encoding="application/x-tex">h_t = (1 - z_t) \odot \tilde{h}_t + z_t \odot h_{t-1}</annotation></semantics></math></span>
+    Ahí <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mi>t</mi></msub><mo>≈</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">z_t \approx 1</annotation></semantics></math></span> significa conservar el estado. Además, PyTorch aplica el reinicio después de la transformación lineal del estado:
+    <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><msub><mover accent="true"><mi>h</mi><mo>~</mo></mover><mi>t</mi></msub><mo>=</mo><mi>tanh</mi><mo>⁡</mo><mrow><mo fence="true">(</mo><msub><mi>W</mi><mrow><mi>i</mi><mi>n</mi></mrow></msub><msub><mi>x</mi><mi>t</mi></msub><mo>+</mo><msub><mi>b</mi><mrow><mi>i</mi><mi>n</mi></mrow></msub><mo>+</mo><msub><mi>r</mi><mi>t</mi></msub><mo>⊙</mo><mo stretchy="false">(</mo><msub><mi>W</mi><mrow><mi>h</mi><mi>n</mi></mrow></msub><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>b</mi><mrow><mi>h</mi><mi>n</mi></mrow></msub><mo stretchy="false">)</mo><mo fence="true">)</mo></mrow></mrow><annotation encoding="application/x-tex">\tilde{h}_t = \tanh\left(W_{in} x_t + b_{in} + r_t \odot (W_{hn} h_{t-1} + b_{hn})\right)</annotation></semantics></math></span>
+    Ambas formulaciones son equivalentes en capacidad; solo cambia cómo se interpreta cada compuerta al leer el código.
+  </div>
+
+  <h2>GRU y LSTM</h2>
+  <div class="wrap">
+  <table>
+    <tr><th></th><th>LSTM</th><th>GRU</th></tr>
+    <tr><td>Canales de estado</td><td>Dos: celda <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">c_t</annotation></semantics></math></span> y estado <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">h_t</annotation></semantics></math></span></td><td>Uno: estado <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">h_t</annotation></semantics></math></span></td></tr>
+    <tr><td>Compuertas</td><td>Olvido, entrada y salida</td><td>Reinicio y actualización</td></tr>
+    <tr><td>Capas con pesos</td><td>Cuatro</td><td>Tres</td></tr>
+    <tr><td>Conservar y renovar</td><td>Dos compuertas independientes (olvido y entrada)</td><td>Una sola compuerta que reparte: <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>−</mo><msub><mi>z</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">1 - z_t</annotation></semantics></math></span> y <span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>z</mi><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">z_t</annotation></semantics></math></span></td></tr>
+    <tr><td>Camino para la memoria</td><td><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>c</mi><mi>t</mi></msub><mo>=</mo><msub><mi>f</mi><mi>t</mi></msub><mo>⊙</mo><msub><mi>c</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>i</mi><mi>t</mi></msub><mo>⊙</mo><msub><mover accent="true"><mi>c</mi><mo>~</mo></mover><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">c_t = f_t \odot c_{t-1} + i_t \odot \tilde{c}_t</annotation></semantics></math></span></td><td><span class="katex"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>t</mi></msub><mo>=</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><msub><mi>z</mi><mi>t</mi></msub><mo stretchy="false">)</mo><mo>⊙</mo><msub><mi>h</mi><mrow><mi>t</mi><mo>−</mo><mn>1</mn></mrow></msub><mo>+</mo><msub><mi>z</mi><mi>t</mi></msub><mo>⊙</mo><msub><mover accent="true"><mi>h</mi><mo>~</mo></mover><mi>t</mi></msub></mrow><annotation encoding="application/x-tex">h_t = (1 - z_t) \odot h_{t-1} + z_t \odot \tilde{h}_t</annotation></semantics></math></span></td></tr>
+  </table>
+  </div>
+</main>
+</body>
+</html>
