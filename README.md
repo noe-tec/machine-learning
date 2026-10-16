@@ -1,7 +1,14 @@
 # machine-learning
 This repository contains code examples, activities and external links related with machine learning.
 
+## Slides and readings
+
+| Topic | Slides | Reading |
+|---|---|---|
+| Vision Transformers | [slides](https://noe-tec.github.io/machine-learning/slides/vision-transformer/) | [How does a model built to read learn to see?](https://noe-tec.github.io/machine-learning/readings/vision-transformer/) |
+
 ## Demos
+
 |ID | Open in Colab | Description |
 |---|---|---|
 | 1 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/demo_interactive_linear_regression.ipynb) | Interactive visualization of a linear model fit to house prices. |
@@ -19,6 +26,7 @@ This repository contains code examples, activities and external links related wi
 | 13 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/demo_kmeans_dbscan_imagen.ipynb) | Demo compresión de imagen con K-means y comparación K-means vs. DBSCAN |
 
 <!--
+
 | 2 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/GANs_MNIST.ipynb) | GAN-MNIST |
 | 3 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/Diffusion_Model_Toy_Example.ipynb) | Diffusion Model Toy Example |
 -->
@@ -27,6 +35,7 @@ This repository contains code examples, activities and external links related wi
 Standalone, single-purpose Python scripts (no notebook boilerplate) demonstrating individual evaluation and feature-selection techniques. See [`examples/README.md`](examples/README.md) for the full index.
 
 ## Activities
+
 |ID | Open in Colab | Description |
 |---|---|---|
 | 1 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/activity_gradient_descent_implementation.ipynb) | Gradient descent implementation |
@@ -48,12 +57,16 @@ Standalone, single-purpose Python scripts (no notebook boilerplate) demonstratin
 | 17 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad_agrupamiento_paises.ipynb) | Agrupamiento de países según indicadores socioeconómicos - Spanish! |
 | 18 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad_xgboost_clasificacion.ipynb) | XGBoost para clasificación — predicción de abandono de clientes - Spanish! |
 | 19 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad_monumentos.ipynb) | Clasificación de monumentos antiguos: transferencia de aprendizaje y aumentación de datos - Spanish! |
+| 20 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/activity_transformers.ipynb) | Self-attention by hand and in code |
+| 21 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/activity_vision_transformer.ipynb) | Inside a Vision Transformer: patches, tokens, encoder block and a pretrained ViT |
 
 <!--
+
 | 11 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/actividad-retropropagacion.ipynb) | Retropropagación | 
 -->
 
 ## External links
+
 |ID | Open in Colab | Description | Source |
 |---|---|---|---|
 | 1 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/third-party/05_07_Support_Vector_Machines.ipynb) | Support Vector Machines | Jake VanderPlas's Python Data Science Handbook |
@@ -64,9 +77,11 @@ Standalone, single-purpose Python scripts (no notebook boilerplate) demonstratin
 | 6 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/third-party/07_ensemble_learning_and_random_forests_ES.ipynb) | Ensemble Learning and Random Forests (traducción al español) | Aurélien Géron's Hands-On Machine Learning (handson-ml3) |
 | 7 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/aimacode/aima-python/blob/master/knowledge_version_space.ipynb#scrollTo=EKgDrTAnDwBj) | Version Space | AIMA code repository |
 | 8 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/third-party/transfer_learning_tutorial.ipynb) | Transfer Learning for Computer Vision (ResNet18, ants vs. bees) | PyTorch Tutorials (Sasank Chilamkurthy) |
+| 9 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/third-party/15_rnns_lstm_gru_ES.ipynb) | RNN, LSTM y GRU con series de tiempo (traducción al español, versión recortada del capítulo 15) | Aurélien Géron's Hands-On Machine Learning (handson-ml3) |
 
 
 ## Books / Tutorials
+
 |ID | Description | Author |
 |---|---|---|
 | 1 | [PythonDataScienceHandbook](https://github.com/jakevdp/PythonDataScienceHandbook) | Jake VanderPlas |

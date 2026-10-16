@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transformers and Vision Transformers</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+  <script>try{if(localStorage.getItem("shstyle-theme")==="dark"&&!/print-pdf/i.test(location.search))document.documentElement.dataset.theme="dark"}catch(e){}</script>
+  <link rel="stylesheet" href="../css/shstyle.css">
+  <link rel="stylesheet" href="../css/dl-extras.css">
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <!-- 1 · COVER -->
+    <section class="cover">
+      <span class="kicker">Deep Learning</span>
+      <h1>Transformers and Vision Transformers</h1>
+      <div class="cover-meta">Noé Sámano</div>
+    </section>
+
+    <!-- 2 · MOTIVATION READING -->
+    <section>
+      <span class="kicker">Before we start</span>
+      <h2>Motivation reading</h2>
+      <div class="cols">
+        <div><svg class="qr" viewBox="0 0 45 45" style="width:300px; height:300px;" role="img" aria-label="QR code: https://noe-tec.github.io/machine-learning/readings/transformers/" shape-rendering="crispEdges"><rect width="45" height="45" fill="white"/><path fill="black" d="M4,4h7v1h-7zM12,4h2v1h-2zM15,4h5v1h-5zM21,4h1v1h-1zM23,4h3v1h-3zM30,4h3v1h-3zM34,4h7v1h-7zM4,5h1v1h-1zM10,5h1v1h-1zM15,5h3v1h-3zM19,5h1v1h-1zM23,5h1v1h-1zM25,5h4v1h-4zM34,5h1v1h-1zM40,5h1v1h-1zM4,6h1v1h-1zM6,6h3v1h-3zM10,6h1v1h-1zM16,6h3v1h-3zM20,6h3v1h-3zM25,6h1v1h-1zM28,6h1v1h-1zM34,6h1v1h-1zM36,6h3v1h-3zM40,6h1v1h-1zM4,7h1v1h-1zM6,7h3v1h-3zM10,7h1v1h-1zM12,7h1v1h-1zM14,7h2v1h-2zM18,7h1v1h-1zM22,7h1v1h-1zM26,7h1v1h-1zM29,7h4v1h-4zM34,7h1v1h-1zM36,7h3v1h-3zM40,7h1v1h-1zM4,8h1v1h-1zM6,8h3v1h-3zM10,8h1v1h-1zM12,8h2v1h-2zM15,8h8v1h-8zM24,8h1v1h-1zM27,8h1v1h-1zM30,8h2v1h-2zM34,8h1v1h-1zM36,8h3v1h-3zM40,8h1v1h-1zM4,9h1v1h-1zM10,9h1v1h-1zM12,9h1v1h-1zM15,9h1v1h-1zM17,9h2v1h-2zM21,9h1v1h-1zM23,9h1v1h-1zM32,9h1v1h-1zM34,9h1v1h-1zM40,9h1v1h-1zM4,10h7v1h-7zM12,10h1v1h-1zM14,10h1v1h-1zM16,10h1v1h-1zM18,10h1v1h-1zM20,10h1v1h-1zM22,10h1v1h-1zM24,10h1v1h-1zM26,10h1v1h-1zM28,10h1v1h-1zM30,10h1v1h-1zM32,10h1v1h-1zM34,10h7v1h-7zM12,11h1v1h-1zM14,11h4v1h-4zM20,11h1v1h-1zM24,11h2v1h-2zM27,11h1v1h-1zM30,11h1v1h-1zM32,11h1v1h-1zM4,12h1v1h-1zM8,12h1v1h-1zM10,12h4v1h-4zM16,12h3v1h-3zM20,12h1v1h-1zM23,12h2v1h-2zM27,12h2v1h-2zM33,12h5v1h-5zM40,12h1v1h-1zM4,13h2v1h-2zM7,13h1v1h-1zM9,13h1v1h-1zM11,13h1v1h-1zM13,13h3v1h-3zM18,13h1v1h-1zM21,13h3v1h-3zM25,13h2v1h-2zM28,13h2v1h-2zM31,13h2v1h-2zM35,13h3v1h-3zM39,13h1v1h-1zM6,14h1v1h-1zM9,14h2v1h-2zM12,14h3v1h-3zM17,14h1v1h-1zM19,14h1v1h-1zM21,14h3v1h-3zM27,14h1v1h-1zM29,14h3v1h-3zM34,14h3v1h-3zM38,14h1v1h-1zM4,15h2v1h-2zM11,15h1v1h-1zM13,15h1v1h-1zM16,15h1v1h-1zM18,15h4v1h-4zM23,15h3v1h-3zM27,15h1v1h-1zM30,15h1v1h-1zM32,15h3v1h-3zM38,15h2v1h-2zM4,16h1v1h-1zM6,16h1v1h-1zM9,16h2v1h-2zM12,16h3v1h-3zM16,16h3v1h-3zM21,16h1v1h-1zM24,16h3v1h-3zM28,16h1v1h-1zM33,16h3v1h-3zM38,16h3v1h-3zM4,17h1v1h-1zM9,17h1v1h-1zM11,17h1v1h-1zM13,17h2v1h-2zM17,17h1v1h-1zM19,17h2v1h-2zM22,17h1v1h-1zM25,17h1v1h-1zM27,17h1v1h-1zM29,17h4v1h-4zM36,17h2v1h-2zM4,18h1v1h-1zM6,18h3v1h-3zM10,18h1v1h-1zM12,18h1v1h-1zM14,18h2v1h-2zM18,18h4v1h-4zM27,18h1v1h-1zM29,18h1v1h-1zM31,18h1v1h-1zM34,18h5v1h-5zM4,19h1v1h-1zM7,19h1v1h-1zM9,19h1v1h-1zM12,19h1v1h-1zM15,19h2v1h-2zM18,19h1v1h-1zM21,19h4v1h-4zM26,19h1v1h-1zM28,19h1v1h-1zM31,19h1v1h-1zM34,19h3v1h-3zM38,19h3v1h-3zM4,20h1v1h-1zM6,20h2v1h-2zM10,20h1v1h-1zM13,20h1v1h-1zM16,20h1v1h-1zM18,20h2v1h-2zM22,20h1v1h-1zM26,20h3v1h-3zM32,20h3v1h-3zM37,20h2v1h-2zM40,20h1v1h-1zM4,21h1v1h-1zM6,21h2v1h-2zM9,21h1v1h-1zM11,21h1v1h-1zM13,21h3v1h-3zM17,21h1v1h-1zM20,21h1v1h-1zM23,21h3v1h-3zM28,21h1v1h-1zM30,21h4v1h-4zM36,21h1v1h-1zM39,21h1v1h-1zM5,22h8v1h-8zM16,22h1v1h-1zM18,22h1v1h-1zM20,22h3v1h-3zM24,22h2v1h-2zM27,22h2v1h-2zM31,22h2v1h-2zM34,22h3v1h-3zM38,22h1v1h-1zM4,23h1v1h-1zM8,23h2v1h-2zM11,23h1v1h-1zM14,23h3v1h-3zM18,23h1v1h-1zM21,23h2v1h-2zM25,23h1v1h-1zM28,23h1v1h-1zM30,23h1v1h-1zM34,23h2v1h-2zM38,23h2v1h-2zM4,24h1v1h-1zM6,24h2v1h-2zM10,24h1v1h-1zM12,24h3v1h-3zM19,24h1v1h-1zM21,24h1v1h-1zM23,24h6v1h-6zM31,24h1v1h-1zM33,24h3v1h-3zM38,24h1v1h-1zM5,25h1v1h-1zM8,25h1v1h-1zM11,25h1v1h-1zM15,25h1v1h-1zM18,25h5v1h-5zM27,25h2v1h-2zM31,25h2v1h-2zM35,25h2v1h-2zM39,25h1v1h-1zM4,26h1v1h-1zM6,26h1v1h-1zM10,26h2v1h-2zM13,26h5v1h-5zM19,26h1v1h-1zM22,26h1v1h-1zM24,26h4v1h-4zM30,26h3v1h-3zM35,26h4v1h-4zM6,27h1v1h-1zM8,27h1v1h-1zM11,27h1v1h-1zM13,27h2v1h-2zM17,27h1v1h-1zM19,27h2v1h-2zM25,27h1v1h-1zM30,27h2v1h-2zM33,27h1v1h-1zM35,27h2v1h-2zM38,27h1v1h-1zM40,27h1v1h-1zM5,28h2v1h-2zM10,28h2v1h-2zM13,28h1v1h-1zM19,28h2v1h-2zM24,28h1v1h-1zM28,28h1v1h-1zM33,28h3v1h-3zM37,28h3v1h-3zM4,29h1v1h-1zM6,29h1v1h-1zM9,29h1v1h-1zM13,29h1v1h-1zM15,29h2v1h-2zM22,29h2v1h-2zM26,29h8v1h-8zM36,29h2v1h-2zM9,30h3v1h-3zM16,30h2v1h-2zM19,30h1v1h-1zM21,30h1v1h-1zM23,30h1v1h-1zM25,30h4v1h-4zM30,30h2v1h-2zM36,30h3v1h-3zM7,31h2v1h-2zM14,31h2v1h-2zM18,31h8v1h-8zM31,31h2v1h-2zM35,31h2v1h-2zM38,31h1v1h-1zM4,32h2v1h-2zM10,32h2v1h-2zM15,32h3v1h-3zM21,32h1v1h-1zM24,32h3v1h-3zM28,32h1v1h-1zM32,32h5v1h-5zM38,32h1v1h-1zM40,32h1v1h-1zM12,33h1v1h-1zM14,33h4v1h-4zM19,33h2v1h-2zM25,33h1v1h-1zM27,33h1v1h-1zM29,33h4v1h-4zM36,33h1v1h-1zM4,34h7v1h-7zM12,34h1v1h-1zM14,34h2v1h-2zM17,34h1v1h-1zM19,34h3v1h-3zM27,34h2v1h-2zM30,34h1v1h-1zM32,34h1v1h-1zM34,34h1v1h-1zM36,34h1v1h-1zM39,34h1v1h-1zM4,35h1v1h-1zM10,35h1v1h-1zM15,35h4v1h-4zM21,35h2v1h-2zM26,35h3v1h-3zM30,35h1v1h-1zM32,35h1v1h-1zM36,35h3v1h-3zM40,35h1v1h-1zM4,36h1v1h-1zM6,36h3v1h-3zM10,36h1v1h-1zM12,36h2v1h-2zM16,36h2v1h-2zM19,36h1v1h-1zM22,36h1v1h-1zM26,36h1v1h-1zM32,36h9v1h-9zM4,37h1v1h-1zM6,37h3v1h-3zM10,37h1v1h-1zM13,37h1v1h-1zM15,37h1v1h-1zM18,37h1v1h-1zM20,37h1v1h-1zM23,37h2v1h-2zM27,37h1v1h-1zM31,37h1v1h-1zM34,37h2v1h-2zM38,37h1v1h-1zM40,37h1v1h-1zM4,38h1v1h-1zM6,38h3v1h-3zM10,38h1v1h-1zM15,38h4v1h-4zM20,38h1v1h-1zM24,38h1v1h-1zM26,38h2v1h-2zM33,38h2v1h-2zM38,38h1v1h-1zM4,39h1v1h-1zM10,39h1v1h-1zM14,39h1v1h-1zM16,39h1v1h-1zM18,39h1v1h-1zM21,39h1v1h-1zM25,39h1v1h-1zM31,39h1v1h-1zM33,39h1v1h-1zM36,39h1v1h-1zM38,39h2v1h-2zM4,40h7v1h-7zM12,40h4v1h-4zM19,40h1v1h-1zM21,40h1v1h-1zM23,40h4v1h-4zM31,40h1v1h-1zM35,40h1v1h-1zM38,40h3v1h-3z"/></svg></div>
+        <div>
+          <p><strong>How does a model built to read learn to see?</strong></p>
+          <p class="muted">A three-minute read. Scan the code or open:<br>
+            <a href="https://noe-tec.github.io/machine-learning/readings/transformers/">noe-tec.github.io/machine-learning/readings/transformers/</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · GOALS -->
+    <section>
+      <span class="kicker">Goals</span>
+      <h2>By the end of this class you will be able to…</h2>
+      <ul>
+        <li class="fragment"><strong>Compute</strong> <span class="term" data-term="attention">attention</span> by hand for a short sentence.</li>
+        <li class="fragment"><strong>Explain</strong> each part of a Transformer block and why it is there.</li>
+        <li class="fragment"><strong>Trace</strong> how a Vision Transformer turns an image into tokens.</li>
+        <li class="fragment"><strong>Choose</strong> between attention, convolution and recurrence for a real problem.</li>
+      </ul>
+    </section>
+
+    <!-- 4 · THE PROBLEM -->
+    <section>
+      <span class="kicker">The problem</span>
+      <h2>An RNN squeezes a sentence into one vector</h2>
+      <svg viewBox="0 0 1100 360" style="width:100%; max-height:360px;">
+        <g>
+          <rect class="svg-node" x="40"  y="250" width="160" height="56" rx="8"/><text class="svg-label" x="120" y="286" text-anchor="middle">the</text>
+          <rect class="svg-node" x="240" y="250" width="160" height="56" rx="8"/><text class="svg-label" x="320" y="286" text-anchor="middle">dog</text>
+          <rect class="svg-node" x="440" y="250" width="160" height="56" rx="8"/><text class="svg-label" x="520" y="286" text-anchor="middle">chased</text>
+          <rect class="svg-node" x="640" y="250" width="160" height="56" rx="8"/><text class="svg-label" x="720" y="286" text-anchor="middle">it</text>
+        </g>
+        <g class="anim-step" data-step="1">
+          <rect class="svg-node" x="70"  y="120" width="100" height="56" rx="8"/><text class="svg-label" x="120" y="156" text-anchor="middle">h₁</text>
+          <rect class="svg-node" x="270" y="120" width="100" height="56" rx="8"/><text class="svg-label" x="320" y="156" text-anchor="middle">h₂</text>
+          <rect class="svg-node" x="470" y="120" width="100" height="56" rx="8"/><text class="svg-label" x="520" y="156" text-anchor="middle">h₃</text>
+          <line class="svg-edge" x1="120" y1="250" x2="120" y2="176"/><line class="svg-edge" x1="320" y1="250" x2="320" y2="176"/>
+          <line class="svg-edge" x1="520" y1="250" x2="520" y2="176"/><line class="svg-edge" x1="720" y1="250" x2="720" y2="176"/>
+          <line class="svg-edge" x1="170" y1="148" x2="270" y2="148"/><line class="svg-edge" x1="370" y1="148" x2="470" y2="148"/>
+          <line class="svg-edge" x1="570" y1="148" x2="670" y2="148"/>
+          <text class="svg-label" x="40" y="60" style="font-size:22px;">step 1 · one word at a time: h₄ waits for h₃, which waits for h₂…</text>
+        </g>
+        <g class="anim-step" data-step="2">
+          <rect class="svg-node-hl" x="670" y="120" width="100" height="56" rx="8"/><text class="svg-label" x="720" y="156" text-anchor="middle">h₄</text>
+          <line class="svg-edge" x1="770" y1="148" x2="870" y2="148"/>
+          <rect class="svg-node" x="870" y="120" width="190" height="56" rx="8"/><text class="svg-label" x="965" y="156" text-anchor="middle">decoder</text>
+          <text class="svg-label" x="40" y="96" style="font-size:22px;">step 2 · only h₄ reaches the decoder: the whole sentence fits in one vector</text>
+        </g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span>
+      <p class="muted fragment">Bahdanau et al. (2014) called this fixed-length vector a <em>bottleneck</em>.</p>
+    </section>
+
+    <!-- 5 · THE FIX -->
+    <section>
+      <span class="kicker">The problem</span>
+      <h2>Let every word look at every other word</h2>
+      <ul>
+        <li class="fragment"><strong>2014:</strong> Bahdanau et al. let the decoder look back at <em>all</em> the encoder states, not just the last one. This is the first attention.</li>
+        <li class="fragment"><strong>2017:</strong> Vaswani et al. kept the attention and removed the recurrence. The result is the Transformer.</li>
+        <li class="fragment">No recurrence means no waiting: all words are processed at the same time, in parallel.</li>
+      </ul>
+      <div class="box-key fragment">Attention gives every token a direct path to every other token.</div>
+    </section>
+
+    <!-- 7 · Q K V -->
+    <section>
+      <span class="kicker">Self-attention</span>
+      <h2>Each token asks, describes and offers</h2>
+      <div class="cols">
+        <div>
+          <ul>
+            <li class="fragment"><strong>Query:</strong> what this <span class="term" data-term="token">token</span> is looking for.</li>
+            <li class="fragment"><strong>Key:</strong> what this token contains.</li>
+            <li class="fragment"><strong>Value:</strong> what this token gives if someone picks it.</li>
+          </ul>
+          <p class="muted fragment">In a real model, Q, K and V come from three learned matrices. Here they are given.</p>
+        </div>
+        <div>
+          <table>
+            <tr><th>token</th><th>Q</th><th>K</th><th>V</th></tr>
+            <tr><td>the</td><td>[0, 1]</td><td>[0, 1]</td><td>[0, 1]</td></tr>
+            <tr><td>dog</td><td>[1, 0]</td><td>[2, 0]</td><td>[4, 0]</td></tr>
+            <tr><td>chased</td><td>[1, 1]</td><td>[0, −1]</td><td>[0, 2]</td></tr>
+            <tr><td>it</td><td>[2, 0]</td><td>[1, 1]</td><td>[1, 1]</td></tr>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 · STEP BY STEP -->
+    <section>
+      <span class="kicker">Self-attention</span>
+      <h2>What does "it" look at?</h2>
+      <svg viewBox="0 0 1100 420" style="width:100%; max-height:420px;">
+        <g>
+          <text class="svg-label" x="300" y="40" text-anchor="middle">the</text>
+          <text class="svg-label" x="490" y="40" text-anchor="middle">dog</text>
+          <text class="svg-label" x="680" y="40" text-anchor="middle">chased</text>
+          <text class="svg-label" x="870" y="40" text-anchor="middle">it</text>
+        </g>
+        <g class="anim-step" data-step="1">
+          <text class="svg-label" x="20" y="105" style="font-size:22px;">1 · score q·k</text>
+          <text class="svg-label" x="300" y="105" text-anchor="middle">0</text><text class="svg-label" x="490" y="105" text-anchor="middle">4</text>
+          <text class="svg-label" x="680" y="105" text-anchor="middle">0</text><text class="svg-label" x="870" y="105" text-anchor="middle">2</text>
+        </g>
+        <g class="anim-step" data-step="2">
+          <text class="svg-label" x="20" y="185" style="font-size:22px;">2 · divide by √2</text>
+          <text class="svg-label" x="300" y="185" text-anchor="middle">0</text><text class="svg-label" x="490" y="185" text-anchor="middle">2.83</text>
+          <text class="svg-label" x="680" y="185" text-anchor="middle">0</text><text class="svg-label" x="870" y="185" text-anchor="middle">1.41</text>
+        </g>
+        <g class="anim-step" data-step="3">
+          <text class="svg-label" x="20" y="265" style="font-size:22px;">3 · softmax</text>
+          <rect class="svg-node" x="250" y="230" width="100" height="50" rx="8"/><text class="svg-label" x="300" y="265" text-anchor="middle">0.04</text>
+          <rect class="svg-node-hl" x="440" y="230" width="100" height="50" rx="8"/><text class="svg-label" x="490" y="265" text-anchor="middle">0.73</text>
+          <rect class="svg-node" x="630" y="230" width="100" height="50" rx="8"/><text class="svg-label" x="680" y="265" text-anchor="middle">0.04</text>
+          <rect class="svg-node" x="820" y="230" width="100" height="50" rx="8"/><text class="svg-label" x="870" y="265" text-anchor="middle">0.18</text>
+        </g>
+        <g class="anim-step" data-step="4">
+          <text class="svg-label" x="20" y="360" style="font-size:22px;">4 · output = 0.04·v_the + 0.73·v_dog + 0.04·v_chased + 0.18·v_it = [3.12, 0.31]</text>
+          <text class="svg-label" x="20" y="400" style="font-size:22px;">"it" takes 73% of its new meaning from "dog"</text>
+        </g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+    </section>
+
+    <!-- 9 · FORMULA -->
+    <section>
+      <span class="kicker">Self-attention</span>
+      <h2>All tokens at once is one matrix product</h2>
+      <div class="eq-key">\[ \mathrm{Attention}(Q, K, V) = \mathrm{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right) V \]</div>
+      <ul>
+        <li class="fragment">\(QK^\top\) holds every score at once: one row per token, one column per token.</li>
+        <li class="fragment">Dividing by \(\sqrt{d_k}\) keeps the scores small, so the <span class="term" data-term="softmax">softmax</span> does not put all the weight on one token.</li>
+        <li class="fragment">Each row of weights sums to 1, then mixes the values.</li>
+      </ul>
+    </section>
+
+    <!-- 9b · WHY DIVIDE BY SQRT(d_k): interactive -->
+    <section>
+      <span class="kicker">Self-attention</span>
+      <h2>Longer vectors, bigger scores, a stuck softmax</h2>
+      <div class="softmax-demo" data-tokens="8" data-seed="7"></div>
+      <p class="muted">One query against 8 keys with random numbers. Try d<sub>k</sub> = 512 without dividing, then switch the division on.
+        The learning signal is the largest gradient of the softmax: near 0%, the model can barely learn.</p>
+    </section>
+
+    <!-- 10 · CHECKPOINT 1 -->
+    <section>
+      <span class="kicker">Checkpoint</span>
+      <div class="quiz" data-correct="b">
+        <p class="quiz-question">The vectors are large (d<sub>k</sub> = 512) and you <em>forget</em> to divide by √d<sub>k</sub>. What happens to the attention weights?</p>
+        <button class="quiz-option" data-opt="a">They become almost equal, because large scores cancel out in the softmax.</button>
+        <button class="quiz-option" data-opt="b">Almost all the weight goes to one token, because the scores grow and the softmax saturates.</button>
+        <button class="quiz-option" data-opt="c">Nothing changes: the scaling only makes the computation faster.</button>
+        <div class="quiz-explain">
+          <strong>B.</strong> A dot product of two 512-dimensional vectors can be large, and the softmax of large differences is close to 0 or 1, so the gradients almost vanish.
+          A has it backwards: equal weights come from small scores, not large ones. C confuses the scaling with an optimization; it changes the values, not the speed.
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 · ACTIVITY 1 -->
+    <section>
+      <span class="kicker">Activity · 20 min</span>
+      <h2>Compute attention by hand</h2>
+      <div class="cols">
+        <div>
+          <ol>
+            <li>Use the Q, K, V table. Compute the four scores for <strong>"dog"</strong>.</li>
+            <li>Divide by √2 and apply the softmax.</li>
+            <li>Mix the values with those weights.</li>
+            <li>Check your result in Part 1 of the notebook.</li>
+          </ol>
+        </div>
+        <div class="activity-meta">
+          <div class="activity-timer" data-minutes="20"></div>
+          <p><strong>How:</strong> in pairs, on paper or with a calculator</p>
+          <p><strong>Notebook:</strong> <a href="https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/activity_transformers.ipynb">Open in Colab</a></p>
+          <p><strong>Ask yourselves:</strong> which word does "dog" look at most, and why?</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 · DIVIDER -->
+    <section class="divider">
+      <h2>The Transformer block</h2>
+    </section>
+
+    <!-- 13 · POSITION -->
+    <section>
+      <span class="kicker">The Transformer block</span>
+      <h2>Attention alone does not know word order</h2>
+      <ul>
+        <li class="fragment tachar">"The dog chased it" and "it chased the dog" mean the same thing to the model.</li>
+        <li class="fragment">Without help, attention sees a <em>set</em> of tokens, not a sequence: shuffle the words and you get the same scores, only in a different order.</li>
+        <li class="fragment">The fix: add a <span class="term" data-term="positional-encoding">positional encoding</span> to each token before the first block.</li>
+      </ul>
+      <div class="box-key fragment">Meaning comes from attention; order comes from the position vector.</div>
+    </section>
+
+    <!-- 14 · THE BLOCK -->
+    <section>
+      <span class="kicker">The Transformer block</span>
+      <h2>One block, repeated N times</h2>
+      <div class="cols">
+        <figure class="fig" style="flex: 0 0 38%;"><img src="img/paper_transformer_architecture.png" alt="Transformer architecture: encoder and decoder stacks with multi-head attention, add and norm, and feed forward layers" style="max-height:500px;"><figcaption>Figure from Vaswani et al. (2017).</figcaption></figure>
+        <ul>
+          <li class="fragment"><strong><span class="term" data-term="multi-head">Multi-head</span> attention:</strong> 8 heads in parallel, each looking for something different.</li>
+          <li class="fragment"><strong>Add &amp; Norm:</strong> a <span class="term" data-term="residual">residual connection</span> plus layer normalization keep deep stacks trainable.</li>
+          <li class="fragment"><strong>Feed forward:</strong> a small MLP applied to each token on its own.</li>
+          <li class="fragment">Result: 28.4 BLEU on English–German, after 3.5 days on 8 GPUs.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 15 · ENCODER VS DECODER -->
+    <section>
+      <span class="kicker">The Transformer block</span>
+      <h2>Encoders read both ways, decoders only look back</h2>
+      <table>
+        <tr><th></th><th>Encoder (BERT)</th><th>Decoder (GPT)</th></tr>
+        <tr class="fragment"><td>Each token sees</td><td>all tokens, left and right</td><td>only the tokens before it</td></tr>
+        <tr class="fragment"><td>How</td><td>full attention</td><td>a <span class="term" data-term="causal-mask">causal mask</span> sets future scores to −∞</td></tr>
+        <tr class="fragment"><td>Good for</td><td>understanding: classify, fill in blanks</td><td>generating: write the next word</td></tr>
+      </table>
+      <p class="muted fragment">The original Transformer had both: an encoder for the source sentence and a decoder for the translation.</p>
+    </section>
+
+    <!-- 16 · CHECKPOINT 2 -->
+    <section>
+      <span class="kicker">Checkpoint</span>
+      <div class="quiz" data-correct="c">
+        <p class="quiz-question">You go from a 100-token sentence to a <em>200-token</em> one. How does the attention matrix of one head change?</p>
+        <button class="quiz-option" data-opt="a">It grows 2×: one more row for each new token.</button>
+        <button class="quiz-option" data-opt="b">It keeps its size; only its values change.</button>
+        <button class="quiz-option" data-opt="c">It grows 4×: from 100 × 100 to 200 × 200 entries.</button>
+        <div class="quiz-explain">
+          <strong>C.</strong> Every token is compared with every token, so the matrix is n × n: 10,000 entries become 40,000.
+          A forgets that each new token also adds a column. B confuses the matrix with the learned weights, which do not depend on the length.
+        </div>
+      </div>
+    </section>
+
+    <!-- 17 · DIVIDER -->
+    <section class="divider">
+      <h2>Vision Transformer</h2>
+    </section>
+
+    <!-- 18 · PATCHES -->
+    <section>
+      <span class="kicker">Vision Transformer</span>
+      <h2>An image becomes a sequence of patches</h2>
+      <div class="cols">
+        <figure class="fig"><img src="img/patches_grid.jpg" alt="Photo of a golden retriever cut into a 14 by 14 grid of patches" style="max-height:400px;"><figcaption>Photo: Dietmar Rabich, CC BY-SA 4.0.</figcaption></figure>
+        <ul>
+          <li class="fragment">224 × 224 pixels cut into <span class="term" data-term="patch">patches</span> of 16 × 16.</li>
+          <li class="fragment">224 / 16 = 14, so 14 × 14 = <strong>196 patches</strong>.</li>
+          <li class="fragment">Each patch is flattened: 16 × 16 × 3 = 768 numbers, then projected to a vector.</li>
+          <li class="fragment">From here on, a patch is just a token.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 19 · SAME ENCODER -->
+    <section>
+      <span class="kicker">Vision Transformer</span>
+      <h2>Patches in, the same encoder, a class out</h2>
+      <figure class="fig"><img src="img/paper_vit_overview.png" alt="Vision Transformer overview: patches with position embeddings and a class token go into a Transformer encoder and an MLP head" style="max-height:430px;"><figcaption>Figure from Dosovitskiy et al. (2021).</figcaption></figure>
+      <p class="fragment">A learned <span class="term" data-term="cls-token">CLS token</span> joins the 196 patches: 197 tokens go through the encoder.</p>
+    </section>
+
+    <!-- 20 · POSITION EMBEDDINGS -->
+    <section>
+      <span class="kicker">Vision Transformer</span>
+      <h2>The model learns where each patch is</h2>
+      <figure class="fig"><img src="img/position_embeddings_examples.png" alt="Four maps of 14 by 14: similarity of one patch's position embedding to all the others, brightest at the patch itself and along its row and column" style="max-height:250px;"><figcaption>Computed with ViT-Base (google/vit-base-patch16-224).</figcaption></figure>
+      <ul>
+        <li class="fragment">Each map: how similar one patch's position vector is to all 196 (white square = that patch).</li>
+        <li class="fragment">Nobody told the model the image is a grid. It learned rows and columns by itself.</li>
+      </ul>
+    </section>
+
+    <!-- 21 · DATA -->
+    <section>
+      <span class="kicker">Vision Transformer</span>
+      <h2>Few built-in assumptions, so it needs a lot of data</h2>
+      <ul>
+        <li class="fragment">A CNN assumes that nearby pixels go together. A ViT does not: its <span class="term" data-term="inductive-bias">inductive bias</span> is weak.</li>
+        <li class="fragment">Trained on 14M–300M images, ViT matches or beats strong CNNs. On smaller datasets it falls behind.</li>
+        <li class="fragment">ViT-Base: 12 layers, 12 heads, 768 dimensions, 86 million parameters.</li>
+        <li class="fragment">On our photos it says <strong>golden retriever</strong> (47%) and, for the campus, <strong>palace</strong> (60%): ImageNet has no "university" class.</li>
+      </ul>
+    </section>
+
+    <!-- 22 · CHECKPOINT 3 -->
+    <section>
+      <span class="kicker">Checkpoint</span>
+      <div class="quiz" data-correct="a">
+        <p class="quiz-question">The same ViT with 16 × 16 patches receives a <em>384 × 384</em> image. How many patch tokens does it get, without the CLS token?</p>
+        <button class="quiz-option" data-opt="a">576, because 384 / 16 = 24 and 24 × 24 = 576.</button>
+        <button class="quiz-option" data-opt="b">24, because 384 / 16 = 24.</button>
+        <button class="quiz-option" data-opt="c">196, because the number of patches is fixed by the model.</button>
+        <div class="quiz-explain">
+          <strong>A.</strong> The image is cut in both directions, so the count is squared: 24 rows × 24 columns.
+          B counts only one row. C confuses the patch size, which is fixed, with the number of patches, which depends on the image; the position embeddings are interpolated to fit.
+        </div>
+      </div>
+    </section>
+
+    <!-- 23 · DINO HEADS -->
+    <section>
+      <span class="kicker">What the model looks at</span>
+      <h2>Each head looks at a different part</h2>
+      <figure class="fig"><img src="img/dino_heads_dog.jpg" alt="Six attention maps of the CLS token on the dog photo, one per head: nose, eye, ear and fur"></figure>
+      <ul>
+        <li class="fragment">Attention of the CLS token in the last layer, one map per head: nose, eye, ear, fur.</li>
+        <li class="fragment">This model (DINO) was trained with <span class="term" data-term="self-supervised">no labels at all</span>.</li>
+      </ul>
+      <p class="muted">Computed with DINO ViT-S/16 (Caron et al., 2021).</p>
+    </section>
+
+    <!-- 24 · DINO CAMPUS -->
+    <section>
+      <span class="kicker">What the model looks at</span>
+      <h2>Without labels, it finds the building</h2>
+      <figure class="fig"><img src="img/dino_mask_campus.jpg" alt="Campus photo next to the same photo with sky and grass darkened, keeping only the patches the model attends to" style="max-height:380px;"><figcaption>Patches that hold 60% of the attention in each head, as in Caron et al. (2021). Photo: Moisés Álvarez Domínguez, CC BY-SA 3.0.</figcaption></figure>
+      <p class="fragment">Sky and grass fade away. Nobody told the model what a building is.</p>
+    </section>
+
+    <!-- 25 · ACTIVITY 2 -->
+    <section>
+      <span class="kicker">Activity · 25 min</span>
+      <h2>Build a Transformer block</h2>
+      <div class="cols">
+        <div>
+          <ol>
+            <li>Part 2: write the attention function and test it on the 4 tokens.</li>
+            <li>Part 3: cut an image into 16 × 16 patches.</li>
+            <li>Part 4: assemble one encoder block and check the shapes.</li>
+            <li>Answer the two questions at the end.</li>
+          </ol>
+        </div>
+        <div class="activity-meta">
+          <div class="activity-timer" data-minutes="25"></div>
+          <p><strong>How:</strong> in pairs, one types, one checks</p>
+          <p><strong>Notebook:</strong> <a href="https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/activity_transformers.ipynb">Open in Colab</a></p>
+          <p><strong>Done when:</strong> every check cell prints "Correct"</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 26 · COST -->
+    <section>
+      <span class="kicker">The comeback</span>
+      <h2>Double the length, four times the work</h2>
+      <figure class="fig"><img src="img/attention_cost.png" alt="Line chart: attention compares n squared pairs and grows to 16.8 million at 4,096 tokens, while an RNN takes n steps" style="max-height:360px;"></figure>
+      <p class="fragment">An RNN does n steps, but one after another. Attention runs in parallel, but compares n² pairs.</p>
+    </section>
+
+    <!-- 27 · CONVNEXT AND MAMBA -->
+    <section>
+      <span class="kicker">The comeback</span>
+      <h2>CNNs and RNNs came back with Transformer ideas</h2>
+      <div class="cols">
+        <div>
+          <h3>ConvNeXt (2022)</h3>
+          <ul>
+            <li class="fragment">A pure CNN, "modernized" step by step: a patchify first layer, 7 × 7 kernels, LayerNorm, GELU.</li>
+            <li class="fragment">87.8% top-1 on ImageNet, competitive with vision Transformers.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Mamba (2023)</h3>
+          <ul>
+            <li class="fragment">A recurrent-style model that still trains in parallel.</li>
+            <li class="fragment">Its cost grows linearly with the length, not with its square.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="box-key fragment">Good ideas move between architectures. The best choice depends on the data and the budget.</div>
+    </section>
+
+    <!-- 28 · ACTIVITY 3 -->
+    <section>
+      <span class="kicker">Activity · 15 min</span>
+      <h2>Attention, convolution or recurrence?</h2>
+      <div class="cols">
+        <div>
+          <ol>
+            <li>Translate a two-page contract.</li>
+            <li>Detect plant diseases from 2,000 leaf photos.</li>
+            <li>Spot anomalies from a sensor on a tiny microcontroller, in real time.</li>
+            <li>Summarize a 300-page book in one pass.</li>
+          </ol>
+        </div>
+        <div class="activity-meta">
+          <div class="activity-timer" data-minutes="15"></div>
+          <p><strong>How:</strong> in teams; each team gets one case</p>
+          <p><strong>Then:</strong> defend your choice in one minute</p>
+          <p><strong>Think about:</strong> data size, sequence length, hardware</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 29 · KEY TAKEAWAYS -->
+    <section>
+      <span class="kicker">Key takeaways</span>
+      <h2>Attention is a general tool, not a trick for text</h2>
+      <ul>
+        <li class="fragment">Self-attention lets every token mix information from every other token, in one matrix product.</li>
+        <li class="fragment">A Transformer block is attention plus position, residuals, normalization and a small MLP.</li>
+        <li class="fragment">A ViT treats 16 × 16 patches as words; with enough data it learns the structure of images.</li>
+        <li class="fragment">Attention costs n²; CNNs and modern RNNs are still the right choice for some problems.</li>
+      </ul>
+    </section>
+
+    <!-- 30 · REFERENCES -->
+    <section>
+      <span class="kicker">Transformers</span>
+      <h2>References and further reading</h2>
+      <div class="refs cols">
+        <div>
+          <h3>References</h3>
+          <ul>
+            <li><span class="ref-type">Paper</span> Bahdanau, D. et al. <a href="https://arxiv.org/abs/1409.0473">Neural machine translation by jointly learning to align and translate</a>. <em>ICLR</em>, 2015.</li>
+            <li><span class="ref-type">Paper</span> Vaswani, A. et al. <a href="https://arxiv.org/abs/1706.03762">Attention is all you need</a>. <em>NIPS</em>, 2017.</li>
+            <li><span class="ref-type">Paper</span> Dosovitskiy, A. et al. <a href="https://arxiv.org/abs/2010.11929">An image is worth 16x16 words: Transformers for image recognition at scale</a>. <em>ICLR</em>, 2021.</li>
+            <li><span class="ref-type">Paper</span> Caron, M. et al. <a href="https://arxiv.org/abs/2104.14294">Emerging properties in self-supervised vision transformers</a>. <em>ICCV</em>, 2021.</li>
+            <li><span class="ref-type">Paper</span> Liu, Z. et al. <a href="https://arxiv.org/abs/2201.03545">A ConvNet for the 2020s</a>. <em>CVPR</em>, 2022.</li>
+            <li><span class="ref-type">Paper</span> Gu, A. and Dao, T. <a href="https://arxiv.org/abs/2312.00752">Mamba: linear-time sequence modeling with selective state spaces</a>. 2023.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Further reading</h3>
+          <ul>
+            <li><span class="ref-type">Web</span> Models used for the figures: <a href="https://huggingface.co/google/vit-base-patch16-224">ViT-Base</a> and <a href="https://huggingface.co/facebook/dino-vits16">DINO ViT-S/16</a> on Hugging Face.</li>
+            <li><span class="ref-type">Image</span> Photos from Wikimedia Commons: <a href="https://commons.wikimedia.org/wiki/File:D%C3%BClmen,_Hausd%C3%BClmen,_Golden_Retriever_--_2022_--_5945.jpg">dog</a> (CC BY-SA 4.0) and <a href="https://commons.wikimedia.org/wiki/File:Facultad_de_ingenier%C3%ADas_en_ITESM_campus_Guadalajara.jpg">campus</a> (CC BY-SA 3.0).</li>
+          </ul>
+        </div>
+      </div>
+      <p class="refs-ia">Note: these slides were generated with the help of artificial intelligence, specifically Claude (Anthropic).</p>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="../js/shstyle.js"></script>
+<script src="../js/dl-extras.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1280, height: 720, margin: 0.06,
+    hash: true, progress: true, slideNumber: 'c/t', controls: true,
+    transition: 'slide', transitionSpeed: 'fast',
+    plugins: [ RevealHighlight ]
+  }).then(() => {
+    SHStyle.init({
+      "attention": { titulo: "Attention", def: "A way for each token to build its new representation as a weighted mix of all tokens. The weights come from how well its query matches each key." },
+      "token": { titulo: "Token", def: "One unit of the input sequence: a word or piece of a word in text, a 16 × 16 patch in a Vision Transformer." },
+      "softmax": { titulo: "Softmax", def: "Turns a list of scores into positive weights that sum to 1. Large differences between scores push the weights toward 0 and 1." },
+      "positional-encoding": { titulo: "Positional encoding", def: "A vector added to each token that tells the model where the token is in the sequence. It can be fixed (sines and cosines) or learned." },
+      "multi-head": { titulo: "Multi-head attention", def: "Several attention operations in parallel, each with its own Q, K and V projections. Their outputs are concatenated and projected back." },
+      "residual": { titulo: "Residual connection", def: "Adds a layer's input to its output, \\(x + f(x)\\), so information and gradients can skip the layer." },
+      "causal-mask": { titulo: "Causal mask", def: "Sets the scores of future tokens to −∞ before the softmax, so a token can only attend to itself and the tokens before it." },
+      "patch": { titulo: "Patch", def: "A small square of the image, 16 × 16 pixels in ViT-Base. Flattened and projected, it plays the role of a word." },
+      "cls-token": { titulo: "CLS token", def: "An extra learned token added at the start of the sequence. Its output after the last block is used to classify the whole image." },
+      "inductive-bias": { titulo: "Inductive bias", def: "Assumptions built into a model's design. A CNN assumes locality and translation equivariance; a ViT assumes very little and must learn it from data." },
+      "self-supervised": { titulo: "Self-supervised learning", def: "Training without human labels: the model learns from a task built from the data itself. DINO compares different crops of the same image." }
+    });
+  });
+</script>
+</body>
+</html>

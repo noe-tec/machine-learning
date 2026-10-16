@@ -1,0 +1,143 @@
+/* ============================================================
+   DL-EXTRAS — componentes propios del curso de Deep Learning.
+   Se carga DESPUÉS de shstyle.css. Solo usa variables del tema (--c-*),
+   así respeta el modo claro y el oscuro.
+   ============================================================ */
+
+/* ---------- Temporizador de actividad ----------
+   <div class="activity-timer" data-minutes="20"></div>
+   Clic: iniciar / pausar. Doble clic: reiniciar. */
+.reveal .activity-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.25em 0.7em;
+  border: 2px solid var(--c-line);
+  border-radius: var(--radius);
+  background: var(--c-surface-1);
+  font-family: var(--font-mono);
+  font-size: 2.2em;
+  font-weight: 600;
+  color: var(--c-ink);
+  cursor: pointer;
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+}
+.reveal .activity-timer .timer-state {
+  font-family: var(--font-sans);
+  font-size: 0.3em;
+  font-weight: 400;
+  color: var(--c-ink-soft);
+}
+.reveal .activity-timer.running {
+  border-color: var(--c-accent);
+  background: var(--c-accent-bg);
+}
+.reveal .activity-timer.last-minute {
+  border-color: var(--c-err);
+  color: var(--c-err);
+}
+.reveal .activity-timer.done {
+  border-color: var(--c-err);
+  background: var(--c-err-bg);
+  color: var(--c-err);
+}
+
+/* Diapositiva de actividad: pasos a la izquierda, temporizador y modalidad a la derecha. */
+.reveal .activity-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+  align-items: flex-start;
+  font-size: 0.75em;
+  color: var(--c-ink-soft);
+}
+.reveal .activity-meta p {
+  margin: 0;
+}
+.reveal .activity-meta .activity-timer {
+  font-size: 2.9em;   /* relative to the smaller .activity-meta text */
+  margin-bottom: 0.15em;
+}
+
+/* ---------- Softmax demo (why divide by sqrt(d_k)) ----------
+   <div class="softmax-demo" data-tokens="8" data-seed="7"></div> */
+.reveal .softmax-demo {
+  font-size: 0.72em;
+  color: var(--c-ink);
+}
+.reveal .softmax-demo .sd-controls {
+  display: flex;
+  gap: 2em;
+  align-items: center;
+  margin-bottom: 0.5em;
+}
+.reveal .softmax-demo .sd-controls label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  cursor: pointer;
+}
+.reveal .softmax-demo .sd-range { width: 16em; accent-color: var(--c-accent); }
+.reveal .softmax-demo .sd-scale { width: 1.2em; height: 1.2em; accent-color: var(--c-accent); }
+.reveal .softmax-demo .sd-switch {
+  padding: 0.2em 0.7em;
+  border: 2px solid var(--c-line);
+  border-radius: var(--radius);
+}
+.reveal .softmax-demo .sd-bars {
+  display: flex;
+  gap: 0.6em;
+  height: 230px;
+  align-items: flex-end;
+}
+.reveal .softmax-demo .sd-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+.reveal .softmax-demo .sd-track {
+  flex: 1;
+  width: 70%;
+  display: flex;
+  align-items: flex-end;
+  border-bottom: 2px solid var(--c-line);
+}
+.reveal .softmax-demo .sd-bar {
+  width: 100%;
+  background: var(--c-accent-soft);
+  border-radius: 4px 4px 0 0;
+  transition: height 0.35s ease;
+}
+.reveal .softmax-demo .sd-top .sd-bar { background: var(--c-accent); }
+.reveal .softmax-demo .sd-val { font-family: var(--font-mono); font-size: 0.9em; margin-top: 0.2em; }
+.reveal .softmax-demo .sd-lab { font-size: 0.75em; color: var(--c-ink-soft); }
+.reveal .softmax-demo .sd-stats {
+  display: flex;
+  gap: 2em;
+  margin-top: 0.6em;
+  color: var(--c-ink-soft);
+}
+.reveal .softmax-demo .sd-stats strong { color: var(--c-ink); font-family: var(--font-mono); }
+.reveal .softmax-demo.sd-saturated .sd-grad,
+.reveal .softmax-demo.sd-saturated .sd-max { color: var(--c-err); }
+
+/* ---------- Figura con pie ----------
+   <figure class="fig"><img src="img/x.png" alt="…"><figcaption>…</figcaption></figure> */
+.reveal figure.fig {
+  margin: 0.3em auto 0;
+  text-align: center;
+}
+.reveal figure.fig img {
+  max-height: 420px;
+  max-width: 100%;
+  margin: 0;
+  border-radius: 6px;
+}
+.reveal figure.fig figcaption {
+  margin-top: 0.3em;
+  font-size: 0.55em;
+  color: var(--c-ink-soft);
+}
