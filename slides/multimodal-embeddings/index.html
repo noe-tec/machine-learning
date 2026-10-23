@@ -150,17 +150,30 @@
     <!-- 17 · MATRIZ CLIP -->
     <section>
       <span class="kicker">CLIP</span>
-      <h2>Con fotos reales, gana la diagonal</h2>
+      <h2>Las parejas correctas quedan en la diagonal</h2>
       <figure class="fig">
         <img src="img/clip_matriz.png" alt="Matriz de similitud coseno entre las fotos de un gato, una taza de café, un cohete y una flor y cuatro descripciones; la diagonal tiene los valores más altos.">
         <figcaption>Un <span class="term" data-term="encoder">encoder</span> para fotos y otro para textos. Similitud coseno entre 4 fotos y 4 descripciones: la pareja correcta gana en cada fila y en cada columna. <span class="muted">OpenCLIP ViT-B/32 (LAION-400M). Flor: vultilion (CC BY 2.0).</span></figcaption>
       </figure>
     </section>
 
+    <!-- PÉRDIDA DE CLIP -->
+    <section>
+      <span class="kicker">CLIP</span>
+      <h2>Cada foto debe elegir su texto entre todo el batch</h2>
+      <div class="eq-key">\[ \mathcal{L}_{I \to T} = -\frac{1}{N} \sum_{i=1}^{N} \log \frac{\exp(\mathbf{I}_i \cdot \mathbf{T}_i / \tau)}{\sum_{j=1}^{N} \exp(\mathbf{I}_i \cdot \mathbf{T}_j / \tau)} \]</div>
+      <ul>
+        <li class="fragment">Es una entropía cruzada por fila: un softmax sobre los \( N \) textos del batch, donde la respuesta correcta es la diagonal.</li>
+        <li class="fragment">Se calcula también por columna, cada texto elige su foto, y se promedian: \( \mathcal{L} = \tfrac{1}{2}(\mathcal{L}_{I \to T} + \mathcal{L}_{T \to I}) \).</li>
+        <li class="fragment">\( \tau \) es una temperatura aprendida (empieza en 0.07). CLIP usó batches de 32,768 pares: muchos negativos por cada pareja correcta.</li>
+      </ul>
+      <p class="muted">Radford et al. (2021), sección 2.3 y figura 3.</p>
+    </section>
+
     <!-- FIGURA DEL PAPER -->
     <section>
       <span class="kicker">CLIP</span>
-      <h2>El paper lo resume en tres pasos</h2>
+      <h2>Entrenar con pares, clasificar con texto</h2>
       <figure class="fig">
         <img src="img/paper_clip_fig1.png" alt="Figura 1 del paper de CLIP: (1) preentrenamiento contrastivo con la matriz de imágenes y textos; (2) un clasificador a partir de los nombres de las clases; (3) predicción zero-shot.">
         <figcaption>(1) Entrenar con la matriz de pares; (2) escribir un texto por clase; (3) clasificar eligiendo el texto más parecido. Figura de Radford et al. (2021).</figcaption>
@@ -175,7 +188,7 @@
         <img src="img/clip_zeroshot.png" style="max-height:340px;" alt="Foto de un templo y las probabilidades de cinco descripciones: temple 94.6 %, castle 5.4 % y el resto menos de 0.1 %.">
         <figcaption>Clasificación <span class="term" data-term="zero-shot">zero-shot</span>: un prompt «a photo of a {etiqueta}» por clase; gana el más parecido, sin reentrenar. <span class="muted">OpenCLIP ViT-B/32 · Foto: danielbuechele (CC BY 2.0).</span></figcaption>
       </figure>
-      <p class="fragment"><strong>Error común:</strong> la etiqueta sola es ambigua. «crane» puede ser grúa o grulla; el prompt da contexto.</p>
+      <p class="fragment"><strong>Error común:</strong> el nombre de la clase puede ser ambiguo: «crane» es grúa o grulla. Hay que agregar contexto al prompt: «a photo of a crane, a type of bird».</p>
     </section>
 
     <!-- 20 · CHECKPOINT 2 -->
@@ -303,27 +316,24 @@
       <p class="muted">Aprendizaje <span class="term" data-term="autosupervisado">autosupervisado</span>: DINOv2 se entrenó así con 142 millones de imágenes curadas (LVD-142M).</p>
     </section>
 
-    <!-- FIGURA DEL PAPER DE DINO -->
-    <section>
-      <span class="kicker">DINOv2</span>
-      <h2>La figura original: autodestilación sin etiquetas</h2>
-      <figure class="fig">
-        <img src="img/paper_dino_fig2.png" alt="Figura 2 del paper de DINO: dos vistas x1 y x2 de una imagen entran al alumno y al maestro; la salida del maestro se centra; ambas pasan por softmax y se comparan con entropía cruzada.">
-        <figcaption><strong>sg</strong> (stop-gradient): el gradiente solo entrena al alumno. <strong>ema</strong>: el maestro es un promedio móvil del alumno. <strong>centering</strong>: evita que todo colapse a la misma salida. Figura de Caron et al. (2021).</figcaption>
-      </figure>
-    </section>
-
     <!-- PERDIDAS DINOV2 -->
     <section>
       <span class="kicker">DINOv2</span>
       <h2>DINOv2 compara la foto completa y también cada parche</h2>
-      <div class="eq-key">\[ \mathcal{L}_{\mathrm{DINO}} = -\sum p_t \log p_s \]</div>
-      <ul>
-        <li class="fragment"><strong>Nivel imagen:</strong> el token CLS del alumno debe dar la misma distribución \( p_s \) que el del maestro \( p_t \).</li>
-        <li class="fragment"><strong>Nivel parche (iBOT):</strong> al alumno se le tapan algunos parches y debe predecir lo que el maestro ve en ellos: \( \mathcal{L}_{\mathrm{iBOT}} = -\sum_i p_{t,i} \log p_{s,i} \).</li>
-        <li class="fragment">Un regularizador (KoLeo) reparte los embeddings para que no se amontonen.</li>
-      </ul>
-      <p class="muted">Según el paper, la pérdida por parche mejora las tareas a nivel de parche, como la segmentación (tabla 3b). Oquab et al. (2023), sección 4.</p>
+      <div class="cols">
+        <div>
+          <h3>Nivel imagen (DINO)</h3>
+          <div class="eq">\[ \mathcal{L}_{\mathrm{DINO}} = -\sum p_t \log p_s \]</div>
+          <p class="fragment">El token CLS del alumno (\( p_s \)) debe dar la misma distribución que el del maestro (\( p_t \)), aunque vean recortes distintos.</p>
+        </div>
+        <div>
+          <h3>Nivel parche (iBOT)</h3>
+          <div class="eq">\[ \mathcal{L}_{\mathrm{iBOT}} = -\sum_i p_{t,i} \log p_{s,i} \]</div>
+          <p class="fragment">Al alumno se le tapan algunos parches \( i \) y debe predecir lo que el maestro ve en ellos.</p>
+        </div>
+      </div>
+      <p class="fragment">Se entrena con las dos a la vez, más un regularizador (KoLeo) que reparte los embeddings para que no se amontonen.</p>
+      <p class="muted">Oquab et al. (2023), sección 4. Según el paper, la pérdida por parche mejora tareas como la segmentación.</p>
     </section>
 
     <!-- 24 · PCA DE PARCHES -->
@@ -346,10 +356,9 @@
           <tr class="fragment"><td>Aprende de</td><td>Pares (imagen, texto)</td><td>Solo imágenes</td></tr>
           <tr class="fragment"><td>Su embedding captura</td><td>Qué <em>es</em> la foto</td><td>Cómo <em>se ve</em>: formas, partes, texturas</td></tr>
           <tr class="fragment"><td>Puedes buscar con</td><td>Texto o imagen</td><td>Solo imagen</td></tr>
-          <tr class="fragment"><td>Úsalo para</td><td>Clasificar sin reentrenar, buscar por descripción</td><td>Encontrar el mismo objeto, segmentar, comparar partes</td></tr>
+          <tr class="fragment"><td>Úsalo para</td><td>Clasificar en clases nuevas solo escribiendo su nombre, buscar por descripción</td><td>Encontrar el mismo objeto, segmentar, comparar partes</td></tr>
         </tbody>
       </table>
-      <p class="muted fragment">En el reto de hoy lo comprobarán con fotos reales.</p>
     </section>
 
     <!-- 26 · CHECKPOINT 3 -->
@@ -516,7 +525,6 @@
         <div class="activity-meta">
           <div class="activity-timer" data-minutes="20"></div>
           <p><strong>Cómo:</strong> todo el grupo</p>
-          <p><strong>Entrega:</strong> {{ASSIGNMENT}}</p>
         </div>
       </div>
     </section>
