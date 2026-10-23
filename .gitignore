@@ -9,3 +9,5 @@ datasets/total_18_data.csv
 activities/data/
 demos/data/
 contexto/
+_to_delete/
+__pycache__/

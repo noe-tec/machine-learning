@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Embeddings multimodales — Lectura</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+  <!-- Starts in light mode; the reader's choice (button or D key) is remembered for all readings. -->
+  <script>try{if(localStorage.getItem("reading-theme")==="dark")document.documentElement.dataset.theme="dark"}catch(e){}</script>
+  <link rel="stylesheet" href="../css/reading.css">
+</head>
+<body>
+<main class="page">
+
+  <header>
+    <span class="kicker">Lectura · 3 minutos</span>
+    <h1>¿Cómo relaciona una máquina una foto, una frase y un sonido?</h1>
+    <div class="meta">Deep Learning</div>
+  </header>
+
+  <p class="lead">Piensa en el buscador de fotos de tu celular. Escribes «perro en la playa» y aparecen fotos que tomaste hace años, aunque nunca les pusiste nombre ni etiqueta. Nadie revisó tu galería foto por foto. Entonces, ¿cómo sabe la máquina qué hay en cada una y cómo la compara con lo que escribiste?</p>
+
+  <p>La respuesta empieza con una idea sencilla: convertir cada cosa en una lista de números, un vector, de modo que las cosas parecidas queden cerca. A ese vector se le llama <em>embedding</em>. El reto es que una foto y una frase son datos muy distintos. Para compararlas, ambas tienen que terminar en el mismo espacio, donde la foto de un perro en la playa quede junto a la frase «un perro en la playa».</p>
+
+  <p>En 2021, OpenAI presentó CLIP, un modelo que lo logró aprendiendo de 400 millones de pares de imagen y texto tomados de internet<sup class="cite"><a href="#ref-1">[1]</a></sup>. Su tarea era adivinar qué descripción va con qué foto. Con eso basta para buscar imágenes escribiendo, o para clasificar fotos en categorías que el modelo nunca vio como etiquetas.</p>
+
+  <p>Pero no todas las imágenes vienen con texto. Una radiografía, una foto de satélite o una pieza de una fábrica casi nunca traen una buena descripción. En 2023, Meta presentó DINOv2, entrenado con 142 millones de imágenes sin ninguna etiqueta<sup class="cite"><a href="#ref-2">[2]</a></sup>. Aun así, aprendió a reconocer las partes de un objeto y a encontrar fotos parecidas.</p>
+
+  <p>¿Y si queremos ir más allá de fotos y frases? Ese mismo año, ImageBind puso en un solo espacio seis tipos de datos: imágenes, texto, audio, profundidad, imágenes térmicas y las señales de movimiento de un sensor<sup class="cite"><a href="#ref-3">[3]</a></sup>. El truco fue usar la imagen como pegamento. Casi todo aparece junto a una imagen: un video trae su sonido, por ejemplo. Al alinear cada tipo de dato con imágenes, el modelo terminó relacionando sonidos y frases que nunca vio juntos.</p>
+
+  <p>Fotos que se conocen por su descripción, imágenes que aprenden solas y sonidos que encuentran su texto sin haberlo visto nunca. <strong>¿Cómo puede una red aprender que dos cosas tan distintas significan lo mismo, si nadie se lo explica?</strong></p>
+
+  <section class="refs">
+    <h2>Referencias</h2>
+    <ol>
+      <li id="ref-1">Radford, A. et al. <a href="https://arxiv.org/abs/2103.00020">Learning Transferable Visual Models From Natural Language Supervision</a>. ICML, 2021.</li>
+      <li id="ref-2">Oquab, M. et al. <a href="https://arxiv.org/abs/2304.07193">DINOv2: Learning Robust Visual Features without Supervision</a>. TMLR, 2024.</li>
+      <li id="ref-3">Girdhar, R. et al. <a href="https://arxiv.org/abs/2305.05665">ImageBind: One Embedding Space To Bind Them All</a>. CVPR, 2023.</li>
+    </ol>
+  </section>
+
+  <p class="footnote">Nota: esta lectura se escribió con ayuda de inteligencia artificial, específicamente Claude (Anthropic).</p>
+
+</main>
+
+<button class="theme-toggle" type="button" aria-label="Modo oscuro / claro (D)" title="Modo oscuro / claro (D)">
+  <svg class="ic-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+  <svg class="ic-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+</button>
+<script>
+  (function () {
+    var root = document.documentElement;
+    var btn = document.querySelector('.theme-toggle');
+    function sync() { btn.setAttribute('aria-pressed', root.dataset.theme === 'dark' ? 'true' : 'false'); }
+    function toggle() {
+      var dark = root.dataset.theme !== 'dark';
+      if (dark) root.dataset.theme = 'dark'; else delete root.dataset.theme;
+      try { localStorage.setItem('reading-theme', dark ? 'dark' : 'light'); } catch (e) {}
+      sync();
+    }
+    btn.addEventListener('click', toggle);
+    document.addEventListener('keydown', function (e) {
+      if ((e.key === 'd' || e.key === 'D') && !e.ctrlKey && !e.metaKey && !e.altKey) toggle();
+    });
+    sync();
+  })();
+</script>
+</body>
+</html>

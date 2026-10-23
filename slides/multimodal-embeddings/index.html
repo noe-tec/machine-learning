@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Embeddings multimodales</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+  <script>try{if(localStorage.getItem("shstyle-theme")==="dark"&&!/print-pdf/i.test(location.search))document.documentElement.dataset.theme="dark"}catch(e){}</script>
+  <link rel="stylesheet" href="../css/shstyle.css">
+  <link rel="stylesheet" href="../css/dl-extras.css">
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <!-- 1 · PORTADA -->
+    <section class="cover">
+      <span class="kicker">Deep Learning</span>
+      <h1>Embeddings multimodales:<br>fotos, textos y más en un mismo espacio</h1>
+      <div class="cover-meta">Noé Sámano</div>
+    </section>
+
+    <!-- 2 · LECTURA -->
+    <section>
+      <span class="kicker">Antes de empezar</span>
+      <h2>Lectura de motivación</h2>
+      <div class="cols">
+        <div><svg class="qr" viewBox="0 0 45 45" style="width:300px; height:300px;" role="img" aria-label="QR code: https://noe-tec.github.io/machine-learning/readings/multimodal-embeddings/" shape-rendering="crispEdges"><rect width="45" height="45" fill="white"/><path fill="black" d="M4,4h7v1h-7zM13,4h2v1h-2zM17,4h1v1h-1zM21,4h2v1h-2zM24,4h1v1h-1zM27,4h1v1h-1zM29,4h1v1h-1zM32,4h1v1h-1zM34,4h7v1h-7zM4,5h1v1h-1zM10,5h1v1h-1zM15,5h1v1h-1zM18,5h2v1h-2zM23,5h1v1h-1zM26,5h1v1h-1zM29,5h4v1h-4zM34,5h1v1h-1zM40,5h1v1h-1zM4,6h1v1h-1zM6,6h3v1h-3zM10,6h1v1h-1zM12,6h1v1h-1zM16,6h1v1h-1zM18,6h1v1h-1zM20,6h1v1h-1zM23,6h4v1h-4zM31,6h2v1h-2zM34,6h1v1h-1zM36,6h3v1h-3zM40,6h1v1h-1zM4,7h1v1h-1zM6,7h3v1h-3zM10,7h1v1h-1zM12,7h1v1h-1zM14,7h1v1h-1zM16,7h1v1h-1zM18,7h4v1h-4zM23,7h1v1h-1zM28,7h3v1h-3zM34,7h1v1h-1zM36,7h3v1h-3zM40,7h1v1h-1zM4,8h1v1h-1zM6,8h3v1h-3zM10,8h1v1h-1zM12,8h1v1h-1zM14,8h5v1h-5zM20,8h1v1h-1zM22,8h2v1h-2zM25,8h1v1h-1zM27,8h1v1h-1zM29,8h1v1h-1zM34,8h1v1h-1zM36,8h3v1h-3zM40,8h1v1h-1zM4,9h1v1h-1zM10,9h1v1h-1zM12,9h2v1h-2zM15,9h4v1h-4zM22,9h1v1h-1zM24,9h3v1h-3zM29,9h4v1h-4zM34,9h1v1h-1zM40,9h1v1h-1zM4,10h7v1h-7zM12,10h1v1h-1zM14,10h1v1h-1zM16,10h1v1h-1zM18,10h1v1h-1zM20,10h1v1h-1zM22,10h1v1h-1zM24,10h1v1h-1zM26,10h1v1h-1zM28,10h1v1h-1zM30,10h1v1h-1zM32,10h1v1h-1zM34,10h7v1h-7zM12,11h1v1h-1zM14,11h2v1h-2zM17,11h2v1h-2zM24,11h2v1h-2zM28,11h1v1h-1zM30,11h1v1h-1zM4,12h1v1h-1zM6,12h5v1h-5zM13,12h1v1h-1zM15,12h5v1h-5zM22,12h1v1h-1zM26,12h6v1h-6zM34,12h5v1h-5zM13,13h9v1h-9zM27,13h1v1h-1zM32,13h1v1h-1zM39,13h1v1h-1zM5,14h3v1h-3zM9,14h4v1h-4zM14,14h2v1h-2zM18,14h1v1h-1zM26,14h1v1h-1zM28,14h6v1h-6zM35,14h2v1h-2zM39,14h2v1h-2zM4,15h6v1h-6zM11,15h7v1h-7zM20,15h1v1h-1zM22,15h1v1h-1zM25,15h4v1h-4zM30,15h2v1h-2zM40,15h1v1h-1zM4,16h1v1h-1zM8,16h5v1h-5zM17,16h2v1h-2zM21,16h1v1h-1zM26,16h1v1h-1zM28,16h3v1h-3zM33,16h2v1h-2zM36,16h5v1h-5zM5,17h3v1h-3zM9,17h1v1h-1zM12,17h1v1h-1zM14,17h3v1h-3zM18,17h1v1h-1zM20,17h6v1h-6zM27,17h1v1h-1zM32,17h1v1h-1zM35,17h1v1h-1zM4,18h1v1h-1zM6,18h3v1h-3zM10,18h2v1h-2zM14,18h2v1h-2zM17,18h1v1h-1zM19,18h1v1h-1zM21,18h1v1h-1zM25,18h2v1h-2zM28,18h1v1h-1zM30,18h4v1h-4zM35,18h3v1h-3zM39,18h2v1h-2zM5,19h1v1h-1zM8,19h1v1h-1zM13,19h1v1h-1zM18,19h1v1h-1zM20,19h6v1h-6zM27,19h1v1h-1zM31,19h3v1h-3zM35,19h2v1h-2zM4,20h4v1h-4zM10,20h1v1h-1zM13,20h1v1h-1zM15,20h3v1h-3zM20,20h1v1h-1zM23,20h1v1h-1zM26,20h6v1h-6zM33,20h4v1h-4zM38,20h1v1h-1zM40,20h1v1h-1zM5,21h2v1h-2zM15,21h1v1h-1zM18,21h2v1h-2zM22,21h1v1h-1zM27,21h1v1h-1zM29,21h1v1h-1zM32,21h1v1h-1zM35,21h1v1h-1zM37,21h1v1h-1zM39,21h1v1h-1zM4,22h2v1h-2zM8,22h1v1h-1zM10,22h2v1h-2zM13,22h1v1h-1zM16,22h1v1h-1zM18,22h3v1h-3zM24,22h3v1h-3zM31,22h1v1h-1zM33,22h1v1h-1zM35,22h2v1h-2zM39,22h2v1h-2zM4,23h4v1h-4zM12,23h2v1h-2zM16,23h1v1h-1zM19,23h1v1h-1zM23,23h4v1h-4zM30,23h4v1h-4zM35,23h1v1h-1zM40,23h1v1h-1zM6,24h1v1h-1zM8,24h1v1h-1zM10,24h2v1h-2zM14,24h2v1h-2zM17,24h1v1h-1zM19,24h1v1h-1zM21,24h1v1h-1zM23,24h1v1h-1zM26,24h6v1h-6zM33,24h2v1h-2zM36,24h3v1h-3zM6,25h2v1h-2zM13,25h1v1h-1zM17,25h2v1h-2zM20,25h1v1h-1zM22,25h3v1h-3zM27,25h2v1h-2zM30,25h1v1h-1zM32,25h1v1h-1zM37,25h1v1h-1zM39,25h1v1h-1zM4,26h3v1h-3zM9,26h2v1h-2zM14,26h1v1h-1zM16,26h5v1h-5zM22,26h1v1h-1zM24,26h2v1h-2zM28,26h1v1h-1zM31,26h1v1h-1zM33,26h1v1h-1zM35,26h3v1h-3zM39,26h2v1h-2zM5,27h5v1h-5zM11,27h1v1h-1zM13,27h4v1h-4zM19,27h1v1h-1zM25,27h4v1h-4zM30,27h7v1h-7zM39,27h1v1h-1zM6,28h1v1h-1zM10,28h3v1h-3zM14,28h2v1h-2zM22,28h2v1h-2zM26,28h1v1h-1zM28,28h7v1h-7zM36,28h1v1h-1zM38,28h2v1h-2zM4,29h2v1h-2zM8,29h1v1h-1zM13,29h2v1h-2zM18,29h3v1h-3zM23,29h1v1h-1zM25,29h1v1h-1zM27,29h1v1h-1zM32,29h2v1h-2zM35,29h1v1h-1zM4,30h1v1h-1zM6,30h1v1h-1zM8,30h1v1h-1zM10,30h2v1h-2zM13,30h1v1h-1zM15,30h1v1h-1zM17,30h2v1h-2zM22,30h1v1h-1zM24,30h2v1h-2zM30,30h2v1h-2zM33,30h2v1h-2zM36,30h2v1h-2zM39,30h2v1h-2zM4,31h1v1h-1zM6,31h2v1h-2zM9,31h1v1h-1zM15,31h4v1h-4zM20,31h1v1h-1zM23,31h1v1h-1zM25,31h2v1h-2zM31,31h6v1h-6zM4,32h1v1h-1zM6,32h1v1h-1zM10,32h1v1h-1zM13,32h2v1h-2zM16,32h3v1h-3zM21,32h1v1h-1zM26,32h1v1h-1zM28,32h3v1h-3zM32,32h7v1h-7zM12,33h1v1h-1zM14,33h1v1h-1zM16,33h2v1h-2zM20,33h2v1h-2zM23,33h2v1h-2zM27,33h1v1h-1zM29,33h1v1h-1zM32,33h1v1h-1zM36,33h2v1h-2zM4,34h7v1h-7zM13,34h1v1h-1zM15,34h1v1h-1zM17,34h1v1h-1zM19,34h1v1h-1zM21,34h1v1h-1zM26,34h1v1h-1zM30,34h1v1h-1zM32,34h1v1h-1zM34,34h1v1h-1zM36,34h1v1h-1zM38,34h1v1h-1zM40,34h1v1h-1zM4,35h1v1h-1zM10,35h1v1h-1zM12,35h1v1h-1zM16,35h1v1h-1zM20,35h3v1h-3zM25,35h1v1h-1zM32,35h1v1h-1zM36,35h2v1h-2zM39,35h1v1h-1zM4,36h1v1h-1zM6,36h3v1h-3zM10,36h1v1h-1zM12,36h1v1h-1zM14,36h5v1h-5zM20,36h1v1h-1zM23,36h2v1h-2zM26,36h1v1h-1zM28,36h2v1h-2zM31,36h6v1h-6zM38,36h3v1h-3zM4,37h1v1h-1zM6,37h3v1h-3zM10,37h1v1h-1zM12,37h1v1h-1zM14,37h1v1h-1zM16,37h1v1h-1zM18,37h2v1h-2zM22,37h4v1h-4zM27,37h1v1h-1zM29,37h1v1h-1zM34,37h1v1h-1zM36,37h3v1h-3zM40,37h1v1h-1zM4,38h1v1h-1zM6,38h3v1h-3zM10,38h1v1h-1zM12,38h3v1h-3zM19,38h4v1h-4zM24,38h1v1h-1zM32,38h1v1h-1zM39,38h2v1h-2zM4,39h1v1h-1zM10,39h1v1h-1zM13,39h2v1h-2zM16,39h1v1h-1zM19,39h1v1h-1zM22,39h5v1h-5zM31,39h4v1h-4zM36,39h1v1h-1zM40,39h1v1h-1zM4,40h7v1h-7zM12,40h1v1h-1zM14,40h4v1h-4zM19,40h1v1h-1zM21,40h1v1h-1zM26,40h2v1h-2zM29,40h2v1h-2zM33,40h2v1h-2zM36,40h5v1h-5z"/></svg></div>
+        <div>
+          <p><strong>¿Cómo relaciona una máquina una foto, una frase y un sonido?</strong></p>
+          <p class="muted">Una lectura de tres minutos. Escanea el código o abre:<br>
+            <a href="https://noe-tec.github.io/machine-learning/readings/multimodal-embeddings/">noe-tec.github.io/machine-learning/readings/multimodal-embeddings/</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · OBJETIVOS -->
+    <section>
+      <span class="kicker">Objetivos</span>
+      <h2>Al terminar la clase podrás…</h2>
+      <ul>
+        <li class="fragment">Explicar cómo CLIP pone fotos y textos en el mismo espacio y clasifica sin reentrenar.</li>
+        <li class="fragment">Explicar cómo DINOv2 aprende embeddings de imágenes sin etiquetas ni texto.</li>
+        <li class="fragment">Explicar cómo ImageBind une seis modalidades usando solo pares con imágenes.</li>
+        <li class="fragment">Elegir entre CLIP y DINOv2 para buscar imágenes parecidas.</li>
+      </ul>
+    </section>
+
+    <!-- 4 · EL PROBLEMA -->
+    <section>
+      <span class="kicker">El problema</span>
+      <h2>Cada modelo guarda lo que aprende en su propio espacio</h2>
+      <ul>
+        <li class="fragment">Un clasificador de imágenes produce 1000 probabilidades: no sabe qué es «un perro en la playa».</li>
+        <li class="fragment">Un modelo de texto produce vectores que no se pueden comparar con los de una foto.</li>
+        <li class="fragment">Queremos un solo espacio donde una foto, su descripción y su sonido queden cerca.</li>
+      </ul>
+      <div class="box-key fragment">Un <span class="term" data-term="embedding">embedding</span> <span class="term" data-term="multimodal">multimodal</span>: modalidades distintas, un mismo espacio.</div>
+    </section>
+
+    <!-- 5 · SIMILITUD COSENO -->
+    <section>
+      <span class="kicker">El problema</span>
+      <h2>«Parecido» se mide con el ángulo entre dos vectores</h2>
+      <div class="eq-key">\[ \cos(\mathbf{a}, \mathbf{b}) = \frac{\mathbf{a} \cdot \mathbf{b}}{\lVert \mathbf{a} \rVert \, \lVert \mathbf{b} \rVert} \]</div>
+      <table>
+        <thead><tr><th>Foto de un gato comparada con…</th><th><span class="term" data-term="coseno">Similitud coseno</span></th></tr></thead>
+        <tbody>
+          <tr class="fragment"><td>«a photo of a cat»</td><td>0.30</td></tr>
+          <tr class="fragment"><td>«a pink flower»</td><td>0.09</td></tr>
+          <tr class="fragment"><td>«a rocket launch»</td><td>0.03</td></tr>
+        </tbody>
+      </table>
+      <p class="muted">Valores de OpenCLIP ViT-B/32. En la sección de CLIP verás de dónde salen.</p>
+    </section>
+
+    <!-- DIVISOR CLIP -->
+    <section class="divider">
+      <h2>Imágenes y texto: CLIP</h2>
+    </section>
+
+    <!-- 15 · PROBLEMA CLIP -->
+    <section>
+      <span class="kicker">CLIP</span>
+      <h2>Un clasificador solo conoce las clases con que lo entrenaron</h2>
+      <ul>
+        <li class="fragment">Un modelo de ImageNet distingue 1000 clases; agregar una más exige juntar y etiquetar fotos.</li>
+        <li class="fragment">En internet, muchas imágenes ya vienen con texto: un pie de foto, un título, una descripción.</li>
+        <li class="fragment">CLIP aprendió de 400 millones de pares (imagen, texto) tomados de internet.</li>
+      </ul>
+      <div class="box-key fragment">Idea: que el texto sea la supervisión.</div>
+    </section>
+
+    <!-- DIAGRAMA CLIP -->
+    <section>
+      <span class="kicker">CLIP</span>
+      <h2>Dos encoders llevan fotos y textos al mismo espacio</h2>
+      <svg viewBox="0 0 1100 420" style="width:100%; max-height:420px;">
+        <g>
+          <rect class="svg-node" x="20" y="60" width="160" height="64" rx="8"/>
+          <text class="svg-label" x="100" y="100" text-anchor="middle">foto</text>
+          <rect class="svg-node" x="20" y="240" width="160" height="64" rx="8"/>
+          <text class="svg-label" x="100" y="280" text-anchor="middle">texto</text>
+        </g>
+        <g class="anim-step" data-step="1">
+          <line class="svg-edge" x1="180" y1="92" x2="230" y2="92"/>
+          <line class="svg-edge" x1="180" y1="272" x2="230" y2="272"/>
+          <rect class="svg-node-hl" x="230" y="52" width="200" height="80" rx="8"/>
+          <text class="svg-label" x="330" y="90" text-anchor="middle" style="font-size:22px;">encoder</text>
+          <text class="svg-label" x="330" y="116" text-anchor="middle" style="font-size:22px;">de imagen</text>
+          <rect class="svg-node-hl" x="230" y="232" width="200" height="80" rx="8"/>
+          <text class="svg-label" x="330" y="270" text-anchor="middle" style="font-size:22px;">encoder</text>
+          <text class="svg-label" x="330" y="296" text-anchor="middle" style="font-size:22px;">de texto</text>
+        </g>
+        <g class="anim-step" data-step="2" data-step-off="3">
+          <line class="svg-edge" x1="430" y1="92" x2="466" y2="92"/>
+          <line class="svg-edge" x1="430" y1="272" x2="466" y2="272"/>
+          <rect class="svg-node" x="470" y="70" width="32" height="44" rx="4"/><rect class="svg-node" x="506" y="70" width="32" height="44" rx="4"/><rect class="svg-node" x="542" y="70" width="32" height="44" rx="4"/><rect class="svg-node" x="578" y="70" width="32" height="44" rx="4"/><rect class="svg-node" x="614" y="70" width="32" height="44" rx="4"/><rect class="svg-node" x="470" y="250" width="32" height="44" rx="4"/><rect class="svg-node" x="506" y="250" width="32" height="44" rx="4"/><rect class="svg-node" x="542" y="250" width="32" height="44" rx="4"/><rect class="svg-node" x="578" y="250" width="32" height="44" rx="4"/><rect class="svg-node" x="614" y="250" width="32" height="44" rx="4"/>
+          <text class="svg-label" x="560" y="150" text-anchor="middle" style="font-size:22px;">vector I</text>
+          <text class="svg-label" x="560" y="330" text-anchor="middle" style="font-size:22px;">vector T</text>
+        </g>
+        <g class="anim-step" data-step="3" data-step-off="4">
+          <rect class="svg-node" x="470" y="70" width="32" height="44" rx="4"/><rect class="svg-node" x="506" y="70" width="32" height="44" rx="4"/><rect class="svg-node" x="542" y="70" width="32" height="44" rx="4"/><rect class="svg-node" x="578" y="70" width="32" height="44" rx="4"/><rect class="svg-node" x="614" y="70" width="32" height="44" rx="4"/><rect class="svg-node" x="470" y="250" width="32" height="44" rx="4"/><rect class="svg-node" x="506" y="250" width="32" height="44" rx="4"/><rect class="svg-node" x="542" y="250" width="32" height="44" rx="4"/><rect class="svg-node" x="578" y="250" width="32" height="44" rx="4"/><rect class="svg-node" x="614" y="250" width="32" height="44" rx="4"/>
+          <text class="svg-label" x="560" y="150" text-anchor="middle" style="font-size:22px;">vector I</text>
+          <text class="svg-label" x="560" y="330" text-anchor="middle" style="font-size:22px;">vector T</text>
+          <line class="svg-edge" x1="660" y1="92" x2="760" y2="160"/>
+          <line class="svg-edge" x1="660" y1="272" x2="760" y2="200"/>
+          <text class="svg-label" x="828" y="58" text-anchor="middle" style="font-size:20px;">T1</text><text class="svg-label" x="890" y="58" text-anchor="middle" style="font-size:20px;">T2</text><text class="svg-label" x="952" y="58" text-anchor="middle" style="font-size:20px;">T3</text><text class="svg-label" x="1014" y="58" text-anchor="middle" style="font-size:20px;">T4</text><text class="svg-label" x="780" y="102" text-anchor="middle" style="font-size:20px;">I1</text><text class="svg-label" x="780" y="158" text-anchor="middle" style="font-size:20px;">I2</text><text class="svg-label" x="780" y="214" text-anchor="middle" style="font-size:20px;">I3</text><text class="svg-label" x="780" y="270" text-anchor="middle" style="font-size:20px;">I4</text><rect class="svg-node-hl" x="800" y="70" width="56" height="50" rx="6"/><rect class="svg-node" x="862" y="70" width="56" height="50" rx="6"/><rect class="svg-node" x="924" y="70" width="56" height="50" rx="6"/><rect class="svg-node" x="986" y="70" width="56" height="50" rx="6"/><rect class="svg-node" x="800" y="126" width="56" height="50" rx="6"/><rect class="svg-node-hl" x="862" y="126" width="56" height="50" rx="6"/><rect class="svg-node" x="924" y="126" width="56" height="50" rx="6"/><rect class="svg-node" x="986" y="126" width="56" height="50" rx="6"/><rect class="svg-node" x="800" y="182" width="56" height="50" rx="6"/><rect class="svg-node" x="862" y="182" width="56" height="50" rx="6"/><rect class="svg-node-hl" x="924" y="182" width="56" height="50" rx="6"/><rect class="svg-node" x="986" y="182" width="56" height="50" rx="6"/><rect class="svg-node" x="800" y="238" width="56" height="50" rx="6"/><rect class="svg-node" x="862" y="238" width="56" height="50" rx="6"/><rect class="svg-node" x="924" y="238" width="56" height="50" rx="6"/><rect class="svg-node-hl" x="986" y="238" width="56" height="50" rx="6"/>
+        </g>
+        <g class="anim-step" data-step="4">
+          <rect class="svg-node" x="470" y="70" width="32" height="44" rx="4"/><rect class="svg-node" x="506" y="70" width="32" height="44" rx="4"/><rect class="svg-node" x="542" y="70" width="32" height="44" rx="4"/><rect class="svg-node" x="578" y="70" width="32" height="44" rx="4"/><rect class="svg-node" x="614" y="70" width="32" height="44" rx="4"/><rect class="svg-node" x="470" y="250" width="32" height="44" rx="4"/><rect class="svg-node" x="506" y="250" width="32" height="44" rx="4"/><rect class="svg-node" x="542" y="250" width="32" height="44" rx="4"/><rect class="svg-node" x="578" y="250" width="32" height="44" rx="4"/><rect class="svg-node" x="614" y="250" width="32" height="44" rx="4"/>
+          <text class="svg-label" x="560" y="150" text-anchor="middle" style="font-size:22px;">vector I</text>
+          <text class="svg-label" x="560" y="330" text-anchor="middle" style="font-size:22px;">vector T</text>
+          <line class="svg-edge" x1="660" y1="92" x2="760" y2="160"/>
+          <line class="svg-edge" x1="660" y1="272" x2="760" y2="200"/>
+          <text class="svg-label" x="828" y="58" text-anchor="middle" style="font-size:20px;">T1</text><text class="svg-label" x="890" y="58" text-anchor="middle" style="font-size:20px;">T2</text><text class="svg-label" x="952" y="58" text-anchor="middle" style="font-size:20px;">T3</text><text class="svg-label" x="1014" y="58" text-anchor="middle" style="font-size:20px;">T4</text><text class="svg-label" x="780" y="102" text-anchor="middle" style="font-size:20px;">I1</text><text class="svg-label" x="780" y="158" text-anchor="middle" style="font-size:20px;">I2</text><text class="svg-label" x="780" y="214" text-anchor="middle" style="font-size:20px;">I3</text><text class="svg-label" x="780" y="270" text-anchor="middle" style="font-size:20px;">I4</text><rect class="svg-node-hl" x="800" y="70" width="56" height="50" rx="6"/><rect class="svg-node" x="862" y="70" width="56" height="50" rx="6"/><rect class="svg-node" x="924" y="70" width="56" height="50" rx="6"/><rect class="svg-node" x="986" y="70" width="56" height="50" rx="6"/><rect class="svg-node" x="800" y="126" width="56" height="50" rx="6"/><rect class="svg-node-hl" x="862" y="126" width="56" height="50" rx="6"/><rect class="svg-node" x="924" y="126" width="56" height="50" rx="6"/><rect class="svg-node" x="986" y="126" width="56" height="50" rx="6"/><rect class="svg-node" x="800" y="182" width="56" height="50" rx="6"/><rect class="svg-node" x="862" y="182" width="56" height="50" rx="6"/><rect class="svg-node-hl" x="924" y="182" width="56" height="50" rx="6"/><rect class="svg-node" x="986" y="182" width="56" height="50" rx="6"/><rect class="svg-node" x="800" y="238" width="56" height="50" rx="6"/><rect class="svg-node" x="862" y="238" width="56" height="50" rx="6"/><rect class="svg-node" x="924" y="238" width="56" height="50" rx="6"/><rect class="svg-node-hl" x="986" y="238" width="56" height="50" rx="6"/><text class="svg-label" x="828" y="102" text-anchor="middle" style="font-size:18px;">+</text><text class="svg-label" x="890" y="158" text-anchor="middle" style="font-size:18px;">+</text><text class="svg-label" x="952" y="214" text-anchor="middle" style="font-size:18px;">+</text><text class="svg-label" x="1014" y="270" text-anchor="middle" style="font-size:18px;">+</text>
+        </g>
+        <g class="anim-step" data-step="1" data-step-off="2"><text class="svg-label" x="20" y="400" style="font-size:22px;">1 · Cada entrada pasa por su propia red: un ViT para fotos, un Transformer para textos.</text></g>
+        <g class="anim-step" data-step="2" data-step-off="3"><text class="svg-label" x="20" y="400" style="font-size:22px;">2 · Ambas salen como vectores de 512 números, de longitud 1, en el mismo espacio.</text></g>
+        <g class="anim-step" data-step="3" data-step-off="4"><text class="svg-label" x="20" y="400" style="font-size:22px;">3 · Con un batch de 4 pares, cada foto se compara con cada texto: I · T.</text></g>
+        <g class="anim-step" data-step="4"><text class="svg-label" x="20" y="400" style="font-size:22px;">4 · Entrenar = subir la diagonal (pares reales) y bajar el resto.</text></g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+    </section>
+
+    <!-- 17 · MATRIZ CLIP -->
+    <section>
+      <span class="kicker">CLIP</span>
+      <h2>Con fotos reales, gana la diagonal</h2>
+      <figure class="fig">
+        <img src="img/clip_matriz.png" alt="Matriz de similitud coseno entre las fotos de un gato, una taza de café, un cohete y una flor y cuatro descripciones; la diagonal tiene los valores más altos.">
+        <figcaption>Un <span class="term" data-term="encoder">encoder</span> para fotos y otro para textos. Similitud coseno entre 4 fotos y 4 descripciones: la pareja correcta gana en cada fila y en cada columna. <span class="muted">OpenCLIP ViT-B/32 (LAION-400M). Flor: vultilion (CC BY 2.0).</span></figcaption>
+      </figure>
+    </section>
+
+    <!-- FIGURA DEL PAPER -->
+    <section>
+      <span class="kicker">CLIP</span>
+      <h2>El paper lo resume en tres pasos</h2>
+      <figure class="fig">
+        <img src="img/paper_clip_fig1.png" alt="Figura 1 del paper de CLIP: (1) preentrenamiento contrastivo con la matriz de imágenes y textos; (2) un clasificador a partir de los nombres de las clases; (3) predicción zero-shot.">
+        <figcaption>(1) Entrenar con la matriz de pares; (2) escribir un texto por clase; (3) clasificar eligiendo el texto más parecido. Figura de Radford et al. (2021).</figcaption>
+      </figure>
+    </section>
+
+    <!-- 19 · ZERO-SHOT -->
+    <section>
+      <span class="kicker">CLIP</span>
+      <h2>El texto se vuelve el clasificador</h2>
+      <figure class="fig">
+        <img src="img/clip_zeroshot.png" style="max-height:340px;" alt="Foto de un templo y las probabilidades de cinco descripciones: temple 94.6 %, castle 5.4 % y el resto menos de 0.1 %.">
+        <figcaption>Clasificación <span class="term" data-term="zero-shot">zero-shot</span>: un prompt «a photo of a {etiqueta}» por clase; gana el más parecido, sin reentrenar. <span class="muted">OpenCLIP ViT-B/32 · Foto: danielbuechele (CC BY 2.0).</span></figcaption>
+      </figure>
+      <p class="fragment"><strong>Error común:</strong> la etiqueta sola es ambigua. «crane» puede ser grúa o grulla; el prompt da contexto.</p>
+    </section>
+
+    <!-- 20 · CHECKPOINT 2 -->
+    <section>
+      <span class="kicker">Checkpoint</span>
+      <div class="quiz" data-correct="c">
+        <p class="quiz-question">Un batch de CLIP tiene 4 fotos y sus 4 descripciones. ¿Cuántas celdas de la matriz son <em>pares negativos</em>?</p>
+        <button class="quiz-option" data-opt="a">4, una por cada foto.</button>
+        <button class="quiz-option" data-opt="b">16, todas las celdas de la matriz.</button>
+        <button class="quiz-option" data-opt="c">12, todas menos la diagonal.</button>
+        <div class="quiz-explain"><strong>C.</strong> La matriz tiene 4 × 4 = 16 celdas; las 4 de la diagonal son las parejas correctas y las otras 12 son negativos. A cuenta las parejas positivas, no las negativas. B olvida que la diagonal es positiva.</div>
+      </div>
+    </section>
+
+    <!-- 21 · VARIANTES -->
+    <section>
+      <span class="kicker">Variantes de CLIP</span>
+      <h2>Cada variante arregla un problema de CLIP</h2>
+      <table>
+        <thead><tr><th>Problema de CLIP</th><th>Variante</th><th>Qué cambia</th></tr></thead>
+        <tbody>
+          <tr class="fragment"><td>Sus datos no son públicos</td><td>OpenCLIP</td><td>Entrena con LAION, datos públicos de hasta 2 mil millones de pares</td></tr>
+          <tr class="fragment"><td>El softmax necesita ver todo el batch</td><td>SigLIP</td><td>Cada par es una pregunta de sí o no (sigmoide)</td></tr>
+          <tr class="fragment"><td>Funciona mejor en inglés</td><td>SigLIP 2</td><td>Encoders multilingües</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 22 · SIGLIP -->
+    <section>
+      <span class="kicker">Variantes de CLIP</span>
+      <h2>SigLIP: cada pareja es una pregunta de sí o no</h2>
+      <div class="eq-key">\[ \mathcal{L} = -\frac{1}{|\mathcal{B}|} \sum_{i=1}^{|\mathcal{B}|} \sum_{j=1}^{|\mathcal{B}|} \log \frac{1}{1 + e^{\, z_{ij}\left(-t\,\mathbf{x}_i \cdot \mathbf{y}_j + b\right)}} \]</div>
+      <ul>
+        <li class="fragment">\( z_{ij} = 1 \) si la foto \( i \) va con el texto \( j \); \( z_{ij} = -1 \) si no.</li>
+        <li class="fragment">Cada celda se califica sola: no hay que normalizar sobre todo el batch.</li>
+      </ul>
+      <div class="box-key fragment">Cada pareja se califica por separado, como una clasificación binaria.</div>
+    </section>
+
+    <!-- DIVISOR DINOV2 -->
+    <section class="divider">
+      <h2>Imágenes sin texto: DINOv2</h2>
+    </section>
+
+    <!-- ARQUITECTURA DINOV2 -->
+    <section>
+      <span class="kicker">DINOv2</span>
+      <h2>Por dentro, DINOv2 es un Vision Transformer</h2>
+      <svg viewBox="0 0 1100 420" style="width:100%; max-height:420px;">
+        <g>
+          <rect class="svg-node" x="20" y="40" width="140" height="96" rx="8"/>
+          <text class="svg-label" x="90" y="84" text-anchor="middle">foto</text>
+          <text class="svg-label" x="90" y="112" text-anchor="middle" style="font-size:18px;">224 × 224</text>
+        </g>
+        <g class="anim-step" data-step="1"><rect class="svg-node" x="200" y="42" width="22" height="22" rx="2"/><rect class="svg-node" x="224" y="42" width="22" height="22" rx="2"/><rect class="svg-node" x="248" y="42" width="22" height="22" rx="2"/><rect class="svg-node" x="272" y="42" width="22" height="22" rx="2"/><rect class="svg-node" x="200" y="66" width="22" height="22" rx="2"/><rect class="svg-node" x="224" y="66" width="22" height="22" rx="2"/><rect class="svg-node" x="248" y="66" width="22" height="22" rx="2"/><rect class="svg-node" x="272" y="66" width="22" height="22" rx="2"/><rect class="svg-node" x="200" y="90" width="22" height="22" rx="2"/><rect class="svg-node" x="224" y="90" width="22" height="22" rx="2"/><rect class="svg-node" x="248" y="90" width="22" height="22" rx="2"/><rect class="svg-node" x="272" y="90" width="22" height="22" rx="2"/><rect class="svg-node" x="200" y="114" width="22" height="22" rx="2"/><rect class="svg-node" x="224" y="114" width="22" height="22" rx="2"/><rect class="svg-node" x="248" y="114" width="22" height="22" rx="2"/><rect class="svg-node" x="272" y="114" width="22" height="22" rx="2"/>
+        </g>
+        <g class="anim-step" data-step="2">
+          <line class="svg-edge" x1="300" y1="80" x2="356" y2="80"/><rect class="svg-node-hl" x="360" y="58" width="70" height="44" rx="6"/><text class="svg-label" x="395" y="87" text-anchor="middle" style="font-size:18px;">CLS</text><rect class="svg-node" x="440" y="58" width="44" height="44" rx="6"/><rect class="svg-node" x="492" y="58" width="44" height="44" rx="6"/><rect class="svg-node" x="544" y="58" width="44" height="44" rx="6"/><rect class="svg-node" x="596" y="58" width="44" height="44" rx="6"/><text class="svg-label" x="660" y="87" style="font-size:22px;">… 256</text>
+        </g>
+        <g class="anim-step" data-step="3">
+          <line class="svg-edge" x1="530" y1="102" x2="530" y2="150"/>
+          <rect class="svg-node-hl" x="360" y="150" width="380" height="80" rx="8"/>
+          <text class="svg-label" x="550" y="186" text-anchor="middle" style="font-size:22px;">12 bloques Transformer</text>
+          <text class="svg-label" x="550" y="214" text-anchor="middle" style="font-size:18px;">6 cabezas de atención</text>
+          <line class="svg-edge" x1="530" y1="230" x2="530" y2="268"/><rect class="svg-node-hl" x="360" y="268" width="70" height="44" rx="6"/><text class="svg-label" x="395" y="297" text-anchor="middle" style="font-size:18px;">CLS</text><rect class="svg-node" x="440" y="268" width="44" height="44" rx="6"/><rect class="svg-node" x="492" y="268" width="44" height="44" rx="6"/><rect class="svg-node" x="544" y="268" width="44" height="44" rx="6"/><rect class="svg-node" x="596" y="268" width="44" height="44" rx="6"/><text class="svg-label" x="660" y="297" style="font-size:22px;">… 256</text>
+        </g>
+        <g class="anim-step" data-step="4">
+          <text class="svg-label" x="780" y="270" style="font-size:20px;">CLS → embedding de toda</text>
+          <text class="svg-label" x="780" y="296" style="font-size:20px;">la foto (búsqueda, k-NN)</text>
+          <text class="svg-label" x="780" y="336" style="font-size:20px;">parches → un embedding</text>
+          <text class="svg-label" x="780" y="362" style="font-size:20px;">por región (la PCA)</text>
+        </g>
+        <g class="anim-step" data-step="1" data-step-off="2"><text class="svg-label" x="20" y="400" style="font-size:22px;">1 · La foto se corta en 16 × 16 = 256 parches de 14 × 14 píxeles.</text></g>
+        <g class="anim-step" data-step="2" data-step-off="3"><text class="svg-label" x="20" y="400" style="font-size:22px;">2 · Cada parche se vuelve un token de 384 números; se agrega el token CLS.</text></g>
+        <g class="anim-step" data-step="3" data-step-off="4"><text class="svg-label" x="20" y="400" style="font-size:22px;">3 · Los tokens pasan por 12 bloques de atención, como en cualquier ViT.</text></g>
+        <g class="anim-step" data-step="4"><text class="svg-label" x="20" y="400" style="font-size:22px;">4 · Salen dos tipos de embedding: uno global (CLS) y uno por parche.</text></g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+      <p class="muted">DINOv2-small: unos 22 millones de parámetros. Lo nuevo no es la red, sino cómo se entrena.</p>
+    </section>
+
+    <!-- 23 · DINOV2: ALUMNO Y MAESTRO -->
+    <section>
+      <span class="kicker">DINOv2</span>
+      <h2>Sin texto: dos vistas de la misma foto deben coincidir</h2>
+      <svg viewBox="0 0 1100 420" style="width:100%; max-height:420px;">
+        <g>
+          <rect class="svg-node" x="20" y="150" width="150" height="100" rx="8"/>
+          <text class="svg-label" x="95" y="207" text-anchor="middle">foto</text>
+        </g>
+        <g class="anim-step" data-step="1">
+          <line class="svg-edge" x1="170" y1="180" x2="290" y2="90"/>
+          <line class="svg-edge" x1="170" y1="220" x2="290" y2="310"/>
+          <rect class="svg-node" x="290" y="50" width="190" height="80" rx="8"/>
+          <text class="svg-label" x="385" y="98" text-anchor="middle">recorte grande</text>
+          <rect class="svg-node" x="290" y="270" width="190" height="80" rx="8"/>
+          <text class="svg-label" x="385" y="318" text-anchor="middle">recorte chico</text>
+        </g>
+        <g class="anim-step" data-step="2">
+          <line class="svg-edge" x1="480" y1="90" x2="560" y2="90"/>
+          <line class="svg-edge" x1="480" y1="310" x2="560" y2="310"/>
+          <rect class="svg-node-hl" x="560" y="50" width="170" height="80" rx="8"/>
+          <text class="svg-label" x="645" y="98" text-anchor="middle">maestro</text>
+          <rect class="svg-node-hl" x="560" y="270" width="170" height="80" rx="8"/>
+          <text class="svg-label" x="645" y="318" text-anchor="middle">alumno</text>
+        </g>
+        <g class="anim-step" data-step="3" data-step-off="5">
+          <line class="svg-edge" x1="730" y1="90" x2="850" y2="180"/>
+          <line class="svg-edge" x1="730" y1="310" x2="850" y2="220"/>
+          <rect class="svg-node" x="850" y="160" width="220" height="80" rx="8"/>
+          <text class="svg-label" x="960" y="208" text-anchor="middle">¿coinciden?</text>
+        </g>
+        <g class="anim-step" data-step="5">
+          <rect class="svg-node-hl" x="760" y="150" width="320" height="100" rx="8"/>
+          <text class="svg-label" x="920" y="193" text-anchor="middle" style="font-size:22px;">Sin etiquetas ni texto:</text>
+          <text class="svg-label" x="920" y="226" text-anchor="middle" style="font-size:22px;">aprendió solo mirando.</text>
+        </g>
+        <g class="anim-step" data-step="1" data-step-off="2"><text class="svg-label" x="20" y="400" style="font-size:22px;">1 · Dos recortes distintos de la misma foto.</text></g>
+        <g class="anim-step" data-step="2" data-step-off="3"><text class="svg-label" x="20" y="400" style="font-size:22px;">2 · Cada recorte entra a un ViT: el maestro y el alumno.</text></g>
+        <g class="anim-step" data-step="3" data-step-off="4"><text class="svg-label" x="20" y="400" style="font-size:22px;">3 · El alumno debe producir la misma salida que el maestro.</text></g>
+        <g class="anim-step" data-step="4" data-step-off="5"><text class="svg-label" x="20" y="400" style="font-size:22px;">4 · Solo se entrena el alumno; el maestro es un promedio móvil del alumno.</text></g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+      <p class="muted">Aprendizaje <span class="term" data-term="autosupervisado">autosupervisado</span>: DINOv2 se entrenó así con 142 millones de imágenes curadas (LVD-142M).</p>
+    </section>
+
+    <!-- FIGURA DEL PAPER DE DINO -->
+    <section>
+      <span class="kicker">DINOv2</span>
+      <h2>La figura original: autodestilación sin etiquetas</h2>
+      <figure class="fig">
+        <img src="img/paper_dino_fig2.png" alt="Figura 2 del paper de DINO: dos vistas x1 y x2 de una imagen entran al alumno y al maestro; la salida del maestro se centra; ambas pasan por softmax y se comparan con entropía cruzada.">
+        <figcaption><strong>sg</strong> (stop-gradient): el gradiente solo entrena al alumno. <strong>ema</strong>: el maestro es un promedio móvil del alumno. <strong>centering</strong>: evita que todo colapse a la misma salida. Figura de Caron et al. (2021).</figcaption>
+      </figure>
+    </section>
+
+    <!-- PERDIDAS DINOV2 -->
+    <section>
+      <span class="kicker">DINOv2</span>
+      <h2>DINOv2 compara la foto completa y también cada parche</h2>
+      <div class="eq-key">\[ \mathcal{L}_{\mathrm{DINO}} = -\sum p_t \log p_s \]</div>
+      <ul>
+        <li class="fragment"><strong>Nivel imagen:</strong> el token CLS del alumno debe dar la misma distribución \( p_s \) que el del maestro \( p_t \).</li>
+        <li class="fragment"><strong>Nivel parche (iBOT):</strong> al alumno se le tapan algunos parches y debe predecir lo que el maestro ve en ellos: \( \mathcal{L}_{\mathrm{iBOT}} = -\sum_i p_{t,i} \log p_{s,i} \).</li>
+        <li class="fragment">Un regularizador (KoLeo) reparte los embeddings para que no se amontonen.</li>
+      </ul>
+      <p class="muted">Según el paper, la pérdida por parche mejora las tareas a nivel de parche, como la segmentación (tabla 3b). Oquab et al. (2023), sección 4.</p>
+    </section>
+
+    <!-- 24 · PCA DE PARCHES -->
+    <section>
+      <span class="kicker">DINOv2</span>
+      <h2>DINOv2 encuentra las partes de un objeto sin que nadie se las nombre</h2>
+      <figure class="fig">
+        <img src="img/dinov2_pca.png" alt="Un perro, una taza de café y un edificio del campus, y debajo la PCA de los embeddings de sus parches: cada parte del objeto tiene su propio color.">
+        <figcaption>Cada <span class="term" data-term="parche">parche</span> de 14 × 14 píxeles tiene su propio embedding. Las 3 primeras componentes de la PCA se pintan como rojo, verde y azul: oreja, cabeza y hocico salen de colores distintos. <span class="muted">DINOv2-small. Fotos: D. Rabich (CC BY-SA 4.0), M. Álvarez Domínguez (CC BY-SA 3.0).</span></figcaption>
+      </figure>
+    </section>
+
+    <!-- 25 · CLIP VS DINOV2 -->
+    <section>
+      <span class="kicker">DINOv2</span>
+      <h2>CLIP entiende conceptos; DINOv2 ve detalles</h2>
+      <table>
+        <thead><tr><th></th><th>CLIP</th><th>DINOv2</th></tr></thead>
+        <tbody>
+          <tr class="fragment"><td>Aprende de</td><td>Pares (imagen, texto)</td><td>Solo imágenes</td></tr>
+          <tr class="fragment"><td>Su embedding captura</td><td>Qué <em>es</em> la foto</td><td>Cómo <em>se ve</em>: formas, partes, texturas</td></tr>
+          <tr class="fragment"><td>Puedes buscar con</td><td>Texto o imagen</td><td>Solo imagen</td></tr>
+          <tr class="fragment"><td>Úsalo para</td><td>Clasificar sin reentrenar, buscar por descripción</td><td>Encontrar el mismo objeto, segmentar, comparar partes</td></tr>
+        </tbody>
+      </table>
+      <p class="muted fragment">En el reto de hoy lo comprobarán con fotos reales.</p>
+    </section>
+
+    <!-- 26 · CHECKPOINT 3 -->
+    <section>
+      <span class="kicker">Checkpoint</span>
+      <div class="quiz" data-correct="a">
+        <p class="quiz-question">Tienes 50,000 fotos de productos <em>sin descripción</em> y quieres encontrar las fotos del mismo modelo exacto de silla. ¿Qué embedding usas?</p>
+        <button class="quiz-option" data-opt="a">Los embeddings de imagen de DINOv2, buscando las fotos más cercanas a una foto de la silla.</button>
+        <button class="quiz-option" data-opt="b">El encoder de texto de CLIP con el prompt «a photo of a chair».</button>
+        <button class="quiz-option" data-opt="c">Un modelo de texto aplicado al nombre de cada archivo de foto.</button>
+        <div class="quiz-explain"><strong>A.</strong> Buscar el mismo modelo exacto es una búsqueda por detalle visual, y DINOv2 aprendió justo eso sin texto. B encuentra cualquier silla, no el modelo exacto. C depende de nombres de archivo que no describen la foto.</div>
+      </div>
+    </section>
+
+    <!-- DIVISOR IMAGEBIND -->
+    <section class="divider">
+      <h2>Muchas modalidades: ImageBind</h2>
+    </section>
+
+    <!-- IMAGEBIND: PROBLEMA -->
+    <section>
+      <span class="kicker">ImageBind</span>
+      <h2>No existen pares de todo con todo</h2>
+      <ul>
+        <li class="fragment">CLIP necesitó 400 millones de pares (imagen, texto).</li>
+        <li class="fragment">¿Pares (audio, texto)? ¿(IMU, texto)? ¿(térmica, audio)? Casi no existen.</li>
+        <li class="fragment">Pero casi todo aparece junto a una imagen: un video trae su audio y el movimiento de la cámara; una cámara de profundidad trae su foto.</li>
+      </ul>
+      <div class="box-key fragment">Idea: usar la imagen como pegamento entre todas las modalidades.</div>
+    </section>
+
+    <!-- IMAGEBIND: DIAGRAMA -->
+    <section>
+      <span class="kicker">ImageBind</span>
+      <h2>Cada modalidad se alinea solo con la imagen</h2>
+      <svg viewBox="0 0 1100 420" style="width:100%; max-height:420px;">
+        <g><rect class="svg-node-hl" x="430" y="180" width="240" height="80" rx="8"/><text class="svg-label" x="550" y="216" text-anchor="middle" style="font-size:22px;">encoder de imagen</text><text class="svg-label" x="550" y="242" text-anchor="middle" style="font-size:17px;">OpenCLIP · congelado</text></g>
+        <g class="anim-step" data-step="1">
+          <line class="svg-edge" x1="550" y1="110" x2="550" y2="180"/><rect class="svg-node" x="430" y="30" width="240" height="80" rx="8"/><text class="svg-label" x="550" y="66" text-anchor="middle" style="font-size:22px;">texto</text><text class="svg-label" x="550" y="92" text-anchor="middle" style="font-size:17px;">OpenCLIP · congelado</text>
+        </g>
+        <g class="anim-step" data-step="2">
+          <line class="svg-edge" x1="240" y1="92" x2="430" y2="200"/><rect class="svg-node" x="40" y="60" width="200" height="64" rx="8"/><text class="svg-label" x="140" y="100" text-anchor="middle" style="font-size:22px;">audio</text>
+        </g>
+        <g class="anim-step" data-step="3">
+          <line class="svg-edge" x1="240" y1="292" x2="430" y2="240"/><rect class="svg-node" x="40" y="260" width="200" height="64" rx="8"/><text class="svg-label" x="140" y="300" text-anchor="middle" style="font-size:22px;">profundidad</text>
+          <line class="svg-edge" x1="860" y1="92" x2="670" y2="200"/><rect class="svg-node" x="860" y="60" width="200" height="64" rx="8"/><text class="svg-label" x="960" y="100" text-anchor="middle" style="font-size:22px;">térmica</text>
+        </g>
+        <g class="anim-step" data-step="4">
+          <line class="svg-edge" x1="860" y1="292" x2="670" y2="240"/><rect class="svg-node" x="860" y="260" width="200" height="64" rx="8"/><text class="svg-label" x="960" y="300" text-anchor="middle" style="font-size:22px;">IMU</text>
+        </g>
+        <g class="anim-step" data-step="5">
+          <path class="svg-edge" d="M140,60 Q140,20 430,40" fill="none" stroke-dasharray="8 6" stroke-width="3"/>
+          <text class="svg-label" x="180" y="30" style="font-size:20px;">¡alineados sin un solo par!</text>
+        </g>
+        <g class="anim-step" data-step="1" data-step-off="2"><text class="svg-label" x="20" y="400" style="font-size:22px;">1 · Imagen y texto: los encoders de CLIP, sin entrenar de nuevo.</text></g>
+        <g class="anim-step" data-step="2" data-step-off="3"><text class="svg-label" x="20" y="400" style="font-size:22px;">2 · Audio: se empareja con el video del que salió (AudioSet).</text></g>
+        <g class="anim-step" data-step="3" data-step-off="4"><text class="svg-label" x="20" y="400" style="font-size:22px;">3 · Profundidad y térmica: con la foto tomada al mismo tiempo (SUN RGB-D, LLVIP).</text></g>
+        <g class="anim-step" data-step="4" data-step-off="5"><text class="svg-label" x="20" y="400" style="font-size:22px;">4 · IMU (acelerómetro y giroscopio): con el video de una cámara en la cabeza (Ego4D).</text></g>
+        <g class="anim-step" data-step="5"><text class="svg-label" x="20" y="400" style="font-size:22px;">5 · Audio y texto nunca se vieron juntos, pero quedan alineados.</text></g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+    </section>
+
+    <!-- IMAGEBIND: ENCODERS -->
+    <section>
+      <span class="kicker">ImageBind</span>
+      <h2>Cada modalidad entra a su propio Transformer</h2>
+      <table>
+        <thead><tr><th>Modalidad</th><th>Se empareja con</th><th>Cómo entra a la red</th></tr></thead>
+        <tbody>
+          <tr class="fragment"><td>Audio</td><td>Videos (AudioSet)</td><td>2 s de audio → espectrograma de 128 bandas → ViT, como si fuera una imagen</td></tr>
+          <tr class="fragment"><td>Profundidad, térmica</td><td>Fotos (SUN RGB-D, LLVIP)</td><td>Imagen de un canal → ViT</td></tr>
+          <tr class="fragment"><td>IMU</td><td>Videos (Ego4D)</td><td>5 s de acelerómetro y giroscopio → convolución 1D → Transformer</td></tr>
+        </tbody>
+      </table>
+      <p class="muted fragment">La arquitectura es la misma idea que ya conoces: convertir cualquier señal en tokens.</p>
+    </section>
+
+    <!-- IMAGEBIND: PÉRDIDA -->
+    <section>
+      <span class="kicker">ImageBind</span>
+      <h2>La pérdida es la de CLIP: cambia la pareja, no la idea</h2>
+      <div class="eq-key">\[ \mathcal{L}_{I,M} = -\log \frac{\exp(\mathbf{q}_i^{\top}\mathbf{k}_i/\tau)}{\exp(\mathbf{q}_i^{\top}\mathbf{k}_i/\tau) + \sum_{j \neq i} \exp(\mathbf{q}_i^{\top}\mathbf{k}_j/\tau)} \]</div>
+      <ul>
+        <li class="fragment">\( \mathbf{q}_i \): embedding de la imagen \( i \); \( \mathbf{k}_i \): embedding de su pareja (su audio, su IMU…).</li>
+        <li class="fragment">Arriba, el par real; abajo, el par real más todos los pares falsos del batch.</li>
+        <li class="fragment">Se suma también al revés, \( \mathcal{L}_{M,I} \): la imagen busca a su pareja y la pareja busca a su imagen.</li>
+      </ul>
+    </section>
+
+    <!-- IMAGEBIND: CAPACIDADES EMERGENTES -->
+    <section>
+      <span class="kicker">ImageBind</span>
+      <h2>Alineó audio y texto sin ver un solo par</h2>
+      <ul>
+        <li class="fragment"><strong>Zero-shot entre modalidades:</strong> clasifica sonidos escribiendo texto, aunque nunca vio pares (audio, texto).</li>
+        <li class="fragment"><strong>Búsqueda cruzada:</strong> un audio encuentra imágenes; un texto encuentra audios.</li>
+        <li class="fragment"><strong>Aritmética de embeddings:</strong> foto de frutas + sonido de pájaros → fotos de pájaros entre frutas.</li>
+      </ul>
+      <div class="box-key fragment">Si A está cerca de la imagen y B también, A y B quedan cerca entre sí.</div>
+      <p class="muted">Girdhar et al. (2023).</p>
+    </section>
+
+    <!-- CHECKPOINT IMAGEBIND -->
+    <section>
+      <span class="kicker">Checkpoint</span>
+      <div class="quiz" data-correct="b">
+        <p class="quiz-question">ImageBind <em>nunca</em> vio pares (audio, texto). ¿Por qué encuentra el sonido de un perro si escribes «a dog barking»?</p>
+        <button class="quiz-option" data-opt="a">Porque su encoder de audio se entrenó con los subtítulos de los videos.</button>
+        <button class="quiz-option" data-opt="b">Porque el audio y el texto se alinearon, por separado, con las mismas imágenes.</button>
+        <button class="quiz-option" data-opt="c">Porque primero convierte el audio en texto y después compara palabras.</button>
+        <div class="quiz-explain"><strong>B.</strong> El audio se alineó con imágenes y el texto ya estaba alineado con imágenes (CLIP); por eso audio y texto quedan cerca sin haberse visto juntos. A falla porque no se usaron pares con texto para el audio. C falla porque no hay transcripción: todo se compara como vectores.</div>
+      </div>
+    </section>
+
+    <!-- 27 · LO ACTUAL -->
+    <section>
+      <span class="kicker kicker-ai">Por qué importa hoy</span>
+      <h2>Los embeddings siguen creciendo</h2>
+      <div class="box-ai" data-label="Por qué importa hoy">
+        <ul>
+          <li class="fragment"><strong>DINOv3</strong> (Meta, 2025): 7 mil millones de parámetros entrenados con 1,700 millones de imágenes, sin etiquetas.</li>
+          <li class="fragment"><strong>SigLIP 2</strong> (Google, 2025): encoders imagen-texto multilingües, usados como «ojos» de modelos de visión y lenguaje.</li>
+          <li class="fragment">Buscadores de fotos, recomendaciones y RAG comparan embeddings con la misma similitud coseno de hoy.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- RETO: CONTEXTO CON IMÁGENES -->
+    <section>
+      <span class="kicker">Actividad · 60 min</span>
+      <h2>Reto: construyan Contexto con imágenes</h2>
+      <div class="cols">
+        <div>
+          <ol>
+            <li>La computadora elige en secreto una imagen de la galería.</li>
+            <li>El jugador escribe descripciones; el juego dice en qué lugar quedó la secreta.</li>
+            <li>Gana quien la lleve al lugar 1.</li>
+            <li>Constrúyanlo desde cero y publíquenlo en un enlace para que otros lo jueguen.</li>
+          </ol>
+          <p class="muted">Pueden usar IA para programar, pero cualquier integrante debe poder explicar cómo se calcula el lugar.</p>
+        </div>
+        <div class="activity-meta">
+          <div class="activity-timer" data-minutes="60"></div>
+          <p><strong>Cómo:</strong> en sus equipos del módulo</p>
+          <p><strong>Instrucciones y extras:</strong> en Canvas</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- FERIA -->
+    <section>
+      <span class="kicker">Actividad · 20 min</span>
+      <h2>Feria: jueguen los juegos de los demás</h2>
+      <div class="cols">
+        <div>
+          <ol>
+            <li>Cada equipo comparte el enlace público de su juego.</li>
+            <li>Jueguen al menos dos juegos de otros equipos.</li>
+            <li>Voten por el mejor juego.</li>
+            <li>Elijo a un integrante de cada equipo para explicar su puntaje.</li>
+          </ol>
+        </div>
+        <div class="activity-meta">
+          <div class="activity-timer" data-minutes="20"></div>
+          <p><strong>Cómo:</strong> todo el grupo</p>
+          <p><strong>Entrega:</strong> {{ASSIGNMENT}}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 29 · IDEAS PARA LLEVARSE -->
+    <section>
+      <span class="kicker">Ideas para llevarse</span>
+      <h2>Aprender comparando pares</h2>
+      <ul>
+        <li class="fragment">Un embedding multimodal pone fotos, textos y sonidos parecidos cerca; la similitud coseno mide qué tan cerca.</li>
+        <li class="fragment">CLIP aprende con pares (imagen, texto): gana la diagonal. SigLIP califica cada par por separado.</li>
+        <li class="fragment">DINOv2 aprende sin texto: dos vistas de la misma foto deben coincidir, en la imagen y en cada parche.</li>
+        <li class="fragment">ImageBind usa la imagen como pegamento: con pares que solo incluyen imágenes alinea seis modalidades.</li>
+      </ul>
+    </section>
+
+    <!-- 30 · REFERENCIAS -->
+    <section>
+      <span class="kicker">Embeddings multimodales</span>
+      <h2>Referencias y lecturas adicionales</h2>
+      <div class="refs cols">
+        <div>
+          <h3>Referencias</h3>
+          <ul>
+            <li><span class="ref-type">Paper</span> Radford, A. et al. Learning Transferable Visual Models From Natural Language Supervision. <em>ICML</em>, 2021. <a href="https://arxiv.org/abs/2103.00020">arXiv:2103.00020</a>.</li>
+            <li><span class="ref-type">Paper</span> Zhai, X., Mustafa, B., Kolesnikov, A. and Beyer, L. Sigmoid Loss for Language Image Pre-Training. <em>ICCV</em>, 2023. <a href="https://arxiv.org/abs/2303.15343">arXiv:2303.15343</a>.</li>
+            <li><span class="ref-type">Paper</span> Caron, M. et al. Emerging Properties in Self-Supervised Vision Transformers. <em>ICCV</em>, 2021. <a href="https://arxiv.org/abs/2104.14294">arXiv:2104.14294</a>.</li>
+            <li><span class="ref-type">Paper</span> Girdhar, R. et al. ImageBind: One Embedding Space To Bind Them All. <em>CVPR</em>, 2023. <a href="https://arxiv.org/abs/2305.05665">arXiv:2305.05665</a>.</li>
+            <li><span class="ref-type">Paper</span> Oquab, M. et al. DINOv2: Learning Robust Visual Features without Supervision. <em>TMLR</em>, 2024. <a href="https://arxiv.org/abs/2304.07193">arXiv:2304.07193</a>.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Lecturas adicionales</h3>
+          <ul>
+            <li><span class="ref-type">Paper</span> <a href="https://arxiv.org/abs/2212.07143">Cherti et al. (2023), OpenCLIP</a> <span class="ref-nota">— cómo escala CLIP con datos públicos.</span></li>
+            <li><span class="ref-type">Paper</span> <a href="https://arxiv.org/abs/2502.14786">Tschannen et al. (2025), SigLIP 2</a> <span class="ref-nota">— la versión multilingüe.</span></li>
+            <li><span class="ref-type">Paper</span> <a href="https://arxiv.org/abs/2508.10104">Siméoni et al. (2025), DINOv3</a> <span class="ref-nota">— el estado actual de DINO.</span></li>
+          </ul>
+        </div>
+      </div>
+      <p class="refs-ia">Nota: estas diapositivas se generaron con ayuda de inteligencia artificial, específicamente Claude (Anthropic).</p>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="../js/shstyle.js"></script>
+<script src="../js/dl-extras.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1280, height: 720, margin: 0.06,
+    hash: true, progress: true, slideNumber: 'c/t', controls: true,
+    transition: 'slide', transitionSpeed: 'fast',
+    plugins: [ RevealHighlight ]
+  }).then(() => {
+    SHStyle.init({
+      "embedding": {
+        titulo: "Embedding",
+        def: "Un vector de números reales que representa algo (una palabra, una foto, un texto) de modo que las cosas parecidas quedan cerca."
+      },
+      "multimodal": {
+        titulo: "Multimodal",
+        def: "Que combina varios tipos de datos (modalidades): imágenes, texto, audio, profundidad, señales de sensores. Un embedding multimodal pone todas en un mismo espacio."
+      },
+      "encoder": {
+        titulo: "Encoder",
+        def: "Red que convierte una entrada (foto o texto) en un embedding. CLIP tiene uno para fotos y otro para textos."
+      },
+      "zero-shot": {
+        titulo: "Zero-shot",
+        def: "Resolver una tarea sin ejemplos etiquetados de esa tarea. En CLIP, las clases se describen con texto en el momento de usar el modelo."
+      },
+      "autosupervisado": {
+        titulo: "Aprendizaje autosupervisado",
+        def: "Entrenamiento donde las etiquetas salen de los propios datos; por ejemplo, dos recortes de la misma foto deben dar la misma salida."
+      },
+      "parche": {
+        titulo: "Parche (patch)",
+        def: "Cuadro pequeño de la imagen (14 × 14 píxeles en DINOv2) que el Vision Transformer trata como un token."
+      },
+      "coseno": {
+        titulo: "Similitud coseno",
+        def: "El coseno del ángulo entre dos vectores: \\( \\mathbf{a}\\cdot\\mathbf{b} / (\\lVert\\mathbf{a}\\rVert\\,\\lVert\\mathbf{b}\\rVert) \\). Vale 1 si apuntan igual, 0 si son perpendiculares. No depende del largo de los vectores."
+      }
+    });
+  });
+</script>
+</body>
+</html>
