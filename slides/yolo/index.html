@@ -1046,91 +1046,27 @@ def nms(cajas, conf, umbral=0.5):
     <section>
       <span class="kicker">Diez años de YOLO</span>
       <h2>YOLO-World compara cada caja con las palabras</h2>
-      <svg viewBox="0 0 1100 425" style="width:100%; max-height:440px;">
-        <image href="img/dog_cat_rcnn.jpg" x="20" y="200" width="240" height="160" preserveAspectRatio="none"/>
-        <g class="anim-step" data-step="1">
-        <text class="svg-label" x="20" y="22" style="font-size:16px; font-weight:400;">vocabulario (texto)</text>
-        <rect class="svg-node-hl" x="20" y="35" width="88" height="40" rx="20" style="stroke-width:2;"/>
-        <text class="svg-label" x="64" y="62" text-anchor="middle" style="font-size:18px;">perro</text>
-        <rect class="svg-node-hl" x="120" y="35" width="88" height="40" rx="20" style="stroke-width:2;"/>
-        <text class="svg-label" x="164" y="62" text-anchor="middle" style="font-size:18px;">gato</text>
-        <rect class="svg-node-hl" x="220" y="35" width="88" height="40" rx="20" style="stroke-width:2;"/>
-        <text class="svg-label" x="264" y="62" text-anchor="middle" style="font-size:18px;">silla</text>
-        </g>
-        <g class="anim-step" data-step="2">
-        <path class="svg-edge" style="stroke-width:2;" d="M312,55L345,55M337,59L345,55L337,51"/>
-        <rect class="svg-node" x="345" y="25" width="180" height="62" rx="8" style="stroke-width:2;"/>
-        <text class="svg-label" x="435" y="52" text-anchor="middle" style="font-size:17px;">codificador</text>
-        <text class="svg-label" x="435" y="74" text-anchor="middle" style="font-size:17px;">de texto (CLIP)</text>
-        <path class="svg-edge" style="stroke-width:2;" d="M525,55L555,55M547,59L555,55L547,51"/>
-        <rect class="f-accent" x="560" y="30" width="110" height="13" rx="3" style="fill-opacity:0.9;"/>
-        <text class="svg-label" x="678" y="42" style="font-size:15px; font-weight:400;">w₁ · perro</text>
-        <rect class="f-accent" x="560" y="50" width="110" height="13" rx="3" style="fill-opacity:0.65;"/>
-        <text class="svg-label" x="678" y="62" style="font-size:15px; font-weight:400;">w₂ · gato</text>
-        <rect class="f-accent" x="560" y="70" width="110" height="13" rx="3" style="fill-opacity:0.4;"/>
-        <text class="svg-label" x="678" y="82" style="font-size:15px; font-weight:400;">w₃ · silla</text>
-        </g>
-        <g class="anim-step" data-step="3">
-        <path class="svg-edge" style="stroke-width:2;" d="M262,280L290,280M282,284L290,280L282,276"/>
-        <rect class="svg-node" x="290" y="240" width="120" height="80" rx="8" style="stroke-width:2;"/>
-        <text class="svg-label" x="350" y="272" text-anchor="middle" style="font-size:17px;">backbone</text>
-        <text class="svg-label" x="350" y="296" text-anchor="middle" style="font-size:15px; font-weight:400;">YOLOv8</text>
-        <path class="svg-edge" style="stroke-width:2;" d="M410,280L445,280M437,284L445,280L437,276"/>
-        </g>
-        <g class="anim-step" data-step="4">
-        <rect class="svg-node-hl" x="445" y="230" width="165" height="100" rx="8" style="stroke-width:3;"/>
-        <text class="svg-label" x="527" y="272" text-anchor="middle" style="font-size:18px;">RepVL-PAN</text>
-        <text class="svg-label" x="527" y="296" text-anchor="middle" style="font-size:14px; font-weight:400;">imagen + texto</text>
-        <path class="svg-edge" style="stroke-width:2;" d="M615,95L560,226M560,217L560,226L567,220"/>
-        </g>
-        <g class="anim-step" data-step="5">
-        <path class="svg-edge" style="stroke-width:2;" d="M610,280L640,280M632,284L640,280L632,276"/>
-        <rect class="svg-node" x="640" y="250" width="90" height="60" rx="8" style="stroke-width:2;"/>
-        <text class="svg-label" x="685" y="286" text-anchor="middle" style="font-size:17px;">head</text>
-        <text class="svg-label" x="685" y="338" text-anchor="middle" style="font-size:14px; font-weight:400;">caja + embedding</text>
-        <rect class="s-accent" x="95" y="203" width="70" height="78" style="fill:none; stroke-width:4;"/>
-        <rect class="s-accent" x="161" y="224" width="89" height="134" style="fill:none; stroke-width:4;"/>
-        </g>
-        <g class="anim-step" data-step="6">
-        <path class="svg-edge" style="stroke-width:2;" d="M730,280L770,280M762,284L770,280L762,276"/>
-        <text class="svg-label" x="955" y="150" text-anchor="middle" style="font-size:17px;">similitud caja–texto</text>
-        <text class="svg-label" x="921.0" y="180" text-anchor="middle" style="font-size:15px; font-weight:400;">perro</text>
-        <text class="svg-label" x="983.0" y="180" text-anchor="middle" style="font-size:15px; font-weight:400;">gato</text>
-        <text class="svg-label" x="1045.0" y="180" text-anchor="middle" style="font-size:15px; font-weight:400;">silla</text>
-        <text class="svg-label" x="880" y="216" text-anchor="end" style="font-size:16px;">caja 1</text>
-        <rect class="f-accent" x="892" y="192" width="58" height="36" rx="4"/>
-        <text class="f-bg" x="921.0" y="216" text-anchor="middle" style="font-size:15px; font-weight:700;">alta</text>
-        <rect class="f-surface-3" x="954" y="192" width="58" height="36" rx="4"/>
-        <text class="f-ink-soft" x="983.0" y="216" text-anchor="middle" style="font-size:15px; font-weight:700;">baja</text>
-        <rect class="f-surface-3" x="1016" y="192" width="58" height="36" rx="4"/>
-        <text class="f-ink-soft" x="1045.0" y="216" text-anchor="middle" style="font-size:15px; font-weight:700;">baja</text>
-        <text class="svg-label" x="880" y="256" text-anchor="end" style="font-size:16px;">caja 2</text>
-        <rect class="f-surface-3" x="892" y="232" width="58" height="36" rx="4"/>
-        <text class="f-ink-soft" x="921.0" y="256" text-anchor="middle" style="font-size:15px; font-weight:700;">baja</text>
-        <rect class="f-accent" x="954" y="232" width="58" height="36" rx="4"/>
-        <text class="f-bg" x="983.0" y="256" text-anchor="middle" style="font-size:15px; font-weight:700;">alta</text>
-        <rect class="f-surface-3" x="1016" y="232" width="58" height="36" rx="4"/>
-        <text class="f-ink-soft" x="1045.0" y="256" text-anchor="middle" style="font-size:15px; font-weight:700;">baja</text>
-        <text class="svg-label" x="955" y="305" text-anchor="middle" style="font-size:15px; font-weight:400;">s = α · cos(caja, palabra) + β</text>
-        </g>
-        <g class="anim-step" data-step="5" data-step-off="6"><rect class="f-accent" x="95" y="183" width="56" height="20" rx="4"/><text class="f-bg" x="123" y="198" text-anchor="middle" style="font-size:14px; font-weight:700;">caja 1</text><rect class="f-accent" x="171" y="204" width="56" height="20" rx="4"/><text class="f-bg" x="199" y="219" text-anchor="middle" style="font-size:14px; font-weight:700;">caja 2</text></g>
-        <g class="anim-step" data-step="6"><rect class="f-accent" x="95" y="183" width="56" height="20" rx="4"/><text class="f-bg" x="123" y="198" text-anchor="middle" style="font-size:14px; font-weight:700;">perro</text><rect class="f-accent" x="171" y="204" width="56" height="20" rx="4"/><text class="f-bg" x="199" y="219" text-anchor="middle" style="font-size:14px; font-weight:700;">gato</text></g>
-        <g class="anim-step" data-step="7">
-        <rect class="s-err" x="340" y="20" width="190" height="72" rx="10" style="fill:none; stroke-width:3; stroke-dasharray:8 6;"/>
-        <text class="f-err" x="790" y="40" style="font-size:16px; font-weight:700;">al desplegarlo:</text>
-        <text class="svg-label" x="790" y="62" style="font-size:15px; font-weight:400;">el vocabulario se codifica</text>
-        <text class="svg-label" x="790" y="82" style="font-size:15px; font-weight:400;">una vez y va en los pesos</text>
-        </g>
-        <g class="anim-step" data-step="1" data-step-off="2"><text class="svg-label" x="550" y="410" text-anchor="middle" style="font-size:21px;">El vocabulario es texto: lo escribe quien usa el modelo.</text></g>
-        <g class="anim-step" data-step="2" data-step-off="3"><text class="svg-label" x="550" y="410" text-anchor="middle" style="font-size:21px;">El codificador de texto de CLIP convierte cada palabra en un embedding.</text></g>
-        <g class="anim-step" data-step="3" data-step-off="4"><text class="svg-label" x="550" y="410" text-anchor="middle" style="font-size:21px;">La imagen entra a un detector YOLOv8, como cualquier YOLO.</text></g>
-        <g class="anim-step" data-step="4" data-step-off="5"><text class="svg-label" x="550" y="410" text-anchor="middle" style="font-size:21px;">RepVL-PAN mezcla las características de la imagen con el texto.</text></g>
-        <g class="anim-step" data-step="5" data-step-off="6"><text class="svg-label" x="550" y="410" text-anchor="middle" style="font-size:21px;">La head predice, por cada caja, su posición y un embedding del objeto.</text></g>
-        <g class="anim-step" data-step="6" data-step-off="7"><text class="svg-label" x="550" y="410" text-anchor="middle" style="font-size:21px;">Cada caja se compara con cada palabra: gana la más parecida.</text></g>
-        <g class="anim-step" data-step="7"><text class="svg-label" x="550" y="410" text-anchor="middle" style="font-size:21px;">Con un vocabulario fijo ya no hace falta correr CLIP en cada imagen.</text></g>
-      </svg>
-      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
-      <p class="muted" style="font-size:0.5em;">Cheng et al. (2024), YOLO-World, CVPR. Detector YOLOv8, codificador de texto de CLIP y RepVL-PAN.</p>
+      <figure class="fig">
+        <img src="img/paper_yoloworld_architecture.png" alt="Figura 3 de YOLO-World: el texto pasa por un codificador de texto congelado y da embeddings del vocabulario; la imagen pasa por el backbone de YOLO y da características en varias escalas; una Vision-Language PAN mezcla ambas; una head de cajas y una head contrastiva producen embeddings de objeto que se comparan con los embeddings del texto en una matriz región–texto.">
+        <figcaption>Arriba, el texto (codificador de CLIP, congelado); abajo, la imagen (backbone de YOLO). La PAN los mezcla y cada caja se compara con cada palabra en la matriz región–texto. Al desplegarlo, el vocabulario del usuario se codifica una sola vez. <span class="muted">Figura de Cheng et al. (2024).</span></figcaption>
+      </figure>
+    </section>
+
+    <!-- YOLO-WORLD: REPVL-PAN -->
+    <section>
+      <span class="kicker">Diez años de YOLO</span>
+      <h2>RepVL-PAN: el texto y la imagen se corrigen</h2>
+      <div class="cols" style="align-items:center;">
+        <figure class="fig" style="flex:1.1;">
+          <img src="img/paper_yoloworld_repvlpan.png" alt="Figura 4 de YOLO-World: la RepVL-PAN con capas T-CSPLayer, que reciben los embeddings de texto (flechas naranjas), y bloques I-Pooling Attention, que actualizan los embeddings de texto con la imagen (flechas punteadas), sobre las escalas C3, C4 y C5.">
+          <figcaption><span class="muted">Figura de Cheng et al. (2024).</span></figcaption>
+        </figure>
+        <ul>
+          <li class="fragment"><strong>Texto → imagen</strong> (naranja): cada T‑CSPLayer resalta lo que se parece a alguna palabra.</li>
+          <li class="fragment"><strong>Imagen → texto</strong> (punteada): I‑Pooling resume la imagen en 27 regiones y actualiza el texto.</li>
+          <li class="fragment">El texto ya «vio» la imagen antes de compararse con cada caja.</li>
+        </ul>
+      </div>
     </section>
 
 
