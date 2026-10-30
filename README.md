@@ -7,6 +7,7 @@ This repository contains code examples, activities and external links related wi
 |---|---|---|
 | Vision Transformers | [slides](https://noe-tec.github.io/machine-learning/slides/vision-transformer/) | [How does a model built to read learn to see?](https://noe-tec.github.io/machine-learning/readings/vision-transformer/) |
 | Multimodal embeddings | [slides](https://noe-tec.github.io/machine-learning/slides/multimodal-embeddings/) | [¿Cómo relaciona una máquina una foto, una frase y un sonido?](https://noe-tec.github.io/machine-learning/readings/multimodal-embeddings/) - Spanish! |
+| De R-CNN a YOLO | [slides](https://noe-tec.github.io/machine-learning/slides/yolo/) | [¿Cómo encuentra una computadora todo lo que hay en una foto de un solo vistazo?](https://noe-tec.github.io/machine-learning/readings/yolo/) - Spanish! |
 
 ## Demos
 
@@ -62,6 +63,7 @@ Standalone, single-purpose Python scripts (no notebook boilerplate) demonstratin
 | 21 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/activity_vision_transformer.ipynb) | Inside a Vision Transformer: patches, tokens, encoder block and a pretrained ViT |
 | 22 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/activity_text_embeddings.ipynb) | Embeddings de palabras: similitud coseno, vecinos y analogías con Word2Vec - Spanish! |
 | 23 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/activity_multimodal_embeddings.ipynb) | Embeddings multimodales: CLIP zero-shot y búsqueda de imágenes con CLIP y DINOv2 - Spanish! |
+| 24 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/activity_object_detection_comparison.ipynb) | ¿Qué detector elegirías? Comparación de Faster R-CNN, YOLOv8n y YOLO-World y construcción de R-CNN - Spanish! |
 
 <!--
 

@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>De R-CNN a YOLO</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+  <script>try{if(localStorage.getItem("shstyle-theme")==="dark"&&!/print-pdf/i.test(location.search))document.documentElement.dataset.theme="dark"}catch(e){}</script>
+  <link rel="stylesheet" href="../css/shstyle.css">
+  <link rel="stylesheet" href="../css/dl-extras.css">
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <!-- 1 · PORTADA -->
+    <section class="cover">
+      <span class="kicker">Deep Learning</span>
+      <h1>De R-CNN a YOLO</h1>
+      <div class="cover-meta">Noé Sámano</div>
+    </section>
+
+    <!-- 2 · LECTURA -->
+    <section>
+      <span class="kicker">Antes de empezar</span>
+      <h2>Lectura de motivación</h2>
+      <div class="cols">
+        <div><svg class="qr" viewBox="0 0 41 41" style="width:300px; height:300px;" role="img" aria-label="Código QR: https://noe-tec.github.io/machine-learning/readings/yolo/" shape-rendering="crispEdges"><rect width="41" height="41" fill="white"/><path fill="black" d="M4,4h7v1h-7zM12,4h1v1h-1zM14,4h1v1h-1zM18,4h1v1h-1zM22,4h1v1h-1zM25,4h2v1h-2zM30,4h7v1h-7zM4,5h1v1h-1zM10,5h1v1h-1zM12,5h1v1h-1zM14,5h1v1h-1zM16,5h1v1h-1zM20,5h1v1h-1zM22,5h2v1h-2zM26,5h1v1h-1zM28,5h1v1h-1zM30,5h1v1h-1zM36,5h1v1h-1zM4,6h1v1h-1zM6,6h3v1h-3zM10,6h1v1h-1zM12,6h1v1h-1zM14,6h2v1h-2zM20,6h1v1h-1zM23,6h3v1h-3zM30,6h1v1h-1zM32,6h3v1h-3zM36,6h1v1h-1zM4,7h1v1h-1zM6,7h3v1h-3zM10,7h1v1h-1zM13,7h3v1h-3zM21,7h1v1h-1zM25,7h1v1h-1zM28,7h1v1h-1zM30,7h1v1h-1zM32,7h3v1h-3zM36,7h1v1h-1zM4,8h1v1h-1zM6,8h3v1h-3zM10,8h1v1h-1zM12,8h2v1h-2zM15,8h5v1h-5zM21,8h3v1h-3zM25,8h1v1h-1zM30,8h1v1h-1zM32,8h3v1h-3zM36,8h1v1h-1zM4,9h1v1h-1zM10,9h1v1h-1zM13,9h2v1h-2zM22,9h1v1h-1zM24,9h1v1h-1zM27,9h2v1h-2zM30,9h1v1h-1zM36,9h1v1h-1zM4,10h7v1h-7zM12,10h1v1h-1zM14,10h1v1h-1zM16,10h1v1h-1zM18,10h1v1h-1zM20,10h1v1h-1zM22,10h1v1h-1zM24,10h1v1h-1zM26,10h1v1h-1zM28,10h1v1h-1zM30,10h7v1h-7zM13,11h1v1h-1zM15,11h1v1h-1zM17,11h2v1h-2zM22,11h1v1h-1zM26,11h3v1h-3zM4,12h1v1h-1zM7,12h6v1h-6zM14,12h1v1h-1zM18,12h5v1h-5zM24,12h1v1h-1zM29,12h1v1h-1zM32,12h1v1h-1zM34,12h3v1h-3zM4,13h4v1h-4zM9,13h1v1h-1zM12,13h1v1h-1zM14,13h3v1h-3zM18,13h2v1h-2zM21,13h3v1h-3zM26,13h2v1h-2zM32,13h3v1h-3zM7,14h1v1h-1zM9,14h3v1h-3zM14,14h1v1h-1zM16,14h1v1h-1zM18,14h3v1h-3zM24,14h2v1h-2zM27,14h1v1h-1zM29,14h1v1h-1zM32,14h3v1h-3zM36,14h1v1h-1zM4,15h1v1h-1zM6,15h1v1h-1zM9,15h1v1h-1zM12,15h1v1h-1zM15,15h1v1h-1zM18,15h1v1h-1zM20,15h2v1h-2zM27,15h1v1h-1zM30,15h2v1h-2zM34,15h2v1h-2zM4,16h1v1h-1zM7,16h6v1h-6zM15,16h1v1h-1zM17,16h4v1h-4zM24,16h1v1h-1zM30,16h2v1h-2zM36,16h1v1h-1zM4,17h1v1h-1zM7,17h1v1h-1zM9,17h1v1h-1zM11,17h1v1h-1zM13,17h5v1h-5zM20,17h3v1h-3zM24,17h1v1h-1zM27,17h1v1h-1zM29,17h1v1h-1zM31,17h1v1h-1zM33,17h1v1h-1zM4,18h1v1h-1zM9,18h2v1h-2zM18,18h1v1h-1zM20,18h2v1h-2zM23,18h2v1h-2zM26,18h1v1h-1zM30,18h2v1h-2zM33,18h2v1h-2zM6,19h2v1h-2zM9,19h1v1h-1zM13,19h4v1h-4zM19,19h1v1h-1zM22,19h3v1h-3zM27,19h1v1h-1zM29,19h1v1h-1zM32,19h3v1h-3zM36,19h1v1h-1zM6,20h1v1h-1zM8,20h1v1h-1zM10,20h1v1h-1zM13,20h2v1h-2zM16,20h1v1h-1zM18,20h1v1h-1zM24,20h1v1h-1zM28,20h6v1h-6zM4,21h2v1h-2zM7,21h2v1h-2zM11,21h1v1h-1zM15,21h1v1h-1zM18,21h2v1h-2zM22,21h3v1h-3zM26,21h1v1h-1zM28,21h1v1h-1zM30,21h1v1h-1zM32,21h1v1h-1zM34,21h1v1h-1zM36,21h1v1h-1zM5,22h1v1h-1zM8,22h1v1h-1zM10,22h2v1h-2zM14,22h1v1h-1zM18,22h2v1h-2zM21,22h1v1h-1zM23,22h3v1h-3zM27,22h1v1h-1zM29,22h1v1h-1zM31,22h1v1h-1zM33,22h2v1h-2zM36,22h1v1h-1zM4,23h3v1h-3zM8,23h1v1h-1zM11,23h3v1h-3zM16,23h1v1h-1zM20,23h1v1h-1zM22,23h2v1h-2zM30,23h1v1h-1zM32,23h4v1h-4zM5,24h1v1h-1zM8,24h1v1h-1zM10,24h1v1h-1zM12,24h1v1h-1zM14,24h1v1h-1zM16,24h3v1h-3zM20,24h2v1h-2zM23,24h2v1h-2zM28,24h1v1h-1zM33,24h1v1h-1zM36,24h1v1h-1zM4,25h3v1h-3zM9,25h1v1h-1zM11,25h1v1h-1zM13,25h3v1h-3zM17,25h2v1h-2zM20,25h4v1h-4zM25,25h4v1h-4zM31,25h3v1h-3zM4,26h1v1h-1zM8,26h5v1h-5zM16,26h1v1h-1zM19,26h1v1h-1zM21,26h2v1h-2zM26,26h2v1h-2zM29,26h1v1h-1zM33,26h4v1h-4zM4,27h1v1h-1zM7,27h1v1h-1zM12,27h3v1h-3zM18,27h1v1h-1zM20,27h2v1h-2zM23,27h2v1h-2zM26,27h1v1h-1zM30,27h1v1h-1zM32,27h1v1h-1zM34,27h2v1h-2zM4,28h5v1h-5zM10,28h1v1h-1zM12,28h1v1h-1zM14,28h2v1h-2zM17,28h1v1h-1zM19,28h2v1h-2zM23,28h1v1h-1zM27,28h7v1h-7zM35,28h1v1h-1zM12,29h1v1h-1zM16,29h7v1h-7zM25,29h1v1h-1zM28,29h1v1h-1zM32,29h1v1h-1zM34,29h2v1h-2zM4,30h7v1h-7zM12,30h2v1h-2zM15,30h2v1h-2zM19,30h1v1h-1zM21,30h1v1h-1zM23,30h6v1h-6zM30,30h1v1h-1zM32,30h1v1h-1zM34,30h1v1h-1zM4,31h1v1h-1zM10,31h1v1h-1zM12,31h2v1h-2zM16,31h1v1h-1zM19,31h1v1h-1zM24,31h1v1h-1zM27,31h2v1h-2zM32,31h5v1h-5zM4,32h1v1h-1zM6,32h3v1h-3zM10,32h1v1h-1zM12,32h2v1h-2zM15,32h1v1h-1zM18,32h1v1h-1zM22,32h3v1h-3zM26,32h7v1h-7zM4,33h1v1h-1zM6,33h3v1h-3zM10,33h1v1h-1zM12,33h1v1h-1zM15,33h1v1h-1zM18,33h1v1h-1zM20,33h1v1h-1zM22,33h3v1h-3zM26,33h1v1h-1zM29,33h1v1h-1zM31,33h1v1h-1zM34,33h3v1h-3zM4,34h1v1h-1zM6,34h3v1h-3zM10,34h1v1h-1zM13,34h1v1h-1zM16,34h4v1h-4zM23,34h2v1h-2zM29,34h1v1h-1zM31,34h2v1h-2zM34,34h3v1h-3zM4,35h1v1h-1zM10,35h1v1h-1zM13,35h4v1h-4zM19,35h2v1h-2zM26,35h1v1h-1zM31,35h6v1h-6zM4,36h7v1h-7zM12,36h1v1h-1zM14,36h1v1h-1zM17,36h1v1h-1zM20,36h3v1h-3zM27,36h6v1h-6z"/></svg></div>
+        <div>
+          <p><strong>¿Cómo encuentra una computadora todo lo que hay en una foto de un solo vistazo?</strong></p>
+          <p class="muted">Una lectura de tres minutos. Escanea el código o abre:<br>
+            <a href="https://noe-tec.github.io/machine-learning/readings/yolo/">noe-tec.github.io/machine-learning/readings/yolo/</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 · OBJETIVOS -->
+    <section>
+      <span class="kicker">Objetivos</span>
+      <h2>Al terminar esta clase podrás…</h2>
+      <ul>
+        <li class="fragment">Explicar cómo R-CNN propone y revisa regiones.</li>
+        <li class="fragment">Distinguir los detectores de dos etapas y de una.</li>
+        <li class="fragment">Calcular la salida de YOLO a partir de su rejilla.</li>
+        <li class="fragment">Aplicar NMS a mano y elegir un YOLO para un caso.</li>
+      </ul>
+    </section>
+
+    <!-- 4 · EL PROBLEMA: CLASIFICAR VS DETECTAR -->
+    <section>
+      <span class="kicker">El problema</span>
+      <h2>Clasificar dice qué; detectar dice qué, dónde y cuántos</h2>
+      <svg viewBox="0 0 1100 400" style="width:100%; max-height:400px;">
+        <g>
+          <rect class="svg-node" x="20" y="20" width="460" height="260" rx="8"/>
+          <rect class="f-surface-3" x="70" y="140" width="140" height="110" rx="14"/>
+          <text class="svg-label" x="140" y="203" text-anchor="middle" style="font-size:22px;">perro</text>
+          <rect class="f-surface-3" x="260" y="90" width="180" height="150" rx="14"/>
+          <text class="svg-label" x="350" y="173" text-anchor="middle" style="font-size:22px;">bicicleta</text>
+          <rect class="svg-node" x="620" y="20" width="460" height="260" rx="8"/>
+          <rect class="f-surface-3" x="670" y="140" width="140" height="110" rx="14"/>
+          <text class="svg-label" x="740" y="203" text-anchor="middle" style="font-size:22px;">perro</text>
+          <rect class="f-surface-3" x="860" y="90" width="180" height="150" rx="14"/>
+          <text class="svg-label" x="950" y="173" text-anchor="middle" style="font-size:22px;">bicicleta</text>
+        </g>
+        <g class="anim-step" data-step="1">
+          <text class="svg-label" x="250" y="330" text-anchor="middle">Clasificación → «perro»</text>
+          <text class="svg-label" x="250" y="368" text-anchor="middle" style="font-size:20px; font-weight:400;">una etiqueta para toda la imagen</text>
+        </g>
+        <g class="anim-step" data-step="2">
+          <rect class="svg-node-hl" x="662" y="132" width="156" height="126" rx="4" style="fill:none;"/>
+          <rect class="svg-node-hl" x="852" y="82" width="196" height="166" rx="4" style="fill:none;"/>
+          <text class="svg-label" x="664" y="124" style="font-size:20px;">perro 0.90</text>
+          <text class="svg-label" x="854" y="74" style="font-size:20px;">bicicleta 0.80</text>
+          <text class="svg-label" x="850" y="330" text-anchor="middle">Detección → una caja por objeto</text>
+        </g>
+        <g class="anim-step" data-step="3">
+          <text class="svg-label" x="850" y="368" text-anchor="middle" style="font-size:20px; font-weight:400;">cada caja: clase, x, y, ancho, alto, confianza</text>
+        </g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+    </section>
+
+    <!-- 5 · UN SOLO OBJETO: CLASIFICAR + LOCALIZAR -->
+    <section>
+      <span class="kicker">El problema</span>
+      <h2>Un solo objeto: clasificar y localizar a la vez</h2>
+      <svg viewBox="0 0 1100 430" style="width:100%; max-height:400px;">
+        <g>
+          <image href="img/cat_single_object.jpg" x="10" y="95" width="300" height="201"/>
+        </g>
+        <g class="anim-step" data-step="1">
+          <rect class="svg-node-hl" x="34" y="136" width="272" height="159" style="fill:none; stroke-width:4;"/>
+          <circle class="f-accent" cx="34" cy="136" r="7"/>
+          <text class="f-accent" x="26" y="124" style="font-size:20px; font-weight:700;">x, y</text>
+          <text class="svg-label" x="170" y="322" text-anchor="middle" style="font-size:20px;">w</text>
+          <text class="svg-label" x="28" y="223" text-anchor="end" style="font-size:20px;">h</text>
+          <text class="svg-label" x="160" y="360" text-anchor="middle" style="font-size:19px; font-weight:400;">¿qué es y dónde está?</text>
+        </g>
+        <g class="anim-step" data-step="2">
+          <path class="svg-edge" style="stroke-width:2;" d="M315,225H338"/>
+          <rect class="svg-node" x="345" y="165" width="26" height="120" rx="4" style="stroke-width:2;"/><rect class="svg-node" x="379" y="173" width="26" height="104" rx="4" style="stroke-width:2;"/><rect class="svg-node" x="413" y="181" width="26" height="88" rx="4" style="stroke-width:2;"/><rect class="svg-node" x="447" y="189" width="26" height="72" rx="4" style="stroke-width:2;"/><rect class="svg-node" x="481" y="197" width="26" height="56" rx="4" style="stroke-width:2;"/>
+          <text class="svg-label" x="420" y="320" text-anchor="middle" style="font-size:18px; font-weight:400;">CNN</text>
+          <rect class="svg-node-hl" x="545" y="150" width="14" height="150" rx="3"/>
+          <text class="svg-label" x="552" y="325" text-anchor="middle" style="font-size:18px;">vector</text>
+          <text class="svg-label" x="552" y="347" text-anchor="middle" style="font-size:18px;">4,096</text>
+        </g>
+        <g class="anim-step" data-step="3">
+          <path class="svg-edge" style="stroke-width:2;" d="M565,195L650,120M640,121L650,120L646,130"/>
+          <path class="svg-edge" style="stroke-width:2;" d="M565,255L650,330M646,320L650,330L640,329"/>
+          <text class="svg-label" x="618" y="190" style="font-size:16px; font-weight:400;">FC → 1,000</text>
+          <text class="svg-label" x="618" y="272" style="font-size:16px; font-weight:400;">FC → 4</text>
+          <text class="svg-label" x="665" y="60" style="font-size:20px;">Puntajes de clase</text>
+          <text class="svg-label" x="665" y="90" style="font-size:19px; font-weight:400;">gato 0.90</text>
+          <text class="svg-label" x="665" y="117" style="font-size:19px; font-weight:400;">perro 0.05</text>
+          <text class="svg-label" x="665" y="144" style="font-size:19px; font-weight:400;">auto 0.01 …</text>
+          <text class="svg-label" x="665" y="320" style="font-size:20px;">Caja</text>
+          <text class="svg-label" x="665" y="348" style="font-size:19px; font-weight:400;">(x, y, w, h)</text>
+        </g>
+        <g class="anim-step" data-step="4">
+          <text class="svg-label" x="935" y="26" text-anchor="middle" style="font-size:17px; font-weight:400;">etiqueta real: gato</text>
+          <path class="svg-edge" style="stroke-width:2;" d="M935,34V64M928,56L935,64L942,56"/>
+          <path class="svg-edge" style="stroke-width:2;" d="M830,100H862M854,93L862,100L854,107"/>
+          <rect class="svg-node" x="865" y="70" width="140" height="60" rx="8" style="stroke-width:2;"/>
+          <text class="svg-label" x="935" y="97" text-anchor="middle" style="font-size:17px;">Entropía</text>
+          <text class="svg-label" x="935" y="119" text-anchor="middle" style="font-size:17px;">cruzada</text>
+          <path class="svg-edge" style="stroke-width:2;" d="M830,335H862M854,328L862,335L854,342"/>
+          <rect class="svg-node" x="865" y="305" width="140" height="60" rx="8" style="stroke-width:2;"/>
+          <text class="svg-label" x="935" y="342" text-anchor="middle" style="font-size:17px;">Pérdida L2</text>
+          <path class="svg-edge" style="stroke-width:2;" d="M935,398V368M928,376L935,368L942,376"/>
+          <text class="svg-label" x="935" y="420" text-anchor="middle" style="font-size:17px; font-weight:400;">caja real: (x′, y′, w′, h′)</text>
+        </g>
+        <g class="anim-step" data-step="5">
+          <path class="svg-edge" style="stroke-width:2;" d="M935,130V196M928,188L935,196L942,188"/>
+          <path class="svg-edge" style="stroke-width:2;" d="M935,305V240M928,248L935,240L942,248"/>
+          <circle class="svg-node-hl" cx="935" cy="218" r="20"/>
+          <text class="svg-label" x="935" y="227" text-anchor="middle" style="font-size:28px;">+</text>
+          <path class="svg-edge" style="stroke-width:2;" d="M957,218H1000M992,211L1000,218L992,225"/>
+          <text class="svg-label" x="1005" y="224" style="font-size:18px;">pérdida</text>
+          <text class="f-accent" x="760" y="226" text-anchor="middle" style="font-size:26px; font-weight:700;">Pérdida multitarea</text>
+        </g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+      <p class="muted">La caja se trata como una regresión: 4 números y una pérdida L2.</p>
+      <p class="muted" style="font-size:0.5em;">Foto: Oxford-IIIT Pet Dataset (Parkhi et al., 2012), CC BY-SA 4.0. Esquema adaptado de CS231n (Stanford).</p>
+    </section>
+
+    <!-- VARIOS OBJETOS -->
+    <section>
+      <span class="kicker">El problema</span>
+      <h2>Casi siempre hay más de un objeto</h2>
+      <svg viewBox="0 0 1100 380" style="width:100%; max-height:400px;">
+        <image href="img/dog_cat_rcnn.jpg" x="10" y="80" width="420" height="280" preserveAspectRatio="none"/>
+        <text class="svg-label" x="560" y="40" text-anchor="middle" style="font-size:20px; font-weight:400;">Aplica una CNN a muchos recortes de la imagen:</text>
+        <text class="svg-label" x="560" y="66" text-anchor="middle" style="font-size:20px; font-weight:400;">cada recorte se clasifica como objeto o fondo</text>
+        <path class="svg-edge" style="stroke-width:2;" d="M440,235H470M462,228L470,235L462,242"/>
+        <rect class="svg-node" x="480" y="175" width="26" height="120" rx="4" style="stroke-width:2;"/><rect class="svg-node" x="514" y="183" width="26" height="104" rx="4" style="stroke-width:2;"/><rect class="svg-node" x="548" y="191" width="26" height="88" rx="4" style="stroke-width:2;"/><rect class="svg-node" x="582" y="199" width="26" height="72" rx="4" style="stroke-width:2;"/><rect class="svg-node" x="616" y="207" width="26" height="56" rx="4" style="stroke-width:2;"/>
+        <text class="svg-label" x="555" y="330" text-anchor="middle" style="font-size:18px; font-weight:400;">CNN</text>
+        <path class="svg-edge" style="stroke-width:2;" d="M650,235H690M682,228L690,235L682,242"/>
+        <g class="anim-step" data-step="1" data-step-off="2">
+        <rect class="s-accent" x="142" y="85" width="122" height="137" style="fill:none; stroke-width:5;"/>
+        <text class="svg-label" x="710" y="190" style="font-size:26px;">¿Perro? <tspan class="f-ok">SÍ</tspan></text>
+        <text class="svg-label" x="710" y="230" style="font-size:26px;">¿Gato? <tspan class="f-err">NO</tspan></text>
+        <text class="svg-label" x="710" y="270" style="font-size:26px;">¿Fondo? <tspan class="f-err">NO</tspan></text>
+        </g>
+        <g class="anim-step" data-step="2" data-step-off="3">
+        <rect class="s-accent" x="257" y="122" width="156" height="234" style="fill:none; stroke-width:5;"/>
+        <text class="svg-label" x="710" y="190" style="font-size:26px;">¿Perro? <tspan class="f-err">NO</tspan></text>
+        <text class="svg-label" x="710" y="230" style="font-size:26px;">¿Gato? <tspan class="f-ok">SÍ</tspan></text>
+        <text class="svg-label" x="710" y="270" style="font-size:26px;">¿Fondo? <tspan class="f-err">NO</tspan></text>
+        </g>
+        <g class="anim-step" data-step="3" data-step-off="4">
+        <rect class="s-accent" x="52" y="195" width="73" height="90" style="fill:none; stroke-width:5;"/>
+        <text class="svg-label" x="710" y="190" style="font-size:26px;">¿Perro? <tspan class="f-err">NO</tspan></text>
+        <text class="svg-label" x="710" y="230" style="font-size:26px;">¿Gato? <tspan class="f-err">NO</tspan></text>
+        <text class="svg-label" x="710" y="270" style="font-size:26px;">¿Fondo? <tspan class="f-ok">SÍ</tspan></text>
+        </g>
+        <g class="anim-step" data-step="4">
+        <rect class="s-accent" x="142" y="85" width="122" height="137" style="fill:none; stroke-width:4;"/>
+        <rect class="s-accent" x="257" y="122" width="156" height="234" style="fill:none; stroke-width:4;"/>
+        <rect class="s-accent" x="52" y="195" width="73" height="90" style="fill:none; stroke-width:4;"/>
+        <text class="svg-label" x="710" y="210" style="font-size:24px;">perro, gato… y fondo</text>
+        <text class="svg-label" x="710" y="245" style="font-size:20px; font-weight:400;">una respuesta por recorte</text>
+        </g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+      <div class="box-key fragment">Con un objeto bastaban 4 números. Con varios, no sabemos cuántas cajas habrá.</div>
+    </section>
+
+    <!-- 6 · EL PROBLEMA: ¿DÓNDE BUSCAR? -->
+    <section>
+      <span class="kicker">El problema</span>
+      <h2>¿Dónde buscar los objetos?</h2>
+      <div class="cols" style="align-items:center; min-height:470px;">
+        <div style="flex:1.15;">
+          <svg viewBox="0 0 500 340" style="width:100%; max-height:360px;">
+            <image href="img/dog_cat_rcnn.jpg" x="10" y="10" width="480" height="320" preserveAspectRatio="none"/>
+            <g class="anim-step" data-step="1" data-step-off="2"><rect class="s-accent" x="10" y="10" width="110" height="110" style="fill:none; stroke-width:5;"/><text class="f-accent" x="18" y="36" style="font-size:18px; font-weight:700;">1</text></g>
+            <g class="anim-step" data-step="2" data-step-off="3"><rect class="s-accent" x="130" y="10" width="110" height="110" style="fill:none; stroke-width:5;"/><text class="f-accent" x="138" y="36" style="font-size:18px; font-weight:700;">2</text></g>
+            <g class="anim-step" data-step="3" data-step-off="4"><rect class="s-accent" x="250" y="10" width="110" height="110" style="fill:none; stroke-width:5;"/><text class="f-accent" x="258" y="36" style="font-size:18px; font-weight:700;">3</text></g>
+            <g class="anim-step" data-step="4" data-step-off="5"><rect class="s-accent" x="370" y="10" width="110" height="110" style="fill:none; stroke-width:5;"/><text class="f-accent" x="378" y="36" style="font-size:18px; font-weight:700;">4</text></g>
+            <g class="anim-step" data-step="5" data-step-off="6"><rect class="s-accent" x="10" y="130" width="110" height="110" style="fill:none; stroke-width:5;"/><text class="f-accent" x="18" y="156" style="font-size:18px; font-weight:700;">5</text></g>
+            <g class="anim-step" data-step="6" data-step-off="7"><rect class="s-accent" x="130" y="130" width="110" height="110" style="fill:none; stroke-width:5;"/><text class="f-accent" x="138" y="156" style="font-size:18px; font-weight:700;">6</text></g>
+            <g class="anim-step" data-step="7" data-step-off="8"><rect class="s-accent" x="90" y="40" width="210" height="210" style="fill:none; stroke-width:5;"/><text class="f-accent" x="100" y="68" style="font-size:18px; font-weight:700;">otro tamaño…</text></g>
+            <g class="anim-step" data-step="8">
+            <rect class="s-accent" x="57" y="141" width="84" height="103" style="fill:none; stroke-width:5; stroke-dasharray:none;"/>
+            <rect class="s-accent" x="161" y="16" width="140" height="156" style="fill:none; stroke-width:5; stroke-dasharray:none;"/>
+            <rect class="s-accent" x="292" y="57" width="179" height="268" style="fill:none; stroke-width:5; stroke-dasharray:none;"/>
+            <rect class="s-ink-soft" x="150" y="10" width="184" height="320" style="fill:none; stroke-width:2; stroke-dasharray:7 6;"/>
+            <rect class="s-ink-soft" x="43" y="122" width="167" height="167" style="fill:none; stroke-width:2; stroke-dasharray:7 6;"/>
+            <rect class="s-ink-soft" x="278" y="43" width="112" height="112" style="fill:none; stroke-width:2; stroke-dasharray:7 6;"/>
+            <rect class="s-ink-soft" x="345" y="177" width="123" height="140" style="fill:none; stroke-width:2; stroke-dasharray:7 6;"/>
+            <rect class="s-ink-soft" x="177" y="150" width="140" height="167" style="fill:none; stroke-width:2; stroke-dasharray:7 6;"/>
+            <rect class="s-ink-soft" x="10" y="205" width="223" height="125" style="fill:none; stroke-width:2; stroke-dasharray:7 6;"/>
+            <rect class="s-ink-soft" x="233" y="10" width="167" height="112" style="fill:none; stroke-width:2; stroke-dasharray:7 6;"/>
+            </g>
+          </svg>
+        </div>
+        <div>
+          <ul>
+            <li class="fragment"><strong>Ventanas deslizantes:</strong> revisar cada posición y tamaño. Miles de ventanas.<span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span></li>
+            <li class="fragment"><strong>Propuestas de regiones:</strong> <span class="term" data-term="selective-search">Selective Search</span> une manchas vecinas parecidas en color y textura; cada grupo es una región (~2,000).</li>
+          </ul>
+          <div class="box-key fragment">Cada región se revisa por separado.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- R-CNN PASO A PASO -->
+    <section>
+      <span class="kicker">El problema</span>
+      <h2><span class="term" data-term="rcnn">R-CNN</span>: una pasada de la CNN por cada región</h2>
+      <svg viewBox="0 0 1100 500" style="width:100%; max-height:470px;">
+        <g transform="matrix(1,0,-0.3915,0.5,130,320)"><image href="img/dog_cat_rcnn.jpg" x="0" y="0" width="420" height="281" preserveAspectRatio="none"/></g>
+        <text class="svg-label" x="230" y="490" text-anchor="middle" style="font-size:18px; font-weight:400;">imagen de entrada</text>
+        <g class="anim-step" data-step="1">
+        <g transform="matrix(1,0,-0.3915,0.5,130,320)">
+        <rect class="s-ink-soft" x="10" y="20" width="90" height="70" style="fill:none; stroke-width:2; stroke-dasharray:6 6;"/>
+        <rect class="s-ink-soft" x="60" y="140" width="160" height="120" style="fill:none; stroke-width:2; stroke-dasharray:6 6;"/>
+        <rect class="s-ink-soft" x="200" y="30" width="120" height="90" style="fill:none; stroke-width:2; stroke-dasharray:6 6;"/>
+        <rect class="s-ink-soft" x="240" y="150" width="160" height="110" style="fill:none; stroke-width:2; stroke-dasharray:6 6;"/>
+        <rect class="s-ink-soft" x="20" y="180" width="120" height="90" style="fill:none; stroke-width:2; stroke-dasharray:6 6;"/>
+        <rect class="s-ink-soft" x="330" y="120" width="80" height="120" style="fill:none; stroke-width:2; stroke-dasharray:6 6;"/>
+        <rect class="s-ink-soft" x="120" y="10" width="150" height="100" style="fill:none; stroke-width:2; stroke-dasharray:6 6;"/>
+        <rect class="s-ink-soft" x="180" y="70" width="210" height="170" style="fill:none; stroke-width:2; stroke-dasharray:6 6;"/>
+        <rect class="s-ink-soft" x="360" y="200" width="55" height="70" style="fill:none; stroke-width:2; stroke-dasharray:6 6;"/>
+        <rect class="s-ink-soft" x="90" y="90" width="90" height="80" style="fill:none; stroke-width:2; stroke-dasharray:6 6;"/>
+        <rect class="s-accent" x="42" y="115" width="73" height="90" style="fill:none; stroke-width:5;"/>
+        <rect class="s-accent" x="132" y="5" width="122" height="137" style="fill:none; stroke-width:5;"/>
+        <rect class="s-accent" x="247" y="42" width="156" height="234" style="fill:none; stroke-width:5;"/>
+        </g>
+        <text class="svg-label" x="600" y="395" style="font-size:21px;">Regiones de interés: ~2,000 propuestas</text>
+        <text class="svg-label" x="600" y="422" style="font-size:18px; font-weight:400;">un método aparte las propone (Selective Search)</text>
+        </g>
+        <g class="anim-step" data-step="2">
+        <path class="svg-edge" style="stroke-width:3;" d="M146,400L170,296" transform="rotate(0)"/>
+        <polygon class="f-accent-bg s-accent" style="stroke-width:2;" points="150,268 210,268 190,296 130,296"/>
+        <path class="svg-edge" style="stroke-width:3;" d="M294,357L320,296" transform="rotate(0)"/>
+        <polygon class="f-accent-bg s-accent" style="stroke-width:2;" points="300,268 360,268 340,296 280,296"/>
+        <path class="svg-edge" style="stroke-width:3;" d="M393,400L470,296" transform="rotate(0)"/>
+        <polygon class="f-accent-bg s-accent" style="stroke-width:2;" points="450,268 510,268 490,296 430,296"/>
+        <text class="svg-label" x="600" y="280" style="font-size:21px;">Cada región se recorta y se deforma</text>
+        <text class="svg-label" x="600" y="307" style="font-size:18px; font-weight:400;">a 227 × 227 píxeles, sin importar su forma</text>
+        </g>
+        <g class="anim-step" data-step="3">
+        <path class="svg-edge" style="stroke-width:3;" d="M170,266V244M163,251L170,243L177,251"/>
+        <polygon class="f-surface-3 s-ink" style="stroke-width:2;" points="125,150 205,150 225,130 145,130"/>
+        <polygon class="f-surface-4 s-ink" style="stroke-width:2;" points="205,150 225,130 225,220 205,240"/>
+        <rect class="svg-node" x="125" y="150" width="80" height="90" style="stroke-width:2;"/>
+        <text class="svg-label" x="165" y="202" text-anchor="middle" style="font-size:20px;">CNN</text>
+        <path class="svg-edge" style="stroke-width:3;" d="M320,266V244M313,251L320,243L327,251"/>
+        <polygon class="f-surface-3 s-ink" style="stroke-width:2;" points="275,150 355,150 375,130 295,130"/>
+        <polygon class="f-surface-4 s-ink" style="stroke-width:2;" points="355,150 375,130 375,220 355,240"/>
+        <rect class="svg-node" x="275" y="150" width="80" height="90" style="stroke-width:2;"/>
+        <text class="svg-label" x="315" y="202" text-anchor="middle" style="font-size:20px;">CNN</text>
+        <path class="svg-edge" style="stroke-width:3;" d="M470,266V244M463,251L470,243L477,251"/>
+        <polygon class="f-surface-3 s-ink" style="stroke-width:2;" points="425,150 505,150 525,130 445,130"/>
+        <polygon class="f-surface-4 s-ink" style="stroke-width:2;" points="505,150 525,130 525,220 505,240"/>
+        <rect class="svg-node" x="425" y="150" width="80" height="90" style="stroke-width:2;"/>
+        <text class="svg-label" x="465" y="202" text-anchor="middle" style="font-size:20px;">CNN</text>
+        <text class="svg-label" x="600" y="180" style="font-size:21px;">Cada recorte pasa por la CNN</text>
+        <text class="svg-label" x="600" y="207" style="font-size:18px; font-weight:400;">una pasada completa por región</text>
+        </g>
+        <g class="anim-step" data-step="4">
+        <path class="svg-edge" style="stroke-width:3;" d="M142,130V114M136,120L142,113L148,120M198,130V114M192,120L198,113L204,120"/>
+        <rect class="svg-node-hl" x="112" y="80" width="56" height="32" rx="4" style="stroke-width:2;"/>
+        <text class="svg-label" x="140" y="102" text-anchor="middle" style="font-size:16px;">caja</text>
+        <rect class="svg-node" x="172" y="80" width="56" height="32" rx="4" style="stroke-width:2;"/>
+        <text class="svg-label" x="200" y="102" text-anchor="middle" style="font-size:16px;">SVM</text>
+        <path class="svg-edge" style="stroke-width:3;" d="M292,130V114M286,120L292,113L298,120M348,130V114M342,120L348,113L354,120"/>
+        <rect class="svg-node-hl" x="262" y="80" width="56" height="32" rx="4" style="stroke-width:2;"/>
+        <text class="svg-label" x="290" y="102" text-anchor="middle" style="font-size:16px;">caja</text>
+        <rect class="svg-node" x="322" y="80" width="56" height="32" rx="4" style="stroke-width:2;"/>
+        <text class="svg-label" x="350" y="102" text-anchor="middle" style="font-size:16px;">SVM</text>
+        <path class="svg-edge" style="stroke-width:3;" d="M442,130V114M436,120L442,113L448,120M498,130V114M492,120L498,113L504,120"/>
+        <rect class="svg-node-hl" x="412" y="80" width="56" height="32" rx="4" style="stroke-width:2;"/>
+        <text class="svg-label" x="440" y="102" text-anchor="middle" style="font-size:16px;">caja</text>
+        <rect class="svg-node" x="472" y="80" width="56" height="32" rx="4" style="stroke-width:2;"/>
+        <text class="svg-label" x="500" y="102" text-anchor="middle" style="font-size:16px;">SVM</text>
+        <text class="svg-label" x="600" y="78" style="font-size:21px;">SVM por clase: ¿qué hay en la región?</text>
+        <text class="svg-label" x="600" y="105" style="font-size:18px; font-weight:400;">la regresión corrige la caja: (dx, dy, dw, dh)</text>
+        </g>
+        <g class="anim-step" data-step="5">
+        <text class="f-err" x="600" y="462" style="font-size:21px; font-weight:700;">Problema: ~2,000 pasadas de la CNN por imagen</text>
+        <text class="f-err" x="600" y="489" style="font-size:19px;">13 s por imagen en GPU, 53 s en CPU</text>
+        </g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+      <p class="muted" style="font-size:0.5em;">Girshick et al. (2014). Esquema adaptado de CS231n (Stanford).</p>
+    </section>
+
+    <!-- FAST R-CNN PASO A PASO -->
+    <section>
+      <span class="kicker">El problema</span>
+      <h2>Fast R-CNN: la CNN corre una vez por imagen</h2>
+      <svg viewBox="0 0 1100 565" style="width:100%; max-height:470px;">
+        <g transform="matrix(1,0,-0.3915,0.5,130,390)"><image href="img/dog_cat_rcnn.jpg" x="0" y="0" width="420" height="281" preserveAspectRatio="none"/></g>
+        <text class="svg-label" x="230" y="555" text-anchor="middle" style="font-size:18px; font-weight:400;">imagen de entrada</text>
+        <g class="anim-step" data-step="1">
+        <polygon class="f-surface-2 s-ink" style="stroke-width:2;" points="140,345 480,345 520,320 180,320"/>
+        <polygon class="f-surface-4 s-ink" style="stroke-width:2;" points="480,345 520,320 520,445 480,470"/>
+        <rect class="svg-node" x="140" y="345" width="340" height="125" style="stroke-width:2; fill-opacity:0.85;"/>
+        <text class="svg-label" x="310" y="400" text-anchor="middle" style="font-size:22px;">CNN (backbone)</text>
+        <text class="svg-label" x="310" y="428" text-anchor="middle" style="font-size:16px; font-weight:400;">AlexNet, VGG, ResNet…</text>
+        <text class="svg-label" x="610" y="400" style="font-size:21px;">Toda la imagen pasa una sola vez</text>
+        <text class="svg-label" x="610" y="427" style="font-size:18px; font-weight:400;">por la CNN: la parte cara se hace una vez</text>
+        </g>
+        <g class="anim-step" data-step="2">
+        <path class="svg-edge" style="stroke-width:3;" d="M330,318V305M323,312L330,304L337,312"/>
+        <g transform="matrix(0.9,0,-0.18,0.18,170,250)"><rect class="f-surface-3 s-ink" x="0" y="0" width="420" height="281" style="stroke-width:8;"/>
+        <rect class="s-accent" x="42" y="115" width="73" height="90" style="fill:none; stroke-width:14;"/>
+        <rect class="s-accent" x="132" y="5" width="122" height="137" style="fill:none; stroke-width:14;"/>
+        <rect class="s-accent" x="247" y="42" width="156" height="234" style="fill:none; stroke-width:14;"/>
+        </g>
+        <text class="svg-label" x="610" y="272" style="font-size:21px;">Las ~2,000 regiones se proyectan</text>
+        <text class="svg-label" x="610" y="299" style="font-size:18px; font-weight:400;">sobre el mapa de características, no sobre la foto</text>
+        </g>
+        <g class="anim-step" data-step="3">
+        <path class="svg-edge" style="stroke-width:3;" d="M212,279L230,226"/>
+        <polygon class="f-accent-bg s-accent" style="stroke-width:2;" points="214,204 262,204 246,226 198,226"/>
+        <path class="svg-edge" style="stroke-width:3;" d="M330,263L330,226"/>
+        <polygon class="f-accent-bg s-accent" style="stroke-width:2;" points="314,204 362,204 346,226 298,226"/>
+        <path class="svg-edge" style="stroke-width:3;" d="M434,279L430,226"/>
+        <polygon class="f-accent-bg s-accent" style="stroke-width:2;" points="414,204 462,204 446,226 398,226"/>
+        <text class="svg-label" x="610" y="205" style="font-size:21px;">RoI pooling: recorta cada región</text>
+        <text class="svg-label" x="610" y="232" style="font-size:18px; font-weight:400;">y la reduce a una rejilla fija de 7 × 7</text>
+        </g>
+        <g class="anim-step" data-step="4">
+        <path class="svg-edge" style="stroke-width:3;" d="M230,202L296,178"/>
+        <path class="svg-edge" style="stroke-width:3;" d="M330,202L330,178"/>
+        <path class="svg-edge" style="stroke-width:3;" d="M430,202L363,178"/>
+        <rect class="svg-node" x="250" y="135" width="160" height="42" rx="6" style="stroke-width:2;"/>
+        <text class="svg-label" x="330" y="163" text-anchor="middle" style="font-size:18px;">capas FC</text>
+        <text class="svg-label" x="610" y="140" style="font-size:21px;">Una red pequeña por región</text>
+        <text class="svg-label" x="610" y="167" style="font-size:18px; font-weight:400;">solo capas totalmente conectadas: barata</text>
+        </g>
+        <g class="anim-step" data-step="5">
+        <path class="svg-edge" style="stroke-width:3;" d="M290,135L250,104M370,135L410,104"/>
+        <rect class="svg-node-hl" x="140" y="60" width="180" height="44" rx="6" style="stroke-width:2;"/>
+        <text class="svg-label" x="230" y="89" text-anchor="middle" style="font-size:17px;">lineal + softmax</text>
+        <rect class="svg-node-hl" x="345" y="60" width="150" height="44" rx="6" style="stroke-width:2;"/>
+        <text class="svg-label" x="420" y="89" text-anchor="middle" style="font-size:17px;">lineal</text>
+        <text class="svg-label" x="230" y="45" text-anchor="middle" style="font-size:17px; font-weight:400;">clase</text>
+        <text class="svg-label" x="420" y="45" text-anchor="middle" style="font-size:17px; font-weight:400;">corrección de caja</text>
+        <text class="svg-label" x="610" y="70" style="font-size:21px;">Dos salidas: clase y caja</text>
+        <text class="svg-label" x="610" y="97" style="font-size:18px; font-weight:400;">se entrenan juntas, sin SVM aparte</text>
+        </g>
+        <g class="anim-step" data-step="6">
+        <text class="f-accent" x="610" y="500" style="font-size:21px; font-weight:700;">0.3 s por imagen: 213× más rápido que R-CNN</text>
+        <text class="f-err" x="610" y="528" style="font-size:19px;">pero las propuestas siguen tardando unos 2 s</text>
+        </g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+      <p class="muted" style="font-size:0.5em;">Girshick (2015): 0.3 s por imagen sin contar las propuestas; 213× al evaluar con VGG16. Esquema adaptado de CS231n (Stanford).</p>
+    </section>
+
+    <!-- RPN (FASTER R-CNN) PASO A PASO -->
+    <section>
+      <span class="kicker">El problema</span>
+      <h2>Faster R-CNN: una red también propone las regiones</h2>
+      <p class="muted" style="margin-top:-0.3em;">La red de propuestas (RPN) reemplaza a Selective Search y usa la misma CNN que el detector.</p>
+      <svg viewBox="0 0 1100 460" style="width:100%; max-height:450px;">
+        <image href="img/dog_cat_rcnn.jpg" x="10" y="120" width="280" height="187" preserveAspectRatio="none"/>
+        <text class="svg-label" x="150" y="335" text-anchor="middle" style="font-size:17px; font-weight:400;">imagen (p. ej. 3 × 640 × 480)</text>
+        <g class="anim-step" data-step="1">
+        <polygon class="f-surface-3 s-ink" style="stroke-width:2;" points="305,150 350,165 350,262 305,277"/>
+        <text class="svg-label" x="327" y="220" text-anchor="middle" style="font-size:15px;">CNN</text>
+        <polygon class="f-surface-2 s-ink" style="stroke-width:2;" points="370,95 395,73 735,73 710,95"/>
+        <polygon class="f-surface-4 s-ink" style="stroke-width:2;" points="710,95 735,73 735,311 710,333"/>
+        <image href="img/dog_cat_rcnn.jpg" x="370" y="95" width="340" height="238" preserveAspectRatio="none" opacity="0.4"/>
+        <path class="s-ink-soft" style="stroke-width:1.5; fill:none;" d="M370,95V333M404,95V333M438,95V333M472,95V333M506,95V333M540,95V333M574,95V333M608,95V333M642,95V333M676,95V333M710,95V333M370,95H710M370,129H710M370,163H710M370,197H710M370,231H710M370,265H710M370,299H710M370,333H710"/>
+        <text class="svg-label" x="540.0" y="363" text-anchor="middle" style="font-size:17px; font-weight:400;">características (p. ej. 512 × 20 × 15)</text>
+        </g>
+        <g class="anim-step" data-step="1" data-step-off="2"><text class="svg-label" x="550" y="440" text-anchor="middle" style="font-size:22px;">Una CNN convierte la imagen en un mapa de características.</text></g>
+        <g class="anim-step" data-step="2" data-step-off="3"><text class="svg-label" x="550" y="440" text-anchor="middle" style="font-size:22px;">Imagina un ancla de tamaño fijo centrada en cada punto del mapa.</text></g>
+        <g class="anim-step" data-step="3" data-step-off="4"><text class="svg-label" x="550" y="440" text-anchor="middle" style="font-size:22px;">En cada punto, una conv predice si su ancla contiene un objeto.</text></g>
+        <g class="anim-step" data-step="4" data-step-off="5"><text class="svg-label" x="550" y="440" text-anchor="middle" style="font-size:22px;">Para las anclas positivas, predice 4 correcciones hacia la caja real.</text></g>
+        <g class="anim-step" data-step="5" data-step-off="6"><text class="svg-label" x="550" y="440" text-anchor="middle" style="font-size:22px;">En la práctica: K anclas de distintos tamaños y proporciones (K = 9).</text></g>
+        <g class="anim-step" data-step="6"><text class="svg-label" x="550" y="440" text-anchor="middle" style="font-size:22px;">Ordena las 9 × 20 × 15 = 2,700 cajas por su puntaje y quédate con ~300.</text></g>
+        <g class="anim-step" data-step="2" data-step-off="5">
+        <rect class="f-accent" x="438" y="163" width="34" height="34" style="fill-opacity:0.55;"/>
+        <rect class="s-accent" x="375" y="110" width="160" height="140" style="fill:none; stroke-width:5;"/>
+        <rect class="f-accent" x="506" y="265" width="34" height="34" style="fill-opacity:0.55;"/>
+        <rect class="s-accent" x="443" y="212" width="160" height="140" style="fill:none; stroke-width:5;"/>
+        <rect class="f-accent" x="540" y="129" width="34" height="34" style="fill-opacity:0.55;"/>
+        <rect class="s-accent" x="477" y="76" width="160" height="140" style="fill:none; stroke-width:5;"/>
+        <rect class="f-accent" x="608" y="231" width="34" height="34" style="fill-opacity:0.55;"/>
+        <rect class="s-accent" x="545" y="178" width="160" height="140" style="fill:none; stroke-width:5;"/>
+        </g>
+        <g class="anim-step" data-step="3">
+        <polygon class="f-surface-3 s-ink" style="stroke-width:2;" points="770,150 815,165 815,262 770,277"/>
+        <text class="svg-label" x="792" y="220" text-anchor="middle" style="font-size:15px;">conv</text>
+        <path class="svg-edge" style="stroke-width:2;" d="M825,170H860M852,163L860,170L852,177"/>
+        </g>
+        <g class="anim-step" data-step="3" data-step-off="5">
+        <text class="svg-label" x="870" y="166" style="font-size:18px;">¿Hay objeto?</text>
+        <text class="svg-label" x="870" y="190" style="font-size:17px; font-weight:400;">1 × 20 × 15</text>
+        </g>
+        <g class="anim-step" data-step="3" data-step-off="4">
+        <rect class="f-err" x="438" y="163" width="34" height="34" style="fill-opacity:0.55;"/>
+        <rect class="s-err" x="375" y="110" width="160" height="140" style="fill:none; stroke-width:5;"/>
+        <rect class="f-err" x="506" y="265" width="34" height="34" style="fill-opacity:0.55;"/>
+        <rect class="s-err" x="443" y="212" width="160" height="140" style="fill:none; stroke-width:5;"/>
+        <rect class="f-err" x="540" y="129" width="34" height="34" style="fill-opacity:0.55;"/>
+        <rect class="s-err" x="477" y="76" width="160" height="140" style="fill:none; stroke-width:5;"/>
+        </g>
+        <g class="anim-step" data-step="3" data-step-off="5">
+        <rect class="f-ok" x="608" y="231" width="34" height="34" style="fill-opacity:0.55;"/>
+        <rect class="s-ok" x="545" y="178" width="160" height="140" style="fill:none; stroke-width:5;"/>
+        </g>
+        <g class="anim-step" data-step="4" data-step-off="5">
+        <rect class="s-magenta" x="570" y="130" width="126" height="203" style="fill:none; stroke-width:5;"/>
+        <path class="svg-edge" style="stroke-width:2;" d="M825,250H860M852,243L860,250L852,257"/>
+        <text class="svg-label" x="870" y="246" style="font-size:18px;">Corrección de caja</text>
+        <text class="svg-label" x="870" y="270" style="font-size:17px; font-weight:400;">4 × 20 × 15</text>
+        </g>
+        <g class="anim-step" data-step="5">
+        <rect class="f-accent" x="608" y="197" width="34" height="34" style="fill-opacity:0.55;"/>
+        <rect class="s-accent" x="595" y="184" width="60" height="60" style="fill:none; stroke-width:3;"/>
+        <rect class="s-accent" x="560" y="149" width="130" height="130" style="fill:none; stroke-width:3;"/>
+        <rect class="s-accent" x="525" y="114" width="200" height="200" style="fill:none; stroke-width:3;"/>
+        <rect class="s-accent" x="575" y="186" width="100" height="55" style="fill:none; stroke-width:3;"/>
+        <rect class="s-accent" x="530" y="162" width="190" height="105" style="fill:none; stroke-width:3;"/>
+        <rect class="s-accent" x="598" y="164" width="55" height="100" style="fill:none; stroke-width:3;"/>
+        <rect class="s-accent" x="572" y="119" width="105" height="190" style="fill:none; stroke-width:3;"/>
+        <path class="svg-edge" style="stroke-width:2;" d="M825,250H860M852,243L860,250L852,257"/>
+        <text class="svg-label" x="870" y="166" style="font-size:18px;">¿Hay objeto?</text>
+        <text class="svg-label" x="870" y="190" style="font-size:17px; font-weight:400;">K × 20 × 15</text>
+        <text class="svg-label" x="870" y="246" style="font-size:18px;">Corrección de caja</text>
+        <text class="svg-label" x="870" y="270" style="font-size:17px; font-weight:400;">4K × 20 × 15</text>
+        </g>
+        <g class="anim-step" data-step="6">
+        <text class="f-accent" x="870" y="330" style="font-size:18px; font-weight:700;">~300 propuestas</text>
+        <text class="svg-label" x="870" y="354" style="font-size:16px; font-weight:400;">5 imágenes/s: 0.2 s por imagen</text>
+        </g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+      <p class="muted" style="font-size:0.5em;">RPN de Ren et al. (2015): K = 9 anclas (3 escalas × 3 proporciones), 300 propuestas, 5 imágenes/s en GPU. Esquema adaptado de CS231n.</p>
+    </section>
+
+
+    <!-- PUNTO DE CONTROL: DOS ETAPAS -->
+    <section>
+      <span class="kicker">Punto de control</span>
+      <div class="quiz" data-correct="b">
+        <p class="quiz-question">Faster R-CNN ya no usa Selective Search. ¿Por qué se sigue llamando un detector de <em>dos etapas</em>?</p>
+        <button class="quiz-option" data-opt="a">Porque la imagen completa pasa dos veces por la CNN, una por etapa.</button>
+        <button class="quiz-option" data-opt="b">Porque primero la RPN propone unas 300 regiones y después otra red clasifica y ajusta cada una.</button>
+        <button class="quiz-option" data-opt="c">Porque clasifica las regiones con SVM aparte, igual que R-CNN.</button>
+        <div class="quiz-explain">
+          <strong>B.</strong> <span class="qe-ok">Correcta.</span> Las dos etapas son proponer y luego revisar cada propuesta. Un detector de una etapa, como YOLO, predice clase y caja directo en cada celda, en un solo paso.
+          <span class="qe-line"><strong>A.</strong> <span class="qe-no">Incorrecta.</span> La CNN corre una sola vez y sus características se comparten entre las dos etapas.</span>
+          <span class="qe-line"><strong>C.</strong> <span class="qe-no">Incorrecta.</span> Eso describe a R-CNN; desde Fast R-CNN la clase sale de una capa lineal con softmax.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · DIVIDER -->
+    <section class="divider">
+      <h2>Mirar una sola vez</h2>
+      <p class="muted">YOLOv1, Redmon et al. (2016)</p>
+    </section>
+
+
+    <!-- 7 · LA PROPUESTA: FIGURA DEL PAPER -->
+    <section>
+      <span class="kicker">Mirar una sola vez</span>
+      <h2>Una red ve toda la imagen y predice todo a la vez</h2>
+      <div class="cols">
+        <figure class="fig" style="flex:1.5;">
+          <img src="img/paper_yolov1_model.png" alt="Figura 2 del paper de YOLO: una foto con un perro y una bicicleta dividida en una rejilla de S por S; de ella salen cajas con confianza y un mapa de probabilidad de clase por celda, que se combinan en las detecciones finales.">
+          <figcaption>Rejilla → cajas con confianza + clase por celda → detecciones. <span class="muted">Figura de Redmon et al. (2016).</span></figcaption>
+        </figure>
+        <ul>
+          <li class="fragment">La imagen entra a 448 × 448 a una sola CNN: 24 capas convolucionales y 2 totalmente conectadas.</li>
+          <li class="fragment">La salida es un tensor con todas las <span class="term" data-term="caja">cajas</span> y clases.</li>
+          <li class="fragment">45 imágenes por segundo: 0.022 s por imagen. La versión pequeña, 155 (0.006 s).</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 8 · LA REJILLA -->
+    <section>
+      <span class="kicker">Mirar una sola vez</span>
+      <h2>Cada celda responde por el objeto cuyo centro cae en ella</h2>
+      <svg viewBox="0 0 1100 420" style="width:100%; max-height:420px;">
+        <g>
+          <rect class="svg-node" x="20" y="10" width="400" height="400" rx="4"/>
+          <rect class="f-surface-3" x="85" y="200" width="140" height="160" rx="14"/>
+          <text class="svg-label" x="155" y="345" text-anchor="middle" style="font-size:20px;">perro</text>
+          <rect class="f-surface-3" x="249" y="110" width="170" height="200" rx="14"/>
+          <text class="svg-label" x="334" y="295" text-anchor="middle" style="font-size:20px;">bicicleta</text>
+        </g>
+        <g class="anim-step" data-step="1">
+          <path class="svg-edge" style="stroke-width:1.5;" d="M77.1,10V410M134.3,10V410M191.4,10V410M248.6,10V410M305.7,10V410M362.9,10V410M20,67.1H420M20,124.3H420M20,181.4H420M20,238.6H420M20,295.7H420M20,352.9H420"/>
+          <text class="svg-label" x="470" y="60">Paso 1 · rejilla de 7 × 7 sobre la imagen</text>
+        </g>
+        <g class="anim-step" data-step="2">
+          <rect class="svg-node-hl" x="134.3" y="238.6" width="57.1" height="57.1" style="fill-opacity:0.6;"/>
+          <circle class="f-accent" cx="155" cy="280" r="7"/>
+          <text class="svg-label" x="470" y="130">Paso 2 · el centro del perro cae en la celda (fila 5, col. 3)</text>
+          <text class="svg-label" x="470" y="162" style="font-size:20px; font-weight:400;">esa celda es la responsable de detectarlo</text>
+        </g>
+        <g class="anim-step" data-step="3">
+          <rect class="svg-node-hl" x="305.7" y="181.4" width="57.1" height="57.1" style="fill-opacity:0.6;"/>
+          <circle class="f-accent" cx="334" cy="210" r="7"/>
+          <text class="svg-label" x="470" y="230">Paso 3 · lo mismo para la bicicleta</text>
+          <text class="svg-label" x="470" y="262" style="font-size:20px; font-weight:400;">la caja puede salirse de la celda; solo el centro cuenta</text>
+        </g>
+        <g class="anim-step" data-step="4">
+          <text class="svg-label" x="470" y="330">Paso 4 · las otras 47 celdas aprenden</text>
+          <text class="svg-label" x="470" y="362" style="font-size:20px; font-weight:400;">a decir «aquí no hay centro de ningún objeto»</text>
+        </g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+    </section>
+
+    <!-- DETECTORES DE UNA ETAPA -->
+    <section>
+      <span class="kicker">Mirar una sola vez</span>
+      <h2>Una etapa: cada celda predice cajas y clases</h2>
+      <svg viewBox="0 0 1100 410" style="width:100%; max-height:420px;">
+        <image href="img/dog_cat_rcnn.jpg" x="10" y="110" width="320" height="214" preserveAspectRatio="none"/>
+        <text class="svg-label" x="170" y="352" text-anchor="middle" style="font-size:18px; font-weight:400;">imagen: 3 × H × W</text>
+        <g class="anim-step" data-step="1">
+        <path class="svg-edge" style="stroke-width:2;" d="M335,217H362M354,210L362,217L354,224"/>
+        <image href="img/dog_cat_rcnn.jpg" x="370" y="110" width="320" height="214" preserveAspectRatio="none"/>
+        <path class="s-surface-1" style="stroke-width:3; fill:none;" d="M370.0,110V324M415.7,110V324M461.4,110V324M507.1,110V324M552.9,110V324M598.6,110V324M644.3,110V324M690.0,110V324M370,110.0H690M370,140.6H690M370,171.1H690M370,201.7H690M370,232.3H690M370,262.9H690M370,293.4H690M370,324.0H690"/>
+        <text class="svg-label" x="530.0" y="352" text-anchor="middle" style="font-size:18px; font-weight:400;">rejilla de 7 × 7</text>
+        </g>
+        <g class="anim-step" data-step="2">
+        <circle class="f-err" cx="530" cy="156" r="7"/>
+        <rect class="s-err" x="490" y="116" width="80" height="80" style="fill:none; stroke-width:4;"/>
+        <rect class="s-err" x="475" y="126" width="110" height="60" style="fill:none; stroke-width:4;"/>
+        <rect class="s-err" x="500" y="101" width="60" height="110" style="fill:none; stroke-width:4;"/>
+        <circle class="f-accent" cx="621" cy="217" r="7"/>
+        <rect class="s-accent" x="581" y="177" width="80" height="80" style="fill:none; stroke-width:4;"/>
+        <rect class="s-accent" x="566" y="187" width="110" height="60" style="fill:none; stroke-width:4;"/>
+        <rect class="s-accent" x="591" y="162" width="60" height="110" style="fill:none; stroke-width:4;"/>
+        <text class="svg-label" x="530.0" y="378" text-anchor="middle" style="font-size:17px; font-weight:400;">B cajas por celda (aquí B = 3)</text>
+        </g>
+        <g class="anim-step" data-step="3"><text class="svg-label" x="740" y="130" style="font-size:20px; font-weight:700;">Por cada caja, 5 números:</text></g>
+        <g class="anim-step" data-step="3"><text class="svg-label" x="740" y="158" style="font-size:18px; font-weight:400;">(x, y, w, h, confianza)</text></g>
+        <g class="anim-step" data-step="4"><text class="svg-label" x="740" y="206" style="font-size:20px; font-weight:700;">Por celda, C puntajes de clase</text></g>
+        <g class="anim-step" data-step="4"><text class="svg-label" x="740" y="234" style="font-size:18px; font-weight:400;">(el fondo cuenta como clase)</text></g>
+        <g class="anim-step" data-step="5"><text class="svg-label" x="740" y="282" style="font-size:20px; font-weight:700;">Como la RPN, pero con clases</text></g>
+        <g class="anim-step" data-step="5"><text class="svg-label" x="740" y="310" style="font-size:18px; font-weight:400;">y en una sola etapa</text></g>
+        <g class="anim-step" data-step="3"><path class="svg-edge" style="stroke-width:2;" d="M700,217H728M720,210L728,217L720,224"/></g>
+        <g class="anim-step" data-step="6">
+        <rect class="svg-node-hl" x="740" y="330" width="330" height="70" rx="10" style="stroke-width:3;"/>
+        <text class="svg-label" x="905" y="360" text-anchor="middle" style="font-size:18px; font-weight:400;">salida</text>
+        <text class="svg-label" x="905" y="388" text-anchor="middle" style="font-size:24px;">7 × 7 × (5B + C)</text>
+        </g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+      <p class="muted" style="font-size:0.5em;">Redmon et al. (2016), YOLO, CVPR. Esquema adaptado de CS231n.</p>
+    </section>
+
+    <!-- 9 · EL VECTOR DE 30 -->
+    <section>
+      <span class="kicker">Mirar una sola vez</span>
+      <h2>Cada celda predice 30 números</h2>
+      <svg viewBox="0 0 1100 420" style="width:100%; max-height:420px;">
+        <g class="anim-step" data-step="1">
+          <rect class="svg-node-hl" x="40" y="150" width="34" height="50" style="stroke-width:2;"/><text class="svg-label" x="57.0" y="183" text-anchor="middle" style="font-size:20px;">x</text>
+          <rect class="svg-node-hl" x="74" y="150" width="34" height="50" style="stroke-width:2;"/><text class="svg-label" x="91.0" y="183" text-anchor="middle" style="font-size:20px;">y</text>
+          <rect class="svg-node-hl" x="108" y="150" width="34" height="50" style="stroke-width:2;"/><text class="svg-label" x="125.0" y="183" text-anchor="middle" style="font-size:20px;">w</text>
+          <rect class="svg-node-hl" x="142" y="150" width="34" height="50" style="stroke-width:2;"/><text class="svg-label" x="159.0" y="183" text-anchor="middle" style="font-size:20px;">h</text>
+          <rect class="svg-node-hl" x="176" y="150" width="34" height="50" style="stroke-width:2;"/><text class="svg-label" x="193.0" y="183" text-anchor="middle" style="font-size:20px;">c</text>
+          <path class="svg-edge" style="stroke-width:2;" d="M40,140V128H210V140"/>
+          <text class="svg-label" x="40" y="115" style="font-size:20px;">caja 1: centro, ancho, alto, confianza</text>
+        </g>
+        <g class="anim-step" data-step="2">
+          <rect class="svg-node-hl" x="210" y="150" width="34" height="50" style="stroke-width:2;"/><text class="svg-label" x="227.0" y="183" text-anchor="middle" style="font-size:20px;">x</text>
+          <rect class="svg-node-hl" x="244" y="150" width="34" height="50" style="stroke-width:2;"/><text class="svg-label" x="261.0" y="183" text-anchor="middle" style="font-size:20px;">y</text>
+          <rect class="svg-node-hl" x="278" y="150" width="34" height="50" style="stroke-width:2;"/><text class="svg-label" x="295.0" y="183" text-anchor="middle" style="font-size:20px;">w</text>
+          <rect class="svg-node-hl" x="312" y="150" width="34" height="50" style="stroke-width:2;"/><text class="svg-label" x="329.0" y="183" text-anchor="middle" style="font-size:20px;">h</text>
+          <rect class="svg-node-hl" x="346" y="150" width="34" height="50" style="stroke-width:2;"/><text class="svg-label" x="363.0" y="183" text-anchor="middle" style="font-size:20px;">c</text>
+          <path class="svg-edge" style="stroke-width:2;" d="M210,210V222H380V210"/>
+          <text class="svg-label" x="210" y="250" style="font-size:20px;">caja 2: lo mismo (B = 2)</text>
+        </g>
+        <g class="anim-step" data-step="3">
+          <rect class="svg-node" x="380" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="414" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="448" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="482" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="516" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="550" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="584" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="618" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="652" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="686" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="720" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="754" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="788" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="822" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="856" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="890" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="924" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="958" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="992" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <rect class="svg-node" x="1026" y="150" width="34" height="50" style="stroke-width:2;"/>
+          <path class="svg-edge" style="stroke-width:2;" d="M380,140V128H1060V140"/>
+          <text class="svg-label" x="720" y="115" text-anchor="middle" style="font-size:20px;">20 probabilidades de clase (PASCAL VOC), una sola vez por celda</text>
+        </g>
+        <g class="anim-step" data-step="4">
+          <text class="svg-label" x="550" y="320" text-anchor="middle">por celda: 2 × 5 + 20 = 30</text>
+          <text class="svg-label" x="550" y="365" text-anchor="middle">rejilla completa: 7 × 7 × 30 = 1,470 números · 98 cajas</text>
+        </g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+    </section>
+
+    <!-- 10 · IoU -->
+    <section>
+      <span class="kicker">Mirar una sola vez</span>
+      <h2>IoU mide cuánto se enciman dos cajas</h2>
+      <div class="eq">\[ \mathrm{IoU} = \frac{\text{área de la intersección}}{\text{área de la unión}} \]</div>
+      <div class="iou-demo" data-a="1,1,5,5" data-b="2,1,6,5" data-grid="12,7"></div>
+      <p class="muted">Posición inicial: intersección 12, unión 16 + 16 − 12 = 20, <span class="term" data-term="iou">IoU</span> = 0.60. Vale 1 si las cajas son idénticas y 0 si no se tocan.</p>
+    </section>
+
+    <!-- 11 · PÉRDIDA -->
+    <section>
+      <span class="kicker">Mirar una sola vez</span>
+      <h2>La pérdida castiga sobre todo dónde está la caja</h2>
+      <div class="eq-key">\[ \mathcal{L} = \lambda_{\text{coord}}\, E_{\text{caja}} + E_{\text{conf}}^{\,\text{objeto}} + \lambda_{\text{noobj}}\, E_{\text{conf}}^{\,\text{vacío}} + E_{\text{clase}} \]</div>
+      <ul>
+        <li class="fragment">Todo es error cuadrático: el paper trata la detección como una regresión.</li>
+        <li class="fragment">\( \lambda_{\text{coord}} = 5 \): equivocarse de lugar cuesta más. \( \lambda_{\text{noobj}} = 0.5 \): casi todas las celdas están vacías y no deben dominar.</li>
+        <li class="fragment">La <span class="term" data-term="confianza">confianza</span> que se aprende es el IoU entre la caja predicha y la real.</li>
+        <li class="fragment">Se predice la raíz del ancho y del alto: un error de 10 píxeles pesa más en una caja chica.</li>
+      </ul>
+    </section>
+
+    <!-- 12 · CHECKPOINT 1 -->
+    <section>
+      <span class="kicker">Punto de control</span>
+      <div class="quiz" data-correct="c">
+        <p class="quiz-question">Un YOLOv1 usa S = 7, B = 3 cajas por celda y <em>C = 80</em> clases. ¿Cuántos números produce por imagen?</p>
+        <button class="quiz-option" data-opt="a">12,495: 7 × 7 × 3 × (5 + 80)</button>
+        <button class="quiz-option" data-opt="b">4,508: 7 × 7 × (3 × 4 + 80)</button>
+        <button class="quiz-option" data-opt="c">4,655: 7 × 7 × (3 × 5 + 80)</button>
+        <div class="quiz-explain">
+          <strong>C.</strong> <span class="qe-ok">Correcta.</span> Cada caja lleva 5 números (centro, ancho, alto y confianza) y las 80 clases van una sola vez por celda: 3 × 5 + 80 = 95 por celda, por 49 celdas.
+          <span class="qe-line"><strong>A.</strong> <span class="qe-no">Incorrecta.</span> Repite las clases en cada caja; eso lo hacen versiones posteriores, no YOLOv1.</span>
+          <span class="qe-line"><strong>B.</strong> <span class="qe-no">Incorrecta.</span> Olvida la confianza de cada caja: son 5 números por caja, no 4.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 · DIVIDER -->
+    <section class="divider">
+      <h2>De muchas cajas a una</h2>
+      <p class="muted">Supresión de no máximos (NMS)</p>
+    </section>
+
+    <!-- NMS: EL ALGORITMO -->
+    <section>
+      <span class="kicker">De muchas cajas a una</span>
+      <h2>El algoritmo de NMS en cuatro pasos</h2>
+      <ol>
+        <li class="fragment">Ordena las cajas por <span class="term" data-term="confianza">confianza</span>, de mayor a menor.</li>
+        <li class="fragment">Guarda la de mayor confianza.</li>
+        <li class="fragment">Borra las que se enciman con ella: IoU mayor al umbral (p. ej. 0.5).</li>
+        <li class="fragment">Repite con las que quedan. Se hace por clase: un perro no borra a un gato.</li>
+      </ol>
+      <pre data-title="nms.py"><code class="language-python" data-trim data-line-numbers="1-8|2|5-6|7|4">
+def nms(cajas, conf, umbral=0.5):
+    orden = sorted(range(len(cajas)), key=lambda i: -conf[i])
+    guardadas = []
+    while orden:
+        mejor = orden.pop(0)
+        guardadas.append(mejor)
+        orden = [i for i in orden if iou(cajas[mejor], cajas[i]) &lt;= umbral]
+    return guardadas
+      </code></pre>
+    </section>
+
+    <!-- 14 · NMS PASO A PASO -->
+    <section>
+      <span class="kicker">De muchas cajas a una</span>
+      <h2>Guarda la mejor caja y borra las que la repiten</h2>
+      <svg viewBox="0 0 1100 420" style="width:100%; max-height:420px;">
+        <g>
+          <path class="svg-edge" style="stroke-width:1; stroke-dasharray:3 5;" d="M20,20H520M20,70H520M20,120H520M20,170H520M20,220H520M20,270H520M20,320H520M20,20V320M70,20V320M120,20V320M170,20V320M220,20V320M270,20V320M320,20V320M370,20V320M420,20V320M470,20V320M520,20V320"/>
+          <rect class="svg-edge" x="70" y="70" width="200" height="200" stroke-dasharray="10 6"/>
+          <rect class="svg-edge" x="120" y="70" width="200" height="200" stroke-dasharray="10 6"/>
+          <rect class="svg-edge" x="270" y="70" width="200" height="200" stroke-dasharray="10 6"/>
+          <text class="svg-label" x="78" y="98" style="font-size:22px;">P 0.90</text>
+          <text class="svg-label" x="128" y="258" style="font-size:22px;">Q 0.80</text>
+          <text class="svg-label" x="370" y="98" style="font-size:22px;">R 0.70</text>
+        </g>
+        <g class="anim-step" data-step="1">
+          <text class="svg-label" x="570" y="60" style="font-size:24px;">1 · Ordena por <tspan class="f-accent">confianza</tspan>: P, Q, R</text>
+        </g>
+        <g class="anim-step" data-step="2">
+          <rect class="svg-node-hl" x="70" y="70" width="200" height="200" style="fill-opacity:0.35;"/>
+          <text class="svg-label" x="570" y="130" style="font-size:24px;">2 · Guarda P, la de mayor confianza</text>
+        </g>
+        <g class="anim-step" data-step="3">
+          <rect class="s-err" x="120" y="70" width="200" height="200" style="fill:none; stroke-width:4;"/>
+          <path class="s-err" style="stroke-width:4;" d="M120,70L320,270M320,70L120,270"/>
+          <text class="svg-label" x="570" y="200" style="font-size:24px;">3 · IoU(P, Q) = 0.60 &gt; 0.5 → borra Q</text>
+        </g>
+        <g class="anim-step" data-step="4">
+          <rect class="svg-node-hl" x="270" y="70" width="200" height="200" style="fill-opacity:0.35;"/>
+          <text class="svg-label" x="570" y="270" style="font-size:24px;">4 · IoU(P, R) = 0 → R es otro objeto</text>
+          <text class="svg-label" x="570" y="304" style="font-size:20px; font-weight:400;">es la mejor de las que quedan: se guarda</text>
+        </g>
+        <g class="anim-step" data-step="5">
+          <text class="svg-label" x="570" y="380" style="font-size:24px;">Resultado: P y R, una caja por objeto</text>
+        </g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+      <p class="muted"><span class="term" data-term="nms">NMS</span> usa un umbral de IoU (aquí 0.5). En YOLOv1 sube el mAP de 2 a 3 puntos.</p>
+    </section>
+
+    <!-- 15 · ACTIVIDAD -->
+    <section>
+      <span class="kicker">Actividad · 10 min</span>
+      <h2>Aplica NMS a mano</h2>
+      <div class="cols">
+        <div style="flex:1.15;">
+          <svg viewBox="0 0 480 370" style="width:100%; max-height:370px;">
+            <path class="svg-edge" style="stroke-width:1; stroke-dasharray:2 4;" d="M30,30V354M66,30V354M102,30V354M138,30V354M174,30V354M210,30V354M246,30V354M282,30V354M318,30V354M354,30V354M390,30V354M426,30V354M462,30V354M30,30H462M30,66H462M30,102H462M30,138H462M30,174H462M30,210H462M30,246H462M30,282H462M30,318H462M30,354H462"/>
+            <text class="svg-label" x="30" y="22" text-anchor="middle" style="font-size:15px; font-weight:400;">0</text>
+            <text class="svg-label" x="102" y="22" text-anchor="middle" style="font-size:15px; font-weight:400;">2</text>
+            <text class="svg-label" x="174" y="22" text-anchor="middle" style="font-size:15px; font-weight:400;">4</text>
+            <text class="svg-label" x="246" y="22" text-anchor="middle" style="font-size:15px; font-weight:400;">6</text>
+            <text class="svg-label" x="318" y="22" text-anchor="middle" style="font-size:15px; font-weight:400;">8</text>
+            <text class="svg-label" x="390" y="22" text-anchor="middle" style="font-size:15px; font-weight:400;">10</text>
+            <text class="svg-label" x="462" y="22" text-anchor="middle" style="font-size:15px; font-weight:400;">12</text>
+            <text class="svg-label" x="22" y="35" text-anchor="end" style="font-size:15px; font-weight:400;">0</text>
+            <text class="svg-label" x="22" y="107" text-anchor="end" style="font-size:15px; font-weight:400;">2</text>
+            <text class="svg-label" x="22" y="179" text-anchor="end" style="font-size:15px; font-weight:400;">4</text>
+            <text class="svg-label" x="22" y="251" text-anchor="end" style="font-size:15px; font-weight:400;">6</text>
+            <text class="svg-label" x="22" y="323" text-anchor="end" style="font-size:15px; font-weight:400;">8</text>
+            <rect class="svg-edge" x="66" y="66" width="144" height="144"/>
+            <text class="svg-label" x="71" y="59" text-anchor="start" style="font-size:17px;">A 0.90</text>
+            <rect class="svg-edge" x="246" y="66" width="144" height="144"/>
+            <text class="svg-label" x="251" y="59" text-anchor="start" style="font-size:17px;">D 0.80</text>
+            <rect class="svg-edge" x="102" y="66" width="144" height="144" stroke-dasharray="10 5"/>
+            <text class="svg-label" x="107" y="203" text-anchor="start" style="font-size:17px;">B 0.75</text>
+            <rect class="svg-edge" x="174" y="174" width="144" height="144" stroke-dasharray="2 6"/>
+            <text class="svg-label" x="313" y="311" text-anchor="end" style="font-size:17px;">F 0.70</text>
+            <rect class="svg-edge" x="66" y="102" width="144" height="144" stroke-dasharray="4 4"/>
+            <text class="svg-label" x="71" y="239" text-anchor="start" style="font-size:17px;">C 0.60</text>
+            <rect class="svg-edge" x="282" y="66" width="144" height="144" stroke-dasharray="10 5"/>
+            <text class="svg-label" x="421" y="59" text-anchor="end" style="font-size:17px;">E 0.55</text>
+          </svg>
+        </div>
+        <div>
+          <ol>
+            <li>Calcula el IoU de las parejas que se tocan.</li>
+            <li>Aplica NMS con umbral 0.5. ¿Qué queda?</li>
+            <li>Repite con 0.7 y 0.05. ¿Qué falla?</li>
+          </ol>
+          <div class="activity-meta">
+            <div class="activity-timer" data-minutes="10" data-editable></div>
+            <p><strong>Modalidad:</strong> en parejas, en papel.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 16 · SIMULADOR NMS -->
+    <section>
+      <span class="kicker">De muchas cajas a una</span>
+      <h2>El umbral decide qué se borra</h2>
+      <div class="nms-demo" data-grid="12,9" data-threshold="0.5" data-boxes="A:1,1,5,5,0.90,al;B:2,1,6,5,0.75,bl;C:1,2,5,6,0.60,bl;D:6,1,10,5,0.80,al;E:7,1,11,5,0.55,ar;F:4,4,8,8,0.70,br"></div>
+      <p class="muted">Compara tus respuestas: con 0.7 sobreviven duplicados; con 0.05 se pierde F, que es otro objeto.</p>
+    </section>
+
+    <!-- 17 · DIVIDER -->
+    <section class="divider">
+      <h2>La arquitectura moderna</h2>
+      <p class="muted">Backbone, neck y head</p>
+    </section>
+
+    <!-- 18 · BACKBONE / NECK / HEAD -->
+    <section>
+      <span class="kicker">La arquitectura moderna</span>
+      <h2>Tres partes, tres trabajos distintos</h2>
+      <svg viewBox="0 0 1100 410" style="width:100%; max-height:380px;">
+        <g>
+          <rect class="svg-node" x="20" y="150" width="90" height="90" rx="6"/>
+          <text class="svg-label" x="65" y="272" text-anchor="middle" style="font-size:18px; font-weight:400;">640 × 640</text>
+          <text class="svg-label" x="65" y="296" text-anchor="middle" style="font-size:18px; font-weight:400;">imagen</text>
+        </g>
+        <g class="anim-step" data-step="1">
+          <text class="svg-label" x="285" y="60" text-anchor="middle" style="font-size:22px;">Backbone</text>
+          <text class="svg-label" x="285" y="86" text-anchor="middle" style="font-size:17px; font-weight:400;">extrae y reduce la resolución</text>
+          <path class="svg-edge" style="stroke-width:2;" d="M110,195H150"/>
+          <rect class="svg-node" x="150" y="105" width="50" height="180" rx="6"/>
+          <rect class="svg-node" x="220" y="125" width="50" height="140" rx="6"/>
+          <rect class="svg-node" x="290" y="145" width="50" height="100" rx="6"/>
+          <rect class="svg-node" x="360" y="160" width="50" height="70" rx="6"/>
+          <text class="svg-label" x="175" y="312" text-anchor="middle" style="font-size:17px; font-weight:400;">160</text>
+          <text class="svg-label" x="245" y="312" text-anchor="middle" style="font-size:17px; font-weight:400;">80</text>
+          <text class="svg-label" x="315" y="312" text-anchor="middle" style="font-size:17px; font-weight:400;">40</text>
+          <text class="svg-label" x="385" y="312" text-anchor="middle" style="font-size:17px; font-weight:400;">20</text>
+        </g>
+        <g class="anim-step" data-step="2">
+          <text class="svg-label" x="580" y="60" text-anchor="middle" style="font-size:22px;">Neck</text>
+          <text class="svg-label" x="580" y="86" text-anchor="middle" style="font-size:17px; font-weight:400;">combina escalas</text>
+          <path class="svg-edge" style="stroke-width:2;" d="M270,140C400,120 440,130 520,130M340,175C420,200 460,215 520,215M410,215C460,280 480,300 520,300"/>
+          <rect class="svg-node" x="520" y="100" width="120" height="60" rx="6"/>
+          <rect class="svg-node" x="520" y="185" width="120" height="60" rx="6"/>
+          <rect class="svg-node" x="520" y="270" width="120" height="60" rx="6"/>
+          <text class="svg-label" x="580" y="138" text-anchor="middle" style="font-size:19px;">80 × 80</text>
+          <text class="svg-label" x="580" y="223" text-anchor="middle" style="font-size:19px;">40 × 40</text>
+          <text class="svg-label" x="580" y="308" text-anchor="middle" style="font-size:19px;">20 × 20</text>
+          <path class="s-accent" style="stroke-width:3; fill:none;" d="M555,160V185M555,245V270M605,185V160M605,270V245"/>
+        </g>
+        <g class="anim-step" data-step="3">
+          <text class="svg-label" x="775" y="60" text-anchor="middle" style="font-size:22px;">Head</text>
+          <text class="svg-label" x="775" y="86" text-anchor="middle" style="font-size:17px; font-weight:400;">caja + clases</text>
+          <path class="svg-edge" style="stroke-width:2;" d="M640,130H720M640,215H720M640,300H720"/>
+          <rect class="svg-node-hl" x="720" y="105" width="110" height="50" rx="6"/>
+          <rect class="svg-node-hl" x="720" y="190" width="110" height="50" rx="6"/>
+          <rect class="svg-node-hl" x="720" y="275" width="110" height="50" rx="6"/>
+          <text class="svg-label" x="845" y="128" style="font-size:19px;">6,400</text>
+          <text class="svg-label" x="845" y="152" style="font-size:16px; font-weight:400;">objetos chicos</text>
+          <text class="svg-label" x="845" y="213" style="font-size:19px;">1,600</text>
+          <text class="svg-label" x="845" y="237" style="font-size:16px; font-weight:400;">medianos</text>
+          <text class="svg-label" x="845" y="298" style="font-size:19px;">400</text>
+          <text class="svg-label" x="845" y="322" style="font-size:16px; font-weight:400;">grandes</text>
+        </g>
+        <g class="anim-step" data-step="4">
+          <text class="svg-label" x="550" y="390" text-anchor="middle" style="font-size:24px;">6,400 + 1,600 + 400 = 8,400 predicciones por imagen</text>
+        </g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+      <p class="muted">El <span class="term" data-term="backbone">backbone</span> extrae características, el <span class="term" data-term="neck">neck</span> las combina entre escalas y la <span class="term" data-term="head">head</span> predice. Números de una entrada de 640 × 640 con pasos de 8, 16 y 32 píxeles.</p>
+    </section>
+
+    <!-- 19 · ANCLAS -->
+    <section>
+      <span class="kicker">La arquitectura moderna</span>
+      <h2>Las anclas daban una forma inicial a cada caja</h2>
+      <div class="cols">
+        <figure class="fig">
+          <img src="img/paper_yolov3_priors.png" alt="Figura 2 de YOLOv3: una caja punteada de ancho p_w y alto p_h (el ancla) y la caja predicha en azul; el centro se calcula como sigma de t_x más c_x y el ancho como p_w por e a la t_w.">
+          <figcaption>La caja punteada es el ancla; la azul, la predicción. <span class="muted">Figura de Redmon y Farhadi (2018).</span></figcaption>
+        </figure>
+        <ul>
+          <li class="fragment">Un <span class="term" data-term="ancla">ancla</span> es una forma típica de caja; la red solo predice cuánto moverla y estirarla.</li>
+          <li class="fragment">YOLOv3 elige 9 anclas con k-means y predice en 3 escalas: 10,647 cajas a 416 × 416.</li>
+          <li class="fragment">YOLOv6 y YOLOv8 ya no usan anclas: cada punto predice su caja directamente.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 20 · UNO-A-MUCHOS VS UNO-A-UNO -->
+    <section>
+      <span class="kicker">La arquitectura moderna</span>
+      <h2>Para quitar NMS, cada objeto debe tener una sola respuesta</h2>
+      <svg viewBox="0 0 1100 420" style="width:100%; max-height:420px;">
+        <g class="anim-step" data-step="1">
+          <text class="svg-label" x="20" y="34" style="font-size:22px;">Uno-a-muchos</text>
+          <rect class="f-surface-3" x="50" y="60" width="170" height="120" rx="14"/>
+          <rect class="svg-node-hl" x="40" y="52" width="176" height="128" style="fill:none; stroke-width:3;"/>
+          <rect class="svg-node-hl" x="56" y="66" width="172" height="122" style="fill:none; stroke-width:3;"/>
+          <rect class="svg-node-hl" x="46" y="72" width="164" height="112" style="fill:none; stroke-width:3;"/>
+          <rect class="svg-node-hl" x="60" y="56" width="168" height="118" style="fill:none; stroke-width:3;"/>
+          <path class="svg-edge" d="M250,120H300M290,110L300,120L290,130"/>
+          <text class="svg-label" x="320" y="112" style="font-size:22px;">4 cajas para el mismo objeto</text>
+          <text class="svg-label" x="320" y="144" style="font-size:20px; font-weight:400;">entrena bien, pero necesita NMS</text>
+        </g>
+        <g class="anim-step" data-step="2">
+          <text class="svg-label" x="20" y="234" style="font-size:22px;">Uno-a-uno</text>
+          <rect class="f-surface-3" x="50" y="260" width="170" height="120" rx="14"/>
+          <rect class="svg-node-hl" x="44" y="254" width="182" height="132" style="fill:none; stroke-width:4;"/>
+          <path class="svg-edge" d="M250,320H300M290,310L300,320L290,330"/>
+          <text class="svg-label" x="320" y="312" style="font-size:22px;">1 caja por objeto</text>
+          <text class="svg-label" x="320" y="344" style="font-size:20px; font-weight:400;">sin NMS, pero menos señal al entrenar</text>
+        </g>
+        <g class="anim-step" data-step="3">
+          <rect class="svg-node" x="700" y="40" width="380" height="330" rx="8" style="stroke-width:2;"/>
+          <text class="svg-label" x="720" y="80" style="font-size:22px;">YOLOv10: las dos a la vez</text>
+          <text class="svg-label" x="720" y="125" style="font-size:19px; font-weight:400;">Al entrenar, dos heads comparten</text>
+          <text class="svg-label" x="720" y="152" style="font-size:19px; font-weight:400;">backbone y neck: la uno-a-muchos</text>
+          <text class="svg-label" x="720" y="179" style="font-size:19px; font-weight:400;">da señal para aprender.</text>
+          <text class="svg-label" x="720" y="226" style="font-size:19px; font-weight:400;">Al usar el modelo, solo queda</text>
+          <text class="svg-label" x="720" y="253" style="font-size:19px; font-weight:400;">la uno-a-uno: salida directa.</text>
+          <text class="svg-label" x="720" y="310" style="font-size:19px;">YOLO26 también trae</text>
+          <text class="svg-label" x="720" y="337" style="font-size:19px;">salida sin NMS.</text>
+        </g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+    </section>
+
+    <!-- 21 · CHECKPOINT 2 -->
+    <section>
+      <span class="kicker">Punto de control</span>
+      <div class="quiz" data-correct="a">
+        <p class="quiz-question">El mismo detector (pasos de 8, 16 y 32, una predicción por punto) recibe una imagen de <em>1280 × 1280</em> en vez de 640 × 640. ¿Cuántas predicciones produce?</p>
+        <button class="quiz-option" data-opt="a">33,600</button>
+        <button class="quiz-option" data-opt="b">16,800</button>
+        <button class="quiz-option" data-opt="c">8,400</button>
+        <div class="quiz-explain">
+          <strong>A.</strong> <span class="qe-ok">Correcta.</span> Al duplicar el lado, cada rejilla duplica sus filas y sus columnas: 160² + 80² + 40² = 33,600, cuatro veces más.
+          <span class="qe-line"><strong>B.</strong> <span class="qe-no">Incorrecta.</span> Supone que crece igual que el lado, pero crece con el área.</span>
+          <span class="qe-line"><strong>C.</strong> <span class="qe-no">Incorrecta.</span> Supone que la red fija el número de predicciones; lo fija el tamaño de la imagen.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 22 · DIVIDER -->
+    <section class="divider">
+      <h2>Diez años de YOLO</h2>
+      <p class="muted">Qué cambió y cuál usar hoy</p>
+    </section>
+
+    <!-- 23 · LÍNEA DE TIEMPO -->
+    <section>
+      <span class="kicker">Diez años de YOLO</span>
+      <h2>El mismo nombre, muchos equipos distintos</h2>
+      <svg viewBox="0 0 1100 390" style="width:100%; max-height:400px;">
+        <g>
+        <path class="svg-edge" style="stroke-width:1; stroke-dasharray:2 6;" d="M270,70V370M340,70V370M410,70V370M480,70V370M550,70V370M620,70V370M690,70V370M760,70V370M830,70V370M900,70V370M970,70V370M1040,70V370"/>
+        <text class="svg-label" x="270" y="55" text-anchor="middle" style="font-size:15px; font-weight:400;">2015</text>
+        <text class="svg-label" x="340" y="55" text-anchor="middle" style="font-size:15px; font-weight:400;">16</text>
+        <text class="svg-label" x="410" y="55" text-anchor="middle" style="font-size:15px; font-weight:400;">17</text>
+        <text class="svg-label" x="480" y="55" text-anchor="middle" style="font-size:15px; font-weight:400;">18</text>
+        <text class="svg-label" x="550" y="55" text-anchor="middle" style="font-size:15px; font-weight:400;">19</text>
+        <text class="svg-label" x="620" y="55" text-anchor="middle" style="font-size:15px; font-weight:400;">2020</text>
+        <text class="svg-label" x="690" y="55" text-anchor="middle" style="font-size:15px; font-weight:400;">21</text>
+        <text class="svg-label" x="760" y="55" text-anchor="middle" style="font-size:15px; font-weight:400;">22</text>
+        <text class="svg-label" x="830" y="55" text-anchor="middle" style="font-size:15px; font-weight:400;">23</text>
+        <text class="svg-label" x="900" y="55" text-anchor="middle" style="font-size:15px; font-weight:400;">24</text>
+        <text class="svg-label" x="970" y="55" text-anchor="middle" style="font-size:15px; font-weight:400;">25</text>
+        <text class="svg-label" x="1040" y="55" text-anchor="middle" style="font-size:15px; font-weight:400;">2026</text>
+        </g>
+        <g class="anim-step" data-step="1">
+          <text class="svg-label" x="20" y="126" style="font-size:18px;">Redmon y Farhadi</text>
+          <path class="svg-edge" style="stroke-width:2;" d="M270,120H480"/>
+          <circle class="f-accent" cx="270" cy="120" r="8"/>
+          <text class="svg-label" x="270" y="104" text-anchor="middle" style="font-size:19px;">v1</text>
+          <circle class="f-accent" cx="340" cy="120" r="8"/>
+          <text class="svg-label" x="340" y="104" text-anchor="middle" style="font-size:19px;">v2</text>
+          <circle class="f-accent" cx="480" cy="120" r="8"/>
+          <text class="svg-label" x="480" y="104" text-anchor="middle" style="font-size:19px;">v3</text>
+          </g>
+        <g class="anim-step" data-step="2">
+          <text class="svg-label" x="20" y="201" style="font-size:18px;">Bochkovskiy, Wang y Liao</text>
+          <path class="svg-edge" style="stroke-width:2;" d="M620,195H900"/>
+          <circle class="f-accent" cx="620" cy="195" r="8"/>
+          <text class="svg-label" x="620" y="179" text-anchor="middle" style="font-size:19px;">v4</text>
+          <circle class="f-accent" cx="760" cy="195" r="8"/>
+          <text class="svg-label" x="760" y="179" text-anchor="middle" style="font-size:19px;">v7</text>
+          <circle class="f-accent" cx="900" cy="195" r="8"/>
+          <text class="svg-label" x="900" y="179" text-anchor="middle" style="font-size:19px;">v9</text>
+          </g>
+        <g class="anim-step" data-step="3">
+          <text class="svg-label" x="20" y="276" style="font-size:18px;">Ultralytics</text>
+          <path class="svg-edge" style="stroke-width:2;" d="M620,270H1040"/>
+          <circle class="f-accent" cx="620" cy="270" r="8"/>
+          <text class="svg-label" x="620" y="254" text-anchor="middle" style="font-size:19px;">v5</text>
+          <circle class="f-accent" cx="830" cy="270" r="8"/>
+          <text class="svg-label" x="830" y="254" text-anchor="middle" style="font-size:19px;">v8</text>
+          <circle class="f-accent" cx="900" cy="270" r="8"/>
+          <text class="svg-label" x="900" y="254" text-anchor="middle" style="font-size:19px;">YOLO11</text>
+          <circle class="f-accent" cx="1040" cy="270" r="8"/>
+          <text class="svg-label" x="1040" y="254" text-anchor="middle" style="font-size:19px;">YOLO26</text>
+          </g>
+        <g class="anim-step" data-step="4">
+          <text class="svg-label" x="20" y="351" style="font-size:18px;">Meituan, Tsinghua y otros</text>
+          <path class="svg-edge" style="stroke-width:2;" d="M760,345H970"/>
+          <circle class="f-accent" cx="760" cy="345" r="8"/>
+          <text class="svg-label" x="760" y="329" text-anchor="middle" style="font-size:19px;">v6</text>
+          <circle class="f-accent" cx="900" cy="345" r="8"/>
+          <text class="svg-label" x="900" y="329" text-anchor="middle" style="font-size:19px;">v10</text>
+          <circle class="f-accent" cx="970" cy="345" r="8"/>
+          <text class="svg-label" x="970" y="329" text-anchor="middle" style="font-size:19px;">v12</text>
+          </g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+      <p class="muted">Fechas de la primera publicación (arXiv o lanzamiento). El número de versión no dice quién la hizo ni si es mejor que la anterior.</p>
+    </section>
+
+    <!-- 24 · CUATRO IDEAS -->
+    <section>
+      <span class="kicker">Diez años de YOLO</span>
+      <h2>Cuatro ideas cambiaron el diseño</h2>
+      <table>
+        <thead><tr><th>Idea</th><th>Qué resolvió</th><th>Desde</th></tr></thead>
+        <tbody>
+          <tr class="fragment"><td>Rejilla y una sola pasada</td><td>Velocidad: 45 imágenes por segundo</td><td>YOLOv1 (2015)</td></tr>
+          <tr class="fragment"><td>Anclas y tres escalas</td><td>Objetos chicos y formas variadas</td><td>YOLOv2 y v3 (2016–2018)</td></tr>
+          <tr class="fragment"><td>Sin anclas</td><td>Ya no hay que diseñar anclas para cada dataset</td><td>YOLOv6 y v8 (2022–2023)</td></tr>
+          <tr class="fragment"><td>Sin NMS (uno-a-uno)</td><td>Salida directa y latencia estable</td><td>YOLOv10 (2024), YOLO26 (2026)</td></tr>
+        </tbody>
+      </table>
+      <p class="muted fragment">Entre medio, cada versión cambió el backbone, el entrenamiento y los datos. YOLOv12 (2025) llevó la atención al centro del diseño.</p>
+    </section>
+
+    <!-- 25 · VOCABULARIO ABIERTO -->
+    <section>
+      <span class="kicker">Diez años de YOLO</span>
+      <h2>Las clases ya pueden escribirse como texto</h2>
+      <figure class="fig">
+        <img src="img/paper_yoloworld_paradigms.png" alt="Figura 2 de YOLO-World: (a) un detector tradicional con vocabulario fijo; (b) un detector de vocabulario abierto grande con codificador de texto en línea; (c) YOLO-World, donde el texto se codifica una vez como vocabulario fuera de línea y se integra a un detector ligero.">
+        <figcaption>(a) clases fijas · (b) texto en cada uso, detector pesado · (c) YOLO-World: el texto se codifica una vez y se integra al detector. <span class="muted">Figura de Cheng et al. (2024).</span></figcaption>
+      </figure>
+      <ul>
+        <li class="fragment">Con <span class="term" data-term="vocabulario-abierto">vocabulario abierto</span>, las clases son frases: «botella de plástico», «persona con casco».</li>
+        <li class="fragment">YOLO-World: 35.4 AP en LVIS a 52 imágenes por segundo en una GPU V100.</li>
+      </ul>
+    </section>
+
+    <!-- 26 · ÁRBOL DE DECISIÓN -->
+    <section>
+      <span class="kicker">Diez años de YOLO</span>
+      <h2>Tres preguntas para elegir un YOLO</h2>
+      <svg viewBox="0 0 1100 420" style="width:100%; max-height:420px;">
+        <g class="anim-step" data-step="1">
+          <rect class="svg-node" x="20" y="20" width="330" height="70" rx="10"/>
+          <text class="svg-label" x="185" y="63" text-anchor="middle" style="font-size:21px;">¿Las clases son fijas?</text>
+          <path class="svg-edge" d="M350,55H430M420,45L430,55L420,65"/>
+          <text class="svg-label" x="390" y="44" text-anchor="middle" style="font-size:18px; font-weight:400;">no</text>
+          <rect class="svg-node-hl" x="430" y="20" width="650" height="70" rx="10"/>
+          <text class="svg-label" x="450" y="63" style="font-size:20px;">Vocabulario abierto: YOLO-World o YOLOE</text>
+        </g>
+        <g class="anim-step" data-step="2">
+          <path class="svg-edge" d="M185,90V150M175,140L185,150L195,140"/>
+          <text class="svg-label" x="205" y="128" style="font-size:18px; font-weight:400;">sí</text>
+          <rect class="svg-node" x="20" y="150" width="330" height="70" rx="10"/>
+          <text class="svg-label" x="185" y="193" text-anchor="middle" style="font-size:21px;">¿Dónde va a correr?</text>
+          <path class="svg-edge" d="M350,170C390,170 390,150 430,150M420,140L430,150L420,160"/>
+          <path class="svg-edge" d="M350,200C390,200 390,235 430,235M420,225L430,235L420,245"/>
+          <rect class="svg-node-hl" x="430" y="118" width="650" height="64" rx="10"/>
+          <text class="svg-label" x="450" y="158" style="font-size:20px;">CPU, celular, Raspberry Pi → YOLO26n o YOLO26s</text>
+          <rect class="svg-node-hl" x="430" y="203" width="650" height="64" rx="10"/>
+          <text class="svg-label" x="450" y="243" style="font-size:20px;">GPU → YOLO26m, l o x según la precisión que pidas</text>
+        </g>
+        <g class="anim-step" data-step="3">
+          <path class="svg-edge" d="M185,220V300M175,290L185,300L195,290"/>
+          <rect class="svg-node" x="20" y="300" width="330" height="90" rx="10"/>
+          <text class="svg-label" x="185" y="338" text-anchor="middle" style="font-size:21px;">¿Producto con</text>
+          <text class="svg-label" x="185" y="366" text-anchor="middle" style="font-size:21px;">código cerrado?</text>
+          <path class="svg-edge" d="M350,345H430M420,335L430,345L420,355"/>
+          <rect class="svg-node" x="430" y="300" width="650" height="90" rx="10"/>
+          <text class="svg-label" x="450" y="337" style="font-size:19px;">Revisa la licencia: Ultralytics (v5, v8, 11, 26) es AGPL-3.0</text>
+          <text class="svg-label" x="450" y="367" style="font-size:19px;">o licencia Enterprise. YOLOX y RT-DETR son Apache-2.0.</text>
+        </g>
+      </svg>
+      <span class="fragment"></span><span class="fragment"></span><span class="fragment"></span>
+    </section>
+
+    <!-- 27 · TAMAÑOS -->
+    <section>
+      <span class="kicker">Diez años de YOLO</span>
+      <h2>Cada tamaño cambia velocidad por precisión</h2>
+      <table>
+        <thead><tr><th>YOLO26</th><th>n</th><th>s</th><th>m</th><th>l</th><th>x</th></tr></thead>
+        <tbody>
+          <tr><td>Parámetros (millones)</td><td>2.4</td><td>9.5</td><td>20.4</td><td>24.8</td><td>55.7</td></tr>
+          <tr class="fragment"><td><span class="term" data-term="map">mAP</span> 50–95 en COCO</td><td>40.9</td><td>48.6</td><td>53.1</td><td>55.0</td><td>57.5</td></tr>
+          <tr class="fragment"><td>CPU, ONNX (ms)</td><td>38.9</td><td>87.2</td><td>220.0</td><td>286.2</td><td>525.8</td></tr>
+          <tr class="fragment"><td>GPU T4, TensorRT (ms)</td><td>1.7</td><td>2.5</td><td>4.7</td><td>6.2</td><td>11.8</td></tr>
+        </tbody>
+      </table>
+      <ul>
+        <li class="fragment">De n a x: 23 veces los parámetros y 16.6 puntos más de mAP, pero 13.5 veces más lento en CPU.</li>
+      </ul>
+      <p class="muted">Imágenes de 640 × 640, salida sin NMS. Documentación de Ultralytics, consultada en octubre de 2026.</p>
+    </section>
+
+    <!-- 28 · CHECKPOINT 3 -->
+    <section>
+      <span class="kicker">Punto de control</span>
+      <div class="quiz" data-correct="b">
+        <p class="quiz-question">Una tienda quiere contar personas con una Raspberry Pi <em>sin GPU</em>, en un producto que va a vender con código cerrado. ¿Qué haces?</p>
+        <button class="quiz-option" data-opt="a">YOLO26x, porque es el más preciso de la familia.</button>
+        <button class="quiz-option" data-opt="b">Un modelo chico (YOLO26n) y revisar antes la licencia.</button>
+        <button class="quiz-option" data-opt="c">YOLO-World, porque detecta cualquier clase que escribas.</button>
+        <div class="quiz-explain">
+          <strong>B.</strong> <span class="qe-ok">Correcta.</span> Sin GPU manda el tamaño: n tarda unos 39 ms por imagen en CPU. Y AGPL-3.0 obliga a compartir el código: compra la licencia Enterprise o usa una alternativa Apache-2.0.
+          <span class="qe-line"><strong>A.</strong> <span class="qe-no">Incorrecta.</span> Ignora el hardware: x tarda más de medio segundo por imagen en CPU.</span>
+          <span class="qe-line"><strong>C.</strong> <span class="qe-no">Incorrecta.</span> Paga el costo del vocabulario abierto sin necesitarlo: «persona» ya es una clase fija.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 29 · IDEAS CLAVE -->
+    <section>
+      <span class="kicker">Ideas clave</span>
+      <h2>Una pasada, una caja por objeto</h2>
+      <ul>
+        <li class="fragment">YOLO convierte la detección en una sola predicción: una rejilla de cajas, confianzas y clases.</li>
+        <li class="fragment">IoU mide el traslape; NMS lo usa para borrar duplicados, y el umbral decide qué se pierde.</li>
+        <li class="fragment">Backbone, neck y head predicen en tres escalas: 8,400 predicciones a 640 × 640.</li>
+        <li class="fragment">Las versiones recientes quitan anclas y NMS. Elige el tamaño por el hardware y revisa la licencia.</li>
+      </ul>
+    </section>
+
+    <!-- 30 · REFERENCIAS -->
+    <section>
+      <span class="kicker">De R-CNN a YOLO</span>
+      <h2>Referencias y lecturas adicionales</h2>
+      <div class="refs cols">
+        <div>
+          <h3>Referencias</h3>
+          <ul>
+            <li><span class="ref-type">Paper</span> Redmon, J. et al. You Only Look Once: Unified, Real-Time Object Detection. <em>CVPR</em>, 2016. <a href="https://arxiv.org/abs/1506.02640">arXiv:1506.02640</a>.</li>
+            <li><span class="ref-type">Paper</span> Redmon, J. and Farhadi, A. YOLOv3: An Incremental Improvement. 2018. <a href="https://arxiv.org/abs/1804.02767">arXiv:1804.02767</a>.</li>
+            <li><span class="ref-type">Paper</span> Wang, A. et al. YOLOv10: Real-Time End-to-End Object Detection. <em>NeurIPS</em>, 2024. <a href="https://arxiv.org/abs/2405.14458">arXiv:2405.14458</a>.</li>
+            <li><span class="ref-type">Paper</span> Cheng, T. et al. YOLO-World: Real-Time Open-Vocabulary Object Detection. <em>CVPR</em>, 2024. <a href="https://arxiv.org/abs/2401.17270">arXiv:2401.17270</a>.</li>
+            <li><span class="ref-type">Web</span> Ultralytics. <a href="https://docs.ultralytics.com/models/yolo26/">Documentación de YOLO26</a>, 2026.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Antes de YOLO y evolución</h3>
+          <ul>
+            <li><span class="ref-type">Paper</span> Girshick, R. et al. R-CNN. <em>CVPR</em>, 2014. <a href="https://arxiv.org/abs/1311.2524">arXiv:1311.2524</a>.</li>
+            <li><span class="ref-type">Paper</span> Girshick, R. Fast R-CNN. <em>ICCV</em>, 2015. <a href="https://arxiv.org/abs/1504.08083">arXiv:1504.08083</a>.</li>
+            <li><span class="ref-type">Paper</span> Ren, S. et al. Faster R-CNN. <em>NeurIPS</em>, 2015. <a href="https://arxiv.org/abs/1506.01497">arXiv:1506.01497</a>.</li>
+            <li><span class="ref-type">Paper</span> Sapkota, R. and Karkee, M. Ultralytics YOLO Evolution. 2025. <a href="https://arxiv.org/abs/2510.09653">arXiv:2510.09653</a>.</li>
+          </ul>
+          <h3>Lecturas adicionales</h3>
+          <ul>
+            <li><span class="ref-type">Paper</span> <a href="https://arxiv.org/abs/2502.12524">Tian et al. (2025), YOLOv12</a> <span class="ref-nota">— atención en un detector de tiempo real.</span></li>
+          </ul>
+        </div>
+      </div>
+      <p class="refs-ia">Nota: estas diapositivas se elaboraron con ayuda de inteligencia artificial, específicamente Claude (Anthropic).</p>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="../js/shstyle.js"></script>
+<script src="../js/dl-extras.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1280, height: 720, margin: 0.06,
+    hash: true, progress: true, slideNumber: 'c/t', controls: true,
+    transition: 'slide', transitionSpeed: 'fast',
+    plugins: [ RevealHighlight ]
+  }).then(() => {
+    SHStyle.init({
+      "caja": { titulo: "Caja delimitadora (bounding box)", def: "Rectángulo que encierra un objeto. Se describe con su centro (x, y), su ancho y su alto, o con dos esquinas." },
+      "iou": { titulo: "IoU (Intersection over Union)", def: "Área de la intersección de dos cajas dividida entre el área de su unión. Vale 1 si las cajas son idénticas y 0 si no se tocan." },
+      "confianza": { titulo: "Confianza", def: "Número entre 0 y 1 que acompaña a cada caja. En YOLOv1 es Pr(objeto) × IoU con la caja real: alta solo si hay un objeto y la caja lo ajusta bien." },
+      "nms": { titulo: "NMS (supresión de no máximos)", def: "Post-proceso que guarda la caja de mayor confianza, borra las que se traslapan con ella por arriba de un umbral de IoU y repite con las que quedan." },
+      "backbone": { titulo: "Backbone", def: "Parte de la red que extrae características de la imagen y reduce su resolución por etapas (por ejemplo, de 640 a 80, 40 y 20)." },
+      "neck": { titulo: "Neck", def: "Capas que combinan características de varias resoluciones (por ejemplo, FPN o PAN), para que cada escala tenga detalle y contexto." },
+      "head": { titulo: "Head (cabeza)", def: "Capas finales que, en cada punto de cada rejilla, predicen la caja, la confianza y las clases." },
+      "ancla": { titulo: "Ancla (anchor box)", def: "Caja de ancho y alto predefinidos que la red ajusta en lugar de predecir la caja desde cero. YOLOv3 usa 9, obtenidas con k-means." },
+      "map": { titulo: "mAP (mean Average Precision)", def: "Métrica estándar de detección: promedio, sobre las clases, del área bajo la curva de precisión contra exhaustividad. «50–95» promedia además los umbrales de IoU de 0.50 a 0.95 (COCO)." },
+      "rcnn": { titulo: "R-CNN (Regions with CNN features)", def: "La R es de <em>regiones</em>. Girshick et al. (2014) toman las regiones que propone un método aparte (Selective Search), pasan cada una por una CNN y con lo que sale clasifican la región y corrigen su caja. Fast R-CNN y Faster R-CNN son sus versiones más rápidas." },
+      "selective-search": { titulo: "Selective Search", def: "Método sin entrenamiento (Uijlings et al., 2013) que parte la imagen en muchas manchas pequeñas y une, de dos en dos, las vecinas más parecidas en color, textura, tamaño y en qué tan bien encajan, hasta que queda una sola. Cada grupo que se forma en el camino da una caja propuesta, así que salen regiones de todos los tamaños." },
+      "vocabulario-abierto": { titulo: "Vocabulario abierto", def: "El detector recibe las clases como texto al usarlo, en lugar de tener una lista fija aprendida en el entrenamiento." }
+    });
+  });
+</script>
+</body>
+</html>
