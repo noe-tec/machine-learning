@@ -100,26 +100,39 @@
 </ul>
 </section>
 <section id="unet-weighted-loss">
-<span class="kicker">U-Net · entropía cruzada ponderada</span>
-<h2>La pérdida asigna un peso a cada píxel</h2>
+<span class="kicker">Pérdida · entropía cruzada por píxel</span>
+<h2>La pérdida parte de la entropía cruzada</h2>
 <figure class="fig">
-<svg viewBox="0 0 1160 185" width="100%" height="185" role="img" aria-label="La probabilidad de la clase correcta determina el error de cada píxel. Este error se multiplica por el peso del píxel y se suma a los demás.">
-<rect x="10" y="10" width="330" height="100" rx="8" class="svg-node"/>
-<text x="30" y="50" class="svg-label">Probabilidad de</text><text x="30" y="86" class="svg-label">la clase correcta</text>
-<path d="M350 60 H405 l-10 -8 m10 8 l-10 8" class="svg-edge"/>
-<rect x="415" y="10" width="280" height="100" rx="8" class="svg-node"/>
-<text x="435" y="50" class="svg-label">Error del píxel:</text><text x="435" y="86" class="svg-label">−log(probabilidad)</text>
-<path d="M705 60 H760 l-10 -8 m10 8 l-10 8" class="svg-edge"/>
-<rect x="770" y="10" width="380" height="100" rx="8" class="svg-node-hl"/>
-<text x="790" y="50" class="svg-label">Multiplicar por su peso</text><text x="790" y="86" class="svg-label">y sumar todos los píxeles</text>
-<text x="15" y="165" class="svg-label">Peso del píxel = compensación por clase + énfasis en la separación entre células</text>
+<svg viewBox="0 0 1160 190" width="100%" height="190" role="img" aria-label="Punto de partida: entropía cruzada promediada sobre los píxeles. Variante 1: pesos por clase para clases poco frecuentes. Variante 2: pesos por píxel, como en U-Net, para los bordes entre células.">
+<rect x="10" y="10" width="360" height="120" rx="8" class="svg-node-hl"/>
+<text x="30" y="48" class="svg-label">Punto de partida</text>
+<text x="30" y="84" class="svg-label">−log p(clase correcta)</text>
+<text x="30" y="116" class="svg-label" style="font-size:20px">promedio sobre los píxeles</text>
+<g class="anim-step" data-step="1">
+<path d="M380 70 H425 l-10 -8 m10 8 l-10 8" class="svg-edge"/>
+<rect x="435" y="10" width="340" height="120" rx="8" class="svg-node"/>
+<text x="455" y="48" class="svg-label">+ pesos por clase</text>
+<text x="455" y="84" class="svg-label" style="font-size:20px">las clases poco frecuentes</text>
+<text x="455" y="112" class="svg-label" style="font-size:20px">pesan más</text>
+</g>
+<g class="anim-step" data-step="2">
+<path d="M785 70 H830 l-10 -8 m10 8 l-10 8" class="svg-edge"/>
+<rect x="840" y="10" width="310" height="120" rx="8" class="svg-node"/>
+<text x="860" y="48" class="svg-label">+ pesos por píxel</text>
+<text x="860" y="84" class="svg-label" style="font-size:20px">U-Net: bordes entre</text>
+<text x="860" y="112" class="svg-label" style="font-size:20px">células que se tocan</text>
+</g>
+<text x="15" y="175" class="svg-label">Pérdida = promedio de  peso(píxel) × (−log p)</text>
 </svg>
 </figure>
+<span class="fragment" aria-hidden="true"></span>
+<span class="fragment" aria-hidden="true"></span>
 <ul>
-<li class="fragment"><strong>Por clase:</strong> equilibra clases con distinta cantidad de píxeles.</li>
-<li class="fragment"><strong>Por ubicación:</strong> enfatiza la separación entre células que se tocan.</li>
+<li class="fragment"><strong>Sin pesos:</strong> cada píxel es una clasificación y todos cuentan igual.</li>
+<li class="fragment"><strong>Por clase:</strong> si el fondo ocupa casi toda la imagen, la red puede ignorar las clases pequeñas; se compensa, p. ej., con el inverso de su frecuencia.</li>
+<li class="fragment"><strong>Por píxel:</strong> U-Net precalcula pesos mayores en las separaciones finas; no se aprenden.</li>
 </ul>
-<div class="box-key fragment">Misma clase ≠ mismo peso.</div>
+<div class="box-key fragment">En PyTorch: <code>nn.CrossEntropyLoss(weight=pesos_por_clase)</code></div>
 <p class="muted">Ronneberger et al. (2015), <a href="https://arxiv.org/pdf/1505.04597#page=4">sección 3, pp. 4–5</a>.</p>
 </section>
 
