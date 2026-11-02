@@ -8,6 +8,7 @@ This repository contains code examples, activities and external links related wi
 | Vision Transformers | [slides](https://noe-tec.github.io/machine-learning/slides/vision-transformer/) | [How does a model built to read learn to see?](https://noe-tec.github.io/machine-learning/readings/vision-transformer/) |
 | Multimodal embeddings | [slides](https://noe-tec.github.io/machine-learning/slides/multimodal-embeddings/) | [¿Cómo relaciona una máquina una foto, una frase y un sonido?](https://noe-tec.github.io/machine-learning/readings/multimodal-embeddings/) - Spanish! |
 | De R-CNN a YOLO | [slides](https://noe-tec.github.io/machine-learning/slides/yolo/) | [¿Cómo encuentra una computadora todo lo que hay en una foto de un solo vistazo?](https://noe-tec.github.io/machine-learning/readings/yolo/) - Spanish! |
+| Segmentación semántica | [slides](https://noe-tec.github.io/machine-learning/slides/semantic-segmentation/) | — |
 
 ## Demos
 

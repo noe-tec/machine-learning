@@ -241,3 +241,45 @@
 }
 .reveal .quiz-explain .qe-ok { color: var(--c-ok); font-weight: 700; }
 .reveal .quiz-explain .qe-no { color: var(--c-err); font-weight: 700; }
+
+/* ---------- Ancla y exponencial: b_w = p_w · e^{t_w} ----------
+   <div class="anchor-exp-demo" data-pw="100" data-presets="0,-0.693,-1.5"></div> */
+.reveal .anchor-exp-demo { font-size: 0.72em; color: var(--c-ink); }
+.reveal .anchor-exp-demo .ae-controls {
+  display: flex;
+  gap: 0.9em;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.reveal .anchor-exp-demo .ae-controls label { display: inline-flex; align-items: center; gap: 0.5em; }
+.reveal .anchor-exp-demo .ae-tw { font-family: var(--font-mono); min-width: 4.2em; display: inline-block; }
+.reveal .anchor-exp-demo .ae-range { width: 14em; accent-color: var(--c-accent); }
+.reveal .anchor-exp-demo .ae-btn {
+  padding: 0.2em 0.7em;
+  border: 2px solid var(--c-accent);
+  border-radius: var(--radius);
+  background: var(--c-accent-bg);
+  color: var(--c-ink);
+  font: inherit;
+  cursor: pointer;
+}
+.reveal .anchor-exp-demo .ae-svg { display: block; width: 100%; max-height: 270px; margin: 0.2em 0; }
+.reveal .ae-anchor { fill: none; stroke: var(--c-ink-soft); stroke-width: 4; stroke-dasharray: 10 7; }
+.reveal .ae-pred {
+  fill: var(--c-accent-bg);
+  fill-opacity: 0.6;
+  stroke: var(--c-accent);
+  stroke-width: 5;
+  transition: x 0.15s, width 0.15s;
+}
+.reveal .ae-center { fill: var(--c-ink); }
+.reveal .ae-lab { font-size: 20px; font-weight: 600; }
+.reveal .ae-lab-anchor { fill: var(--c-ink-soft); }
+.reveal .ae-lab-pred { fill: var(--c-accent); }
+.reveal .anchor-exp-demo .ae-out p { margin: 0.15em 0; }
+.reveal .anchor-exp-demo .ae-formula { font-size: 1.25em; }
+.reveal .anchor-exp-demo .ae-formula strong { color: var(--c-accent); font-family: var(--font-mono); }
+.reveal .anchor-exp-demo .ae-msg { color: var(--c-ink-soft); }
+.reveal .anchor-exp-demo.ae-grow .ae-msg { color: var(--c-ok); }
+.reveal .anchor-exp-demo.ae-shrink .ae-msg { color: var(--c-err); }
+.reveal .ae-lab .ae-sub { font-size: 14px; }

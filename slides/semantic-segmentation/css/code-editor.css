@@ -1,0 +1,11 @@
+/* Colores del editor oscuro de VS Code, limitados al ejemplo de PyTorch. */
+#transpose-pytorch pre { background: #1e1e1e; }
+#transpose-pytorch pre::before { background: #252526; color: #cccccc; }
+#transpose-pytorch pre code { color: #d4d4d4; }
+#transpose-pytorch .editor-keyword { color: #c586c0; }
+#transpose-pytorch .editor-variable { color: #9cdcfe; }
+#transpose-pytorch .editor-function { color: #dcdcaa; }
+#transpose-pytorch .editor-type { color: #4ec9b0; }
+#transpose-pytorch .editor-number { color: #b5cea8; }
+#transpose-pytorch .editor-comment { color: #6a9955; }
+#transpose-pytorch .editor-constant { color: #569cd6; }

@@ -1,0 +1,18 @@
+{
+  "method": "Herramienta integrada image_gen",
+  "synthetic": true,
+  "prompts": [
+    {
+      "file": "01_escena_cotidiana.png",
+      "prompt": "Use case: photorealistic-natural. Asset: standalone synthetic photograph for an object detection classroom exercise, landscape. Natural ordinary street-side park in daylight. Exactly one adult pedestrian fully visible, one medium sized golden brown dog standing beside them, and one parked blue compact car in side three-quarter view. The pedestrian, dog, and car have clear complete silhouettes, do not overlap, and each occupies a substantial part of the frame. Eye-level candid photography, realistic anatomy and proportions, sharp focus across subjects, neutral natural colors, ordinary background, not cinematic or stylized. No text, logos, watermarks, bounding boxes, labels, collage or panels. This is a single photograph."
+    },
+    {
+      "file": "02_oclusiones.png",
+      "prompt": "Use case: photorealistic-natural. Asset: single synthetic landscape photograph for an object detection lesson on occlusion and object size. An ordinary outdoor cafe patio in soft daylight. In the foreground a small dining table with an open laptop, a white ceramic cup partly hidden behind the laptop, a clear water bottle partly hidden behind the cup. Two cafe chairs overlap naturally, one nearer and one behind the table. In the distant background two adult pedestrians are small in the frame and partly occluded by the cafe furniture. Coherent real perspective and realistic proportions, documentary snapshot with sharp depth of field, natural textures and neutral lighting. Objects remain recognizable despite partial occlusions; laptop, cup, bottle, table, chairs and people are the intended objects. No written text, watermarks, labels, bounding boxes, collage, panels or stylized illustration."
+    },
+    {
+      "file": "03_casco.png",
+      "prompt": "Use case: photorealistic-natural. Asset: single landscape synthetic photograph for teaching closed-vocabulary versus open-vocabulary object detection. An adult construction worker wearing a very clearly visible plain bright yellow industrial safety hard hat and an orange high visibility vest, standing outdoors in a quiet construction yard. Medium full-body framing, worker occupies about two thirds of image height, head and hard hat unobscured and helmet large enough to recognize clearly. The yellow hard hat has a realistic rigid dome, brim and suspension, contrasting against a neutral gray wall. Worker holding nothing, hands relaxed, normal anatomy. Natural daylight, realistic documentary photography, sharp focus on worker and helmet, ordinary construction background with no other people or vehicles. No text, brand logos, watermark, labels, boxes, collage or diagrams. Aim for a realistic recognizable person and helmet, not a fashion portrait."
+    }
+  ]
+}

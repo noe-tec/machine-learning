@@ -12,7 +12,8 @@
      <div class="activity-timer" data-minutes="20" data-editable></div>
 
    Interactivos de detección: .iou-demo (IoU con cajas arrastrables) y
-   .nms-demo (NMS paso a paso con umbral ajustable). Ver references/visuals.md.
+   .nms-demo (NMS paso a paso con umbral ajustable) y .anchor-exp-demo
+   (ancho de caja con b_w = p_w · e^{t_w}). Ver references/visuals.md.
    ============================================================ */
 (function () {
   'use strict';
@@ -28,7 +29,10 @@
       inter: 'Intersección', union: 'Unión', drag: 'Arrastra las cajas',
       threshold: 'Umbral de IoU', step: 'Siguiente paso', reset: 'Reiniciar',
       nmsStart: 'Ordena por confianza: ', nmsKeep: 'Guardo ', nmsDrop: 'Borro ',
-      nmsNone: 'no borro ninguna', nmsDone: 'Fin: quedan ', nmsIou: 'IoU '
+      nmsNone: 'no borro ninguna', nmsDone: 'Fin: quedan ', nmsIou: 'IoU ',
+      anchor: 'ancla', pred: 'caja predicha', factor: 'factor',
+      same: 't<sub>w</sub> = 0: el ancho no cambia.', grow: 't<sub>w</sub> &gt; 0: la caja crece.',
+      shrink: 't<sub>w</sub> &lt; 0: la caja se encoge, pero nunca llega a cero ni a un ancho negativo.'
     },
     en: {
       timerTitle: 'Click: start / pause · Double-click: reset',
@@ -39,7 +43,10 @@
       inter: 'Intersection', union: 'Union', drag: 'Drag the boxes',
       threshold: 'IoU threshold', step: 'Next step', reset: 'Reset',
       nmsStart: 'Sort by confidence: ', nmsKeep: 'Keep ', nmsDrop: 'Remove ',
-      nmsNone: 'nothing removed', nmsDone: 'Done: kept ', nmsIou: 'IoU '
+      nmsNone: 'nothing removed', nmsDone: 'Done: kept ', nmsIou: 'IoU ',
+      anchor: 'anchor', pred: 'predicted box', factor: 'factor',
+      same: 't<sub>w</sub> = 0: the width does not change.', grow: 't<sub>w</sub> &gt; 0: the box grows.',
+      shrink: 't<sub>w</sub> &lt; 0: the box shrinks, but never reaches zero or a negative width.'
     }
   }[LANG];
 
@@ -404,6 +411,59 @@
     reset();
   }
 
+
+  /* ------------------------------------------------------------
+     Ancla y exponencial (YOLOv2/v3): b_w = p_w · e^{t_w}.
+       <div class="anchor-exp-demo" data-pw="100" data-presets="0,-0.693,-1.5"></div>
+     Ancla punteada de p_w píxeles y caja predicha con el mismo centro;
+     el deslizador mueve t_w entre −1.5 y +1.5 y los botones fijan ejemplos.
+     ------------------------------------------------------------ */
+  function setupAnchorExpDemo(el) {
+    var pw = parseFloat(el.dataset.pw || '100');
+    var presets = (el.dataset.presets || '0,-0.693,-1.5').split(',').map(Number);
+    var S = 1.5, CX = 380, CY = 115, H = 130;          // 1 px de la caja = 1.5 unidades SVG
+    var fmtN = function (v, d) { return (v < 0 ? '−' : '') + Math.abs(v).toFixed(d); };
+    el.innerHTML =
+      '<div class="ae-controls">' +
+        '<label><span>t<sub>w</sub> = <strong class="ae-tw"></strong></span>' +
+        '<input class="ae-range" type="range" min="-1.5" max="1.5" step="0.001" value="0"></label>' +
+        presets.map(function (v) {
+          return '<button type="button" class="ae-btn" data-v="' + v + '">t<sub>w</sub> = ' + fmtN(v, v % 1 ? 3 : 0) + '</button>';
+        }).join('') +
+      '</div>';
+    var svg = svgEl('svg', { viewBox: '0 0 760 250', 'class': 'ae-svg' }, el);
+    var pred = svgEl('rect', { 'class': 'ae-pred', y: CY - H / 2, height: H, rx: 4 }, svg);
+    var anc = svgEl('rect', { 'class': 'ae-anchor', x: CX - pw * S / 2, y: CY - H / 2, width: pw * S, height: H, rx: 4 }, svg);
+    svgEl('circle', { 'class': 'ae-center', cx: CX, cy: CY, r: 6 }, svg);
+    var tA = svgEl('text', { 'class': 'ae-lab ae-lab-anchor', x: CX, y: CY - H / 2 - 12, 'text-anchor': 'middle' }, svg);
+    tA.innerHTML = TXT.anchor + ': p<tspan class="ae-sub" dy="6">w</tspan><tspan dy="-6"> = ' + pw + ' px</tspan>';
+    var tP = svgEl('text', { 'class': 'ae-lab ae-lab-pred', x: CX, y: CY + H / 2 + 30, 'text-anchor': 'middle' }, svg);
+    var out = document.createElement('div'); out.className = 'ae-out';
+    out.innerHTML = '<p class="ae-formula"></p><p class="ae-msg"></p>';
+    el.appendChild(out);
+    var range = el.querySelector('.ae-range');
+
+    function render() {
+      var tw = parseFloat(range.value), f = Math.exp(tw), bw = pw * f, w = bw * S;
+      pred.setAttribute('x', CX - w / 2); pred.setAttribute('width', w);
+      tP.innerHTML = TXT.pred + ': b<tspan class="ae-sub" dy="6">w</tspan><tspan dy="-6"> = ' + bw.toFixed(1) + ' px</tspan>';
+      el.querySelector('.ae-tw').textContent = fmtN(tw, 3);
+      out.querySelector('.ae-formula').innerHTML =
+        'b<sub>w</sub> = p<sub>w</sub> · e<sup>t<sub>w</sub></sup> = ' + pw + ' × e<sup>' + fmtN(tw, 3) + '</sup> = ' +
+        pw + ' × <strong class="ae-f">' + f.toFixed(3) + '</strong> = <strong class="ae-bw">' + bw.toFixed(1) + ' px</strong>';
+      var m = out.querySelector('.ae-msg');
+      m.innerHTML = Math.abs(tw) < 0.0005 ? TXT.same : tw > 0 ? TXT.grow : TXT.shrink;
+      el.classList.toggle('ae-grow', tw > 0.0005);
+      el.classList.toggle('ae-shrink', tw < -0.0005);
+    }
+    range.addEventListener('input', render);
+    Array.prototype.forEach.call(el.querySelectorAll('.ae-btn'), function (b) {
+      b.addEventListener('click', function (e) { e.stopPropagation(); range.value = b.dataset.v; render(); });
+    });
+    el.addEventListener('keydown', function (ev) { ev.stopPropagation(); });
+    render();
+  }
+
   function init() {
     var timers = document.querySelectorAll('.activity-timer');
     for (var i = 0; i < timers.length; i++) setupTimer(timers[i]);
@@ -411,6 +471,7 @@
     for (var k = 0; k < demos.length; k++) setupSoftmaxDemo(demos[k]);
     Array.prototype.forEach.call(document.querySelectorAll('.iou-demo'), setupIouDemo);
     Array.prototype.forEach.call(document.querySelectorAll('.nms-demo'), setupNmsDemo);
+    Array.prototype.forEach.call(document.querySelectorAll('.anchor-exp-demo'), setupAnchorExpDemo);
   }
 
   if (document.readyState === 'loading') {
