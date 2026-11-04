@@ -27,10 +27,11 @@ This repository contains code examples, activities and external links related wi
 | 11 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/linear_regression_and_feature_selection.ipynb) | Linear regression: evaluation strategies and feature selection |
 | 12 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/retropropagacion.ipynb) | Retropropagación: red neuronal desde cero con NumPy |
 | 13 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/demo_kmeans_dbscan_imagen.ipynb) | Demo compresión de imagen con K-means y comparación K-means vs. DBSCAN |
+| 14 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/GANs_MNIST.ipynb) | Red generativa antagónica (GAN) con MNIST: entrenamiento con visualización del progreso - Spanish! |
+| 15 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/VAE_2D.ipynb) | Autocodificador variacional (VAE) con espacio latente 2D y comparación con un autocodificador determinístico - Spanish! |
 
 <!--
 
-| 2 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/GANs_MNIST.ipynb) | GAN-MNIST |
 | 3 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/demos/Diffusion_Model_Toy_Example.ipynb) | Diffusion Model Toy Example |
 -->
 
