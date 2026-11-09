@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tipos de normalización</title>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+  <script>try{if(localStorage.getItem("shstyle-theme")==="dark"&&!/print-pdf/i.test(location.search))document.documentElement.dataset.theme="dark"}catch(e){}</script>
+  <link rel="stylesheet" href="../css/shstyle.css">
+  <link rel="stylesheet" href="../css/dl-extras.css">
+</head>
+<body>
+<div class="reveal">
+  <div class="slides">
+
+    <!-- ============ 1. PORTADA ============ -->
+    <section class="cover">
+      <span class="kicker">Deep Learning</span>
+      <h1>Tipos de normalización</h1>
+      <div class="cover-meta">Noé Sámano</div>
+    </section>
+
+    <!-- ============ 2. OBJETIVOS ============ -->
+    <section>
+      <span class="kicker">Objetivos</span>
+      <h2>Al terminar esta clase podrás…</h2>
+      <ul>
+        <li class="fragment"><strong>Distinguir</strong> Batch, Layer, Instance y Group Norm por los ejes sobre los que calculan la media.</li>
+        <li class="fragment"><strong>Calcular</strong> a mano cuántas medias saca cada una de un tensor pequeño.</li>
+        <li class="fragment"><strong>Explicar</strong> por qué Batch Norm se comporta distinto en entrenamiento y en inferencia.</li>
+        <li class="fragment"><strong>Elegir</strong> la normalización adecuada para un problema real y defender tu elección.</li>
+      </ul>
+    </section>
+
+    <!-- ============ 3. EL PROBLEMA ============ -->
+    <section>
+      <span class="kicker">El problema</span>
+      <h2>Sin normalizar, la señal se apaga capa tras capa</h2>
+<svg viewBox="0 0 1100 400" style="width:100%; max-height:400px;">
+<g>
+<line class="s-line" x1="120" y1="77.8" x2="1100" y2="77.8" style="stroke-dasharray:4 6;"/>
+<text class="svg-label" x="112" y="84.8" text-anchor="end" style="font-size:19px; font-weight:400;">1</text>
+<line class="s-line" x1="120" y1="203.9" x2="1100" y2="203.9" style="stroke-dasharray:4 6;"/>
+<text class="svg-label" x="112" y="210.9" text-anchor="end" style="font-size:19px; font-weight:400;">0.1</text>
+<line class="s-line" x1="120" y1="330.0" x2="1100" y2="330.0" style="stroke-dasharray:4 6;"/>
+<text class="svg-label" x="112" y="337.0" text-anchor="end" style="font-size:19px; font-weight:400;">0.01</text>
+<text class="svg-label" x="174" y="362" text-anchor="middle" style="font-size:20px; font-weight:400;">1</text>
+<text class="svg-label" x="294" y="362" text-anchor="middle" style="font-size:20px; font-weight:400;">2</text>
+<text class="svg-label" x="414" y="362" text-anchor="middle" style="font-size:20px; font-weight:400;">3</text>
+<text class="svg-label" x="534" y="362" text-anchor="middle" style="font-size:20px; font-weight:400;">4</text>
+<text class="svg-label" x="654" y="362" text-anchor="middle" style="font-size:20px; font-weight:400;">5</text>
+<text class="svg-label" x="774" y="362" text-anchor="middle" style="font-size:20px; font-weight:400;">6</text>
+<text class="svg-label" x="894" y="362" text-anchor="middle" style="font-size:20px; font-weight:400;">7</text>
+<text class="svg-label" x="1014" y="362" text-anchor="middle" style="font-size:20px; font-weight:400;">8</text>
+<text class="svg-label" x="620.0" y="394" text-anchor="middle" style="font-size:20px; font-weight:400;">capa</text>
+<text class="svg-label" x="30" y="28" style="font-size:19px; font-weight:400;">desviación estándar (escala log)</text>
+</g><g class="anim-step" data-step="1">
+<rect class="f-ink-faint s-ink-soft" x="140" y="137.1" width="34" height="192.9"/>
+<rect class="f-ink-faint s-ink-soft" x="260" y="186.2" width="34" height="143.8"/>
+<rect class="f-ink-faint s-ink-soft" x="380" y="229.9" width="34" height="100.1"/>
+<rect class="f-ink-faint s-ink-soft" x="500" y="264.6" width="34" height="65.4"/>
+<rect class="f-ink-faint s-ink-soft" x="620" y="285.3" width="34" height="44.7"/>
+<rect class="f-ink-faint s-ink-soft" x="740" y="283.4" width="34" height="46.6"/>
+<rect class="f-ink-faint s-ink-soft" x="860" y="281.8" width="34" height="48.2"/>
+<rect class="f-ink-faint s-ink-soft" x="980" y="284.2" width="34" height="45.8"/>
+<rect class="f-ink-faint s-ink-soft" x="830" y="20" width="22" height="22"/><text class="svg-label" x="862" y="38" style="font-size:20px; font-weight:400;">sin normalizar</text>
+</g><g class="anim-step" data-step="2">
+<rect class="svg-node-hl" x="174" y="77.8" width="34" height="252.2" rx="0"/>
+<rect class="svg-node-hl" x="294" y="77.8" width="34" height="252.2" rx="0"/>
+<rect class="svg-node-hl" x="414" y="77.8" width="34" height="252.2" rx="0"/>
+<rect class="svg-node-hl" x="534" y="77.8" width="34" height="252.2" rx="0"/>
+<rect class="svg-node-hl" x="654" y="77.8" width="34" height="252.2" rx="0"/>
+<rect class="svg-node-hl" x="774" y="77.8" width="34" height="252.2" rx="0"/>
+<rect class="svg-node-hl" x="894" y="77.8" width="34" height="252.2" rx="0"/>
+<rect class="svg-node-hl" x="1014" y="77.8" width="34" height="252.2" rx="0"/>
+<rect class="svg-node-hl" x="830" y="54" width="22" height="22" rx="0"/><text class="svg-label" x="862" y="72" style="font-size:20px; font-weight:400;">con Layer Norm</text>
+</g></svg>
+<span class="fragment"></span>
+<span class="fragment"></span>
+      <p class="muted">Red de 8 capas lineales de 256 neuronas con ReLU, inicialización por omisión de PyTorch. Entrada: 512 vectores aleatorios. En la capa 8, la desviación pasa de 1 a 0.023 sin normalizar; con Layer Norm se queda en 1.</p>
+    </section>
+
+    <!-- ============ 4. LA FÓRMULA ============ -->
+    <section>
+      <span class="kicker">La idea común</span>
+      <h2>Restar la media, dividir entre la desviación</h2>
+      <div class="eq-key">\[ \hat{x} = \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}} \qquad y = \gamma\,\hat{x} + \beta \]</div>
+      <ul>
+        <li class="fragment">Después de normalizar, el grupo de números tiene media 0 y desviación 1. \( \epsilon \) evita dividir entre cero.</li>
+        <li class="fragment"><span class="term" data-term="gamma-beta">γ y β</span> se aprenden: la red puede volver a escalar y mover los valores si le conviene.</li>
+        <li class="fragment">Las cuatro técnicas usan <em>esta misma fórmula</em>. Solo cambia <em>qué números</em> entran al cálculo de μ y σ.</li>
+      </ul>
+    </section>
+
+    <!-- ============ 5. LOS CUBOS ============ -->
+    <section>
+      <span class="kicker">La idea común</span>
+      <h2>Cuatro maneras de agrupar el mismo tensor</h2>
+      <div class="cols" style="gap:8px;">
+        <figure class="fig fragment"><img src="img/paper_gn_cube_bn.png" alt="Cubo con ejes N, C y H·W; en azul, una rebanada de un canal que atraviesa todo el batch."></figure>
+        <figure class="fig fragment"><img src="img/paper_gn_cube_ln.png" alt="Cubo con ejes N, C y H·W; en azul, una rebanada de una muestra con todos sus canales."></figure>
+        <figure class="fig fragment"><img src="img/paper_gn_cube_in.png" alt="Cubo con ejes N, C y H·W; en azul, una columna de una muestra y un canal."></figure>
+        <figure class="fig fragment"><img src="img/paper_gn_cube_gn.png" alt="Cubo con ejes N, C y H·W; en azul, una muestra con un grupo de tres canales."></figure>
+      </div>
+      <p class="muted">N es el <span class="term" data-term="batch">batch</span>, C los <span class="term" data-term="canal">canales</span> y H, W las posiciones de la imagen. Los cuadros azules comparten la misma μ y la misma σ. Figura de Wu y He (2018).</p>
+    </section>
+
+    <!-- ============ 6. EJEMPLO RESUELTO: TENSOR ============ -->
+    <section>
+      <span class="kicker">Ejemplo resuelto</span>
+      <h2>Mismo tensor, cuatro grupos distintos</h2>
+<svg viewBox="0 0 1100 420" style="width:100%; max-height:420px;">
+<g>
+<text class="svg-label" x="210" y="52" text-anchor="middle" style="font-size:22px;">canal 0</text>
+<text class="svg-label" x="350" y="52" text-anchor="middle" style="font-size:22px;">canal 1</text>
+<text class="svg-label" x="490" y="52" text-anchor="middle" style="font-size:22px;">canal 2</text>
+<text class="svg-label" x="630" y="52" text-anchor="middle" style="font-size:22px;">canal 3</text>
+<text class="svg-label" x="136" y="128" text-anchor="end" style="font-size:22px;">imagen 0</text>
+<rect class="svg-node" x="160" y="70" width="50" height="50"/>
+<text class="svg-label" x="185.0" y="103.0" text-anchor="middle" style="font-size:22px; font-weight:400;">0</text>
+<rect class="svg-node" x="210" y="70" width="50" height="50"/>
+<text class="svg-label" x="235.0" y="103.0" text-anchor="middle" style="font-size:22px; font-weight:400;">1</text>
+<rect class="svg-node" x="160" y="120" width="50" height="50"/>
+<text class="svg-label" x="185.0" y="153.0" text-anchor="middle" style="font-size:22px; font-weight:400;">2</text>
+<rect class="svg-node" x="210" y="120" width="50" height="50"/>
+<text class="svg-label" x="235.0" y="153.0" text-anchor="middle" style="font-size:22px; font-weight:400;">3</text>
+<rect class="svg-node" x="300" y="70" width="50" height="50"/>
+<text class="svg-label" x="325.0" y="103.0" text-anchor="middle" style="font-size:22px; font-weight:400;">4</text>
+<rect class="svg-node" x="350" y="70" width="50" height="50"/>
+<text class="svg-label" x="375.0" y="103.0" text-anchor="middle" style="font-size:22px; font-weight:400;">5</text>
+<rect class="svg-node" x="300" y="120" width="50" height="50"/>
+<text class="svg-label" x="325.0" y="153.0" text-anchor="middle" style="font-size:22px; font-weight:400;">6</text>
+<rect class="svg-node" x="350" y="120" width="50" height="50"/>
+<text class="svg-label" x="375.0" y="153.0" text-anchor="middle" style="font-size:22px; font-weight:400;">7</text>
+<rect class="svg-node" x="440" y="70" width="50" height="50"/>
+<text class="svg-label" x="465.0" y="103.0" text-anchor="middle" style="font-size:22px; font-weight:400;">8</text>
+<rect class="svg-node" x="490" y="70" width="50" height="50"/>
+<text class="svg-label" x="515.0" y="103.0" text-anchor="middle" style="font-size:22px; font-weight:400;">9</text>
+<rect class="svg-node" x="440" y="120" width="50" height="50"/>
+<text class="svg-label" x="465.0" y="153.0" text-anchor="middle" style="font-size:22px; font-weight:400;">10</text>
+<rect class="svg-node" x="490" y="120" width="50" height="50"/>
+<text class="svg-label" x="515.0" y="153.0" text-anchor="middle" style="font-size:22px; font-weight:400;">11</text>
+<rect class="svg-node" x="580" y="70" width="50" height="50"/>
+<text class="svg-label" x="605.0" y="103.0" text-anchor="middle" style="font-size:22px; font-weight:400;">12</text>
+<rect class="svg-node" x="630" y="70" width="50" height="50"/>
+<text class="svg-label" x="655.0" y="103.0" text-anchor="middle" style="font-size:22px; font-weight:400;">13</text>
+<rect class="svg-node" x="580" y="120" width="50" height="50"/>
+<text class="svg-label" x="605.0" y="153.0" text-anchor="middle" style="font-size:22px; font-weight:400;">14</text>
+<rect class="svg-node" x="630" y="120" width="50" height="50"/>
+<text class="svg-label" x="655.0" y="153.0" text-anchor="middle" style="font-size:22px; font-weight:400;">15</text>
+<text class="svg-label" x="136" y="278" text-anchor="end" style="font-size:22px;">imagen 1</text>
+<rect class="svg-node" x="160" y="220" width="50" height="50"/>
+<text class="svg-label" x="185.0" y="253.0" text-anchor="middle" style="font-size:22px; font-weight:400;">16</text>
+<rect class="svg-node" x="210" y="220" width="50" height="50"/>
+<text class="svg-label" x="235.0" y="253.0" text-anchor="middle" style="font-size:22px; font-weight:400;">17</text>
+<rect class="svg-node" x="160" y="270" width="50" height="50"/>
+<text class="svg-label" x="185.0" y="303.0" text-anchor="middle" style="font-size:22px; font-weight:400;">18</text>
+<rect class="svg-node" x="210" y="270" width="50" height="50"/>
+<text class="svg-label" x="235.0" y="303.0" text-anchor="middle" style="font-size:22px; font-weight:400;">19</text>
+<rect class="svg-node" x="300" y="220" width="50" height="50"/>
+<text class="svg-label" x="325.0" y="253.0" text-anchor="middle" style="font-size:22px; font-weight:400;">20</text>
+<rect class="svg-node" x="350" y="220" width="50" height="50"/>
+<text class="svg-label" x="375.0" y="253.0" text-anchor="middle" style="font-size:22px; font-weight:400;">21</text>
+<rect class="svg-node" x="300" y="270" width="50" height="50"/>
+<text class="svg-label" x="325.0" y="303.0" text-anchor="middle" style="font-size:22px; font-weight:400;">22</text>
+<rect class="svg-node" x="350" y="270" width="50" height="50"/>
+<text class="svg-label" x="375.0" y="303.0" text-anchor="middle" style="font-size:22px; font-weight:400;">23</text>
+<rect class="svg-node" x="440" y="220" width="50" height="50"/>
+<text class="svg-label" x="465.0" y="253.0" text-anchor="middle" style="font-size:22px; font-weight:400;">24</text>
+<rect class="svg-node" x="490" y="220" width="50" height="50"/>
+<text class="svg-label" x="515.0" y="253.0" text-anchor="middle" style="font-size:22px; font-weight:400;">25</text>
+<rect class="svg-node" x="440" y="270" width="50" height="50"/>
+<text class="svg-label" x="465.0" y="303.0" text-anchor="middle" style="font-size:22px; font-weight:400;">26</text>
+<rect class="svg-node" x="490" y="270" width="50" height="50"/>
+<text class="svg-label" x="515.0" y="303.0" text-anchor="middle" style="font-size:22px; font-weight:400;">27</text>
+<rect class="svg-node" x="580" y="220" width="50" height="50"/>
+<text class="svg-label" x="605.0" y="253.0" text-anchor="middle" style="font-size:22px; font-weight:400;">28</text>
+<rect class="svg-node" x="630" y="220" width="50" height="50"/>
+<text class="svg-label" x="655.0" y="253.0" text-anchor="middle" style="font-size:22px; font-weight:400;">29</text>
+<rect class="svg-node" x="580" y="270" width="50" height="50"/>
+<text class="svg-label" x="605.0" y="303.0" text-anchor="middle" style="font-size:22px; font-weight:400;">30</text>
+<rect class="svg-node" x="630" y="270" width="50" height="50"/>
+<text class="svg-label" x="655.0" y="303.0" text-anchor="middle" style="font-size:22px; font-weight:400;">31</text>
+<text class="svg-label" x="160" y="372" style="font-size:20px; font-weight:400;">x = torch.arange(32.).reshape(2, 4, 2, 2) · forma (N, C, H, W)</text>
+</g>
+<g class="anim-step" data-step="1" data-step-off="2">
+<rect class="svg-node-hl" x="154" y="64" width="112" height="112" rx="6" style="fill:none; stroke-width:5;"/>
+<rect class="svg-node-hl" x="154" y="214" width="112" height="112" rx="6" style="fill:none; stroke-width:5;"/>
+<text class="svg-label" x="755" y="110" style="font-size:26px;">Batch Norm</text>
+<text class="svg-label" x="755" y="160" style="font-size:21px; font-weight:400;">Un canal en todo el batch</text>
+<text class="svg-label" x="755" y="200" style="font-size:21px; font-weight:400;">8 números · μ = 9.5</text>
+<text class="svg-label" x="755" y="240" style="font-size:21px; font-weight:400;">4 pares (μ, σ): uno por canal</text>
+<text class="svg-label" x="755" y="300" style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:400;">x.mean(dim=(0, 2, 3))</text>
+</g>
+<g class="anim-step" data-step="2" data-step-off="3">
+<rect class="svg-node-hl" x="154" y="64" width="532" height="112" rx="6" style="fill:none; stroke-width:5;"/>
+<text class="svg-label" x="755" y="110" style="font-size:26px;">Layer Norm</text>
+<text class="svg-label" x="755" y="160" style="font-size:21px; font-weight:400;">Una imagen, todos sus canales</text>
+<text class="svg-label" x="755" y="200" style="font-size:21px; font-weight:400;">16 números · μ = 7.5</text>
+<text class="svg-label" x="755" y="240" style="font-size:21px; font-weight:400;">2 pares (μ, σ): uno por imagen</text>
+<text class="svg-label" x="755" y="300" style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:400;">x.mean(dim=(1, 2, 3))</text>
+</g>
+<g class="anim-step" data-step="3" data-step-off="4">
+<rect class="svg-node-hl" x="154" y="64" width="112" height="112" rx="6" style="fill:none; stroke-width:5;"/>
+<text class="svg-label" x="755" y="110" style="font-size:26px;">Instance Norm</text>
+<text class="svg-label" x="755" y="160" style="font-size:21px; font-weight:400;">Un canal de una imagen</text>
+<text class="svg-label" x="755" y="200" style="font-size:21px; font-weight:400;">4 números · μ = 1.5</text>
+<text class="svg-label" x="755" y="240" style="font-size:21px; font-weight:400;">8 pares (μ, σ): imagen × canal</text>
+<text class="svg-label" x="755" y="300" style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:400;">x.mean(dim=(2, 3))</text>
+</g>
+<g class="anim-step" data-step="4">
+<rect class="svg-node-hl" x="154" y="64" width="252" height="112" rx="6" style="fill:none; stroke-width:5;"/>
+<text class="svg-label" x="755" y="110" style="font-size:26px;">Group Norm (G = 2)</text>
+<text class="svg-label" x="755" y="160" style="font-size:21px; font-weight:400;">Un grupo de canales de una imagen</text>
+<text class="svg-label" x="755" y="200" style="font-size:21px; font-weight:400;">8 números · μ = 3.5</text>
+<text class="svg-label" x="755" y="240" style="font-size:21px; font-weight:400;">4 pares (μ, σ): imagen × grupo</text>
+<text class="svg-label" x="755" y="300" style="font-family:'JetBrains Mono',monospace; font-size:18px; font-weight:400;">x.reshape(2, 2, 8).mean(dim=2)</text>
+</g>
+</svg>
+<span class="fragment"></span>
+<span class="fragment"></span>
+<span class="fragment"></span>
+<span class="fragment"></span>
+    </section>
+
+    <!-- ============ BATCH NORM ============ -->
+    <section class="divider">
+      <h2>Batch Norm</h2>
+      <p class="muted">Ioffe y Szegedy, 2015</p>
+    </section>
+
+    <section>
+      <span class="kicker">Batch Norm</span>
+      <h2>Cada canal se compara con el resto del batch</h2>
+      <ul>
+        <li class="fragment">Promedia sobre N, H y W: una μ y una σ por canal<sup>[1]</sup>.</li>
+        <li class="fragment">Permite tasas de aprendizaje más altas: Inception con BN llegó a la precisión de Inception con 14 veces menos pasos<sup>[1]</sup>.</li>
+        <li class="fragment">μ y σ cambian con cada batch. Ese ruido actúa como <span class="term" data-term="regularizacion">regularización</span><sup>[1, 4]</sup>.</li>
+        <li class="fragment">ResNet la usa después de cada convolución<sup>[6]</sup>.</li>
+      </ul>
+      <p class="muted fragment">La explicación original fue el <em>internal covariate shift</em>. Hoy se discute: Santurkar et al. (2018) muestran que BN ayuda porque suaviza la superficie de la pérdida<sup>[5]</sup>.</p>
+    </section>
+
+    <section>
+      <span class="kicker">Batch Norm</span>
+      <h2>Mismo dato, distinta salida: train contra eval</h2>
+      <pre data-title="bn_train_eval.py"><code class="language-python" data-trim data-line-numbers="1-3|4-5|6|7-8">
+import torch, torch.nn as nn
+bn = nn.BatchNorm2d(4)
+x = torch.arange(32.).reshape(2, 4, 2, 2)
+bn.train(); y = bn(x)    # usa μ y σ de este batch
+print(bn.running_mean)   # [0.95, 1.35, 1.75, 2.15]
+bn.eval();  z = bn(x)    # usa μ y σ guardadas
+print(y[0, 0, 0, 0])     # -1.18
+print(z[0, 0, 0, 0])     # -0.33
+      </code></pre>
+      <ul>
+        <li class="fragment">En <code>train()</code> usa μ y σ del batch y actualiza sus <span class="term" data-term="running-stats">estadísticas acumuladas</span><sup>[17]</sup>.</li>
+        <li class="fragment"><strong>Error común:</strong> evaluar sin <code>model.eval()</code>. La predicción de una imagen depende de qué otras imágenes vienen en el batch.</li>
+      </ul>
+    </section>
+
+    <section>
+      <span class="kicker">Batch Norm</span>
+      <h2>Con batches chicos, el error de BN se dispara</h2>
+      <div class="cols">
+        <figure class="fig" style="flex:1.3;">
+          <img src="img/paper_gn_batch_size_error.png" alt="Gráfica del error de validación en ImageNet contra el tamaño del batch por GPU (32, 16, 8, 4, 2). La línea de Batch Norm sube de 23.6 a 34.7; la de Group Norm se queda cerca de 24.">
+          <figcaption>Eje vertical: error de clasificación de ResNet-50 en ImageNet. <span class="muted">Figura de Wu y He (2018).</span></figcaption>
+        </figure>
+        <div>
+          <ul>
+            <li class="fragment">Con 32 imágenes por GPU, BN falla en 23.6&nbsp;% de los casos.</li>
+            <li class="fragment">Con 2, μ y σ cambian mucho de un batch a otro: el error sube a 34.7&nbsp;%.</li>
+            <li class="fragment">Group Norm no mira al batch: se queda cerca de 24&nbsp;%.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <span class="kicker">Batch Norm · Cuándo sí y cuándo no</span>
+      <h2>BN brilla con batches grandes de imágenes</h2>
+      <div class="cols">
+        <div>
+          <h3>Úsala cuando</h3>
+          <ul>
+            <li class="fragment">Entrenas una CNN de clasificación con 16 o más imágenes por GPU<sup>[4]</sup>.</li>
+            <li class="fragment">Quieres entrenar rápido con tasas de aprendizaje altas<sup>[1]</sup>.</li>
+            <li class="fragment">En inferencia se fusiona con los pesos de la convolución anterior<sup>[16]</sup>.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Evítala cuando</h3>
+          <ul>
+            <li class="fragment">El batch por GPU es chico (1 a 8)<sup>[4]</sup>.</li>
+            <li class="fragment">Usas una RNN: las estadísticas cambian con el largo de la secuencia<sup>[2]</sup>.</li>
+            <li class="fragment">Los datos reales son muy distintos a los de entrenamiento: las medias guardadas ya no aplican<sup>[15]</sup>.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <span class="kicker">Punto de control</span>
+      <div class="quiz" data-correct="c">
+        <p class="quiz-question">Tu CNN con Batch Norm ya está entrenada. En producción clasificas imágenes en batches de 8, pero <em>olvidaste</em> llamar a <code>model.eval()</code>. ¿Qué pasa?</p>
+        <button class="quiz-option" data-opt="a">Nada: los pesos son los mismos, así que las predicciones no cambian.</button>
+        <button class="quiz-option" data-opt="b">El programa marca error porque BN no acepta batches de 8.</button>
+        <button class="quiz-option" data-opt="c">La predicción de cada imagen depende de las otras 7 imágenes del batch.</button>
+        <div class="quiz-explain">
+          <strong>C.</strong> <span class="qe-ok">Correcta.</span> En modo train, BN normaliza con la μ y la σ del batch actual, no con las guardadas. Además sigue modificando las estadísticas acumuladas.
+          <span class="qe-line"><strong>A.</strong> <span class="qe-no">Incorrecta.</span> Los pesos son iguales, pero μ y σ no: salen del batch que llega.</span>
+          <span class="qe-line"><strong>B.</strong> <span class="qe-no">Incorrecta.</span> BN acepta cualquier batch con más de un valor por canal; el problema es silencioso.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LAYER NORM ============ -->
+    <section class="divider">
+      <h2>Layer Norm</h2>
+      <p class="muted">Ba, Kiros y Hinton, 2016</p>
+    </section>
+
+    <section>
+      <span class="kicker">Layer Norm</span>
+      <h2>Cada ejemplo se normaliza por su cuenta</h2>
+      <ul>
+        <li class="fragment">Promedia sobre todas las características de <em>un</em> ejemplo: no mira al resto del batch<sup>[2]</sup>.</li>
+        <li class="fragment">Hace exactamente lo mismo en entrenamiento y en inferencia. No guarda estadísticas.</li>
+        <li class="fragment">En un Transformer, cada token es un vector de d números. <code>nn.LayerNorm(d)</code> normaliza cada token por separado<sup>[17]</sup>.</li>
+      </ul>
+      <pre class="fragment"><code class="language-python" data-trim>
+tokens = torch.randn(4, 10, 512)     # (batch, tokens, d)
+out = nn.LayerNorm(512)(tokens)      # 40 pares (μ, σ)
+out[0, 0].mean(), out[0, 0].std()    # ≈ 0 y ≈ 1 en cada token
+      </code></pre>
+    </section>
+
+    <section>
+      <span class="kicker">Layer Norm · Cuándo sí y cuándo no</span>
+      <h2>LN es la normalización de las secuencias</h2>
+      <div class="cols">
+        <div>
+          <h3>Úsala cuando</h3>
+          <ul>
+            <li class="fragment">Entrenas un Transformer: el original, GPT-2 y ViT usan LN<sup>[7, 8, 9]</sup>.</li>
+            <li class="fragment">Usas una RNN: se aplica en cada paso de tiempo<sup>[2]</sup>.</li>
+            <li class="fragment">El batch es chico, incluso de 1<sup>[2]</sup>.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Evítala cuando</h3>
+          <ul>
+            <li class="fragment">Tienes una CNN de visión: en ResNet-50, LN 25.3&nbsp;% y BN 23.6&nbsp;% de error<sup>[4]</sup>.</li>
+            <li class="fragment">Los canales son muy distintos: LN supone que aportan parecido<sup>[4]</sup>.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="muted fragment">LLaMA usa RMSNorm: una variante de LN que no resta la media<sup>[10, 11]</sup>.</p>
+    </section>
+
+    <section>
+      <span class="kicker">Punto de control</span>
+      <div class="quiz" data-correct="a">
+        <p class="quiz-question">Un Transformer recibe un tensor de forma (B, T, d) = (4, 10, 512). ¿Cuántos pares (μ, σ) calcula <code>nn.LayerNorm(512)</code>?</p>
+        <button class="quiz-option" data-opt="a">40: uno por cada token de cada ejemplo.</button>
+        <button class="quiz-option" data-opt="b">512: uno por cada característica.</button>
+        <button class="quiz-option" data-opt="c">4: uno por cada ejemplo del batch.</button>
+        <div class="quiz-explain">
+          <strong>A.</strong> <span class="qe-ok">Correcta.</span> LN promedia los 512 números de cada token, así que hay 4 × 10 = 40 grupos.
+          <span class="qe-line"><strong>B.</strong> <span class="qe-no">Incorrecta.</span> Eso sería normalizar cada característica a lo largo del batch: es la idea de Batch Norm.</span>
+          <span class="qe-line"><strong>C.</strong> <span class="qe-no">Incorrecta.</span> Sería LN sobre (T, d) juntos. <code>nn.LayerNorm(512)</code> solo toma el último eje.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ INSTANCE NORM ============ -->
+    <section class="divider">
+      <h2>Instance Norm</h2>
+      <p class="muted">Ulyanov, Vedaldi y Lempitsky, 2016</p>
+    </section>
+
+    <section>
+      <span class="kicker">Instance Norm</span>
+      <h2>IN borra el contraste de cada imagen</h2>
+      <div class="cols">
+        <figure class="fig">
+          <img src="img/instance_norm_contrast.png" alt="Cuadrícula de 2 por 2. Arriba a la izquierda, un paisaje con cielo, sol, montaña y pasto. Abajo a la izquierda, el mismo paisaje oscuro y con poco contraste. A la derecha, la salida de Instance Norm de cada uno: las dos son iguales.">
+          <figcaption>Izquierda: original y versión oscura. Derecha: después de IN.</figcaption>
+        </figure>
+        <div>
+          <ul>
+            <li class="fragment">Promedia sobre H y W: una μ y una σ por imagen y por canal.</li>
+            <li class="fragment">Las dos salidas son iguales: IN quita el brillo y el contraste de cada imagen<sup>[3]</sup>.</li>
+            <li class="fragment">En <span class="term" data-term="transferencia-estilo">transferencia de estilo</span>, eso es justo lo que quieres: el contraste lo pone el estilo, no la foto<sup>[3]</sup>.</li>
+          </ul>
+          
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <span class="kicker">Instance Norm · Cuándo sí y cuándo no</span>
+      <h2>IN sirve para generar y segmentar, no para clasificar</h2>
+      <div class="cols">
+        <div>
+          <h3>Úsala cuando</h3>
+          <ul>
+            <li class="fragment">Haces transferencia de estilo<sup>[3]</sup>.</li>
+            <li class="fragment">Traduces imágenes con GAN: CycleGAN usa IN<sup>[12]</sup>.</li>
+            <li class="fragment">Segmentas imágenes médicas 3D con batch de 2: nnU-Net usa IN<sup>[13]</sup>.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Evítala cuando</h3>
+          <ul>
+            <li class="fragment">Clasificas: en ResNet-50, IN tiene 28.4&nbsp;% de error y BN 23.6&nbsp;%<sup>[4]</sup>.</li>
+            <li class="fragment">El brillo o el contraste importan para la tarea: IN los borra<sup>[3]</sup>.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <span class="kicker">Punto de control</span>
+      <div class="quiz" data-correct="b">
+        <p class="quiz-question">Un tensor tiene forma (N, C, H, W). ¿Qué normalización calcula sus medias con <code>x.mean(dim=(2, 3))</code>?</p>
+        <button class="quiz-option" data-opt="a">Batch Norm, porque promedia la imagen completa.</button>
+        <button class="quiz-option" data-opt="b">Instance Norm: una media por imagen y por canal.</button>
+        <button class="quiz-option" data-opt="c">Layer Norm, porque no incluye el eje del batch.</button>
+        <div class="quiz-explain">
+          <strong>B.</strong> <span class="qe-ok">Correcta.</span> Solo se promedian H y W, así que quedan N × C medias: una por cada imagen y cada canal.
+          <span class="qe-line"><strong>A.</strong> <span class="qe-no">Incorrecta.</span> Batch Norm también promedia el eje 0: <code>dim=(0, 2, 3)</code>.</span>
+          <span class="qe-line"><strong>C.</strong> <span class="qe-no">Incorrecta.</span> Layer Norm también promedia los canales: <code>dim=(1, 2, 3)</code>.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ GROUP NORM ============ -->
+    <section class="divider">
+      <h2>Group Norm</h2>
+      <p class="muted">Wu y He, 2018</p>
+    </section>
+
+    <section>
+      <span class="kicker">Group Norm</span>
+      <h2>GN junta canales en grupos: entre LN e IN</h2>
+      <ul>
+        <li class="fragment">Divide los C canales en G grupos y promedia cada grupo en H y W. Por omisión, G = 32<sup>[4]</sup>.</li>
+        <li class="fragment">Con G = 1 es Layer Norm. Con G = C es Instance Norm.</li>
+        <li class="fragment">No mira al batch: su error en ResNet-50 se queda en 24.0–24.2&nbsp;% de 32 a 2 imágenes por GPU<sup>[4]</sup>.</li>
+      </ul>
+      <table class="fragment">
+        <thead><tr><th>ResNet-50, 32 imágenes por GPU<sup>[4]</sup></th><th>Error en ImageNet</th></tr></thead>
+        <tbody>
+          <tr><td>G = 1 (Layer Norm)</td><td>25.3&nbsp;%</td></tr>
+          <tr><td>G = 32</td><td>24.1&nbsp;%</td></tr>
+          <tr><td>1 canal por grupo (Instance Norm)</td><td>28.4&nbsp;%</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <span class="kicker">Group Norm · Cuándo sí y cuándo no</span>
+      <h2>GN rescata a la visión con batches chicos</h2>
+      <div class="cols">
+        <div>
+          <h3>Úsala cuando</h3>
+          <ul>
+            <li class="fragment">Haces detección, segmentación o video con 1 o 2 imágenes por GPU<sup>[4]</sup>.</li>
+            <li class="fragment">Haces <span class="term" data-term="ajuste-fino">ajuste fino</span> de un detector<sup>[4]</sup>.</li>
+            <li class="fragment">Construyes un modelo de difusión: la U-Net de DDPM usa GN<sup>[14]</sup>.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Evítala cuando</h3>
+          <ul>
+            <li class="fragment">Tienes batches grandes: BN gana por poco (23.6&nbsp;% y 24.1&nbsp;%)<sup>[4]</sup>.</li>
+            <li class="fragment">No quieres otro hiperparámetro: G debe dividir a C<sup>[17]</sup>.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <span class="kicker">Punto de control</span>
+      <div class="quiz" data-correct="a">
+        <p class="quiz-question">Una capa tiene C = 64 canales. Usas <code>nn.GroupNorm(num_groups=64, num_channels=64)</code>. ¿A qué normalización <em>equivale</em>?</p>
+        <button class="quiz-option" data-opt="a">A Instance Norm: cada grupo tiene un solo canal.</button>
+        <button class="quiz-option" data-opt="b">A Layer Norm: usa todos los canales de la imagen.</button>
+        <button class="quiz-option" data-opt="c">A Batch Norm: hay un grupo por canal.</button>
+        <div class="quiz-explain">
+          <strong>A.</strong> <span class="qe-ok">Correcta.</span> 64 grupos para 64 canales deja un canal por grupo: cada media sale solo de H y W.
+          <span class="qe-line"><strong>B.</strong> <span class="qe-no">Incorrecta.</span> Layer Norm es el otro extremo: G = 1.</span>
+          <span class="qe-line"><strong>C.</strong> <span class="qe-no">Incorrecta.</span> Hay una media por canal, pero de una sola imagen; BN promedia también el batch.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SÍNTESIS ============ -->
+    <section>
+      <span class="kicker">Resumen</span>
+      <h2>Lo que cambia es sobre qué ejes se promedia</h2>
+      <table>
+        <thead><tr><th>Método</th><th>Promedia sobre</th><th>¿Depende del batch?</th><th>Uso típico</th></tr></thead>
+        <tbody>
+          <tr class="fragment"><td>Batch Norm</td><td>N, H, W</td><td>Sí, y distinto en train y eval</td><td>CNN de clasificación</td></tr>
+          <tr class="fragment"><td>Layer Norm</td><td>C, H, W (o d)</td><td>No</td><td>Transformers y RNN</td></tr>
+          <tr class="fragment"><td>Instance Norm</td><td>H, W</td><td>No</td><td>Estilo, GAN, segmentación 3D</td></tr>
+          <tr class="fragment"><td>Group Norm</td><td>C/G canales, H, W</td><td>No</td><td>Detección, segmentación, difusión</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <span class="kicker">Resumen</span>
+      <h2>Cuatro preguntas para elegir</h2>
+<svg viewBox="0 0 1100 420" style="width:100%; max-height:420px;">
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="f-ink-soft"/></marker></defs>
+<g class="anim-step" data-step="1">
+<rect class="svg-node" x="20" y="15" width="640" height="66" rx="8"/>
+<text class="svg-label" x="40" y="57" style="font-size:23px;">¿Es un Transformer o una RNN?</text>
+<line class="svg-edge" x1="660" y1="48" x2="800" y2="48" marker-end="url(#arr)"/>
+<text class="svg-label" x="730" y="39" text-anchor="middle" style="font-size:20px; font-weight:400;">sí</text>
+<rect class="svg-node-hl" x="805" y="15" width="270" height="66" rx="8"/>
+<text class="svg-label" x="940" y="57" text-anchor="middle" style="font-size:24px;">Layer Norm</text>
+<line class="svg-edge" x1="120" y1="81" x2="120" y2="115" marker-end="url(#arr)"/>
+<text class="svg-label" x="135" y="105" style="font-size:20px; font-weight:400;">no</text>
+</g>
+<g class="anim-step" data-step="2">
+<rect class="svg-node" x="20" y="117" width="640" height="66" rx="8"/>
+<text class="svg-label" x="40" y="159" style="font-size:23px;">¿Generas imágenes o cambias su estilo?</text>
+<line class="svg-edge" x1="660" y1="150" x2="800" y2="150" marker-end="url(#arr)"/>
+<text class="svg-label" x="730" y="141" text-anchor="middle" style="font-size:20px; font-weight:400;">sí</text>
+<rect class="svg-node-hl" x="805" y="117" width="270" height="66" rx="8"/>
+<text class="svg-label" x="940" y="159" text-anchor="middle" style="font-size:24px;">Instance Norm</text>
+<line class="svg-edge" x1="120" y1="183" x2="120" y2="217" marker-end="url(#arr)"/>
+<text class="svg-label" x="135" y="207" style="font-size:20px; font-weight:400;">no</text>
+</g>
+<g class="anim-step" data-step="3">
+<rect class="svg-node" x="20" y="219" width="640" height="66" rx="8"/>
+<text class="svg-label" x="40" y="261" style="font-size:23px;">¿CNN con 16 o más imágenes por GPU?</text>
+<line class="svg-edge" x1="660" y1="252" x2="800" y2="252" marker-end="url(#arr)"/>
+<text class="svg-label" x="730" y="243" text-anchor="middle" style="font-size:20px; font-weight:400;">sí</text>
+<rect class="svg-node-hl" x="805" y="219" width="270" height="66" rx="8"/>
+<text class="svg-label" x="940" y="261" text-anchor="middle" style="font-size:24px;">Batch Norm</text>
+<line class="svg-edge" x1="120" y1="285" x2="120" y2="319" marker-end="url(#arr)"/>
+<text class="svg-label" x="135" y="309" style="font-size:20px; font-weight:400;">no</text>
+</g>
+<g class="anim-step" data-step="4">
+<rect class="svg-node" x="20" y="321" width="640" height="66" rx="8"/>
+<text class="svg-label" x="40" y="363" style="font-size:23px;">¿Batch chico: detección, segmentación, video?</text>
+<line class="svg-edge" x1="660" y1="354" x2="800" y2="354" marker-end="url(#arr)"/>
+<text class="svg-label" x="730" y="345" text-anchor="middle" style="font-size:20px; font-weight:400;">sí</text>
+<rect class="svg-node-hl" x="805" y="321" width="270" height="66" rx="8"/>
+<text class="svg-label" x="940" y="363" text-anchor="middle" style="font-size:24px;">Group Norm</text>
+</g>
+</svg>
+<span class="fragment"></span>
+<span class="fragment"></span>
+<span class="fragment"></span>
+<span class="fragment"></span>
+      <p class="muted">Es una guía, no una regla: en segmentación médica 3D, nnU-Net usa IN<sup>[13]</sup>. Umbral de 16 imágenes<sup>[4]</sup>.</p>
+    </section>
+
+    <!-- ============ ACTIVIDAD 1 ============ -->
+    <section>
+      <span class="kicker">Actividad · 5 min</span>
+      <h2>Elige la normalización y defiéndela</h2>
+      <div class="cols">
+        <div style="flex:1.3;">
+          <ol>
+            <li>Clasificar productos con ResNet-50, 64 imágenes por GPU</li>
+            <li>Segmentar tumores en 3D, 2 volúmenes por GPU</li>
+            <li>Un chatbot tipo GPT</li>
+            <li>Pintar fotos al estilo de Van Gogh</li>
+            <li>Reconocer voz con una LSTM y audios de distinto largo</li>
+          </ol>
+        </div>
+        <div class="activity-meta">
+          <div class="activity-timer" data-minutes="5" data-editable></div>
+          <p><strong>Qué hacer:</strong> elijan BN, LN, IN o GN para cada caso, con una razón. Luego un equipo defiende cada caso en 1 minuto.</p>
+          <p><strong>Modalidad:</strong> en equipos de 3</p>
+          <div class="solucion" data-label="Ver respuestas">1 BN · 2 GN o IN · 3 LN · 4 IN · 5 LN</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ACTIVIDAD 2 (COLAB) ============ -->
+    <section>
+      <span class="kicker">Actividad · 15 min</span>
+      <h2>Programa las cuatro normalizaciones a mano</h2>
+      <div class="cols">
+        <div>
+          <ol>
+            <li>Abre la libreta y completa los cuatro huecos con <code>mean</code> y <code>var</code>.</li>
+            <li>Cada celda de prueba compara tu resultado con la capa de PyTorch.</li>
+            <li>Mide qué tan lejos queda la μ del batch de la μ real con batches de 32 y de 2.</li>
+          </ol>
+        </div>
+        <div class="activity-meta">
+          <div class="activity-timer" data-minutes="15" data-editable></div>
+          <p><strong>Modalidad:</strong> en parejas</p>
+          <p><strong>Libreta:</strong> <a href="https://colab.research.google.com/github/noe-tec/machine-learning/blob/main/activities/activity_normalization.ipynb">Abrir en Colab</a></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ IDEAS CLAVE ============ -->
+    <section>
+      <span class="kicker">Ideas clave</span>
+      <h2>Misma fórmula, distinto grupo de números</h2>
+      <ul>
+        <li class="fragment">Las cuatro restan la media y dividen entre la desviación; solo cambian los ejes del promedio.</li>
+        <li class="fragment">Batch Norm es la única que depende del batch: brilla con batches grandes y exige <code>model.eval()</code>.</li>
+        <li class="fragment">Layer Norm normaliza cada ejemplo por su cuenta: es la de Transformers y RNN.</li>
+        <li class="fragment">Instance Norm borra el estilo de la imagen; Group Norm es el punto medio para batches chicos.</li>
+      </ul>
+    </section>
+
+    <!-- ============ REFERENCIAS ============ -->
+    <section>
+      <span class="kicker">Tipos de normalización</span>
+      <h2>Referencias (1 de 2)</h2>
+      <div class="refs cols">
+        <div>
+          <ul>
+            <li><span class="ref-type">Paper</span> [1] Ioffe, S. y Szegedy, C. Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift. <em>ICML</em>, 2015. <a href="https://arxiv.org/abs/1502.03167">arXiv:1502.03167</a>.</li>
+            <li><span class="ref-type">Paper</span> [2] Ba, J. L., Kiros, J. R. y Hinton, G. E. Layer Normalization. 2016. <a href="https://arxiv.org/abs/1607.06450">arXiv:1607.06450</a>.</li>
+            <li><span class="ref-type">Paper</span> [3] Ulyanov, D., Vedaldi, A. y Lempitsky, V. Instance Normalization: The Missing Ingredient for Fast Stylization. 2016. <a href="https://arxiv.org/abs/1607.08022">arXiv:1607.08022</a>.</li>
+            <li><span class="ref-type">Paper</span> [4] Wu, Y. y He, K. Group Normalization. <em>ECCV</em>, 2018. <a href="https://arxiv.org/abs/1803.08494">arXiv:1803.08494</a>. Figuras 1 y 2, tablas 1–3.</li>
+          </ul>
+        </div>
+        <div>
+          <ul>
+            <li><span class="ref-type">Paper</span> [5] Santurkar, S., Tsipras, D., Ilyas, A. y Madry, A. How Does Batch Normalization Help Optimization? <em>NeurIPS</em>, 2018. <a href="https://arxiv.org/abs/1805.11604">arXiv:1805.11604</a>.</li>
+            <li><span class="ref-type">Paper</span> [6] He, K., Zhang, X., Ren, S. y Sun, J. Deep Residual Learning for Image Recognition. <em>CVPR</em>, 2016. <a href="https://arxiv.org/abs/1512.03385">arXiv:1512.03385</a>.</li>
+            <li><span class="ref-type">Paper</span> [7] Vaswani, A. et al. Attention Is All You Need. <em>NeurIPS</em>, 2017. <a href="https://arxiv.org/abs/1706.03762">arXiv:1706.03762</a>.</li>
+            <li><span class="ref-type">Paper</span> [8] Radford, A. et al. Language Models are Unsupervised Multitask Learners. OpenAI, 2019. <a href="https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf">PDF</a>.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <span class="kicker">Tipos de normalización</span>
+      <h2>Referencias (2 de 2)</h2>
+      <div class="refs cols">
+        <div>
+          <ul>
+            <li><span class="ref-type">Paper</span> [9] Dosovitskiy, A. et al. An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale. <em>ICLR</em>, 2021. <a href="https://arxiv.org/abs/2010.11929">arXiv:2010.11929</a>.</li>
+            <li><span class="ref-type">Paper</span> [10] Touvron, H. et al. LLaMA: Open and Efficient Foundation Language Models. 2023. <a href="https://arxiv.org/abs/2302.13971">arXiv:2302.13971</a>.</li>
+            <li><span class="ref-type">Paper</span> [11] Zhang, B. y Sennrich, R. Root Mean Square Layer Normalization. <em>NeurIPS</em>, 2019. <a href="https://arxiv.org/abs/1910.07467">arXiv:1910.07467</a>.</li>
+            <li><span class="ref-type">Paper</span> [12] Zhu, J.-Y. et al. Unpaired Image-to-Image Translation using Cycle-Consistent Adversarial Networks. <em>ICCV</em>, 2017. <a href="https://arxiv.org/abs/1703.10593">arXiv:1703.10593</a>.</li>
+            <li><span class="ref-type">Paper</span> [13] Isensee, F. et al. nnU-Net: Self-adapting Framework for U-Net-Based Medical Image Segmentation. 2018. <a href="https://arxiv.org/abs/1809.10486">arXiv:1809.10486</a>.</li>
+          </ul>
+        </div>
+        <div>
+          <ul>
+            <li><span class="ref-type">Paper</span> [14] Ho, J., Jain, A. y Abbeel, P. Denoising Diffusion Probabilistic Models. <em>NeurIPS</em>, 2020. <a href="https://arxiv.org/abs/2006.11239">arXiv:2006.11239</a>.</li>
+            <li><span class="ref-type">Paper</span> [15] Li, Y. et al. Revisiting Batch Normalization For Practical Domain Adaptation. 2016. <a href="https://arxiv.org/abs/1603.04779">arXiv:1603.04779</a>.</li>
+            <li><span class="ref-type">Paper</span> [16] Jacob, B. et al. Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference. <em>CVPR</em>, 2018. <a href="https://arxiv.org/abs/1712.05877">arXiv:1712.05877</a>.</li>
+            <li><span class="ref-type">Web</span> [17] <a href="https://docs.pytorch.org/docs/stable/nn.html#normalization-layers">PyTorch: capas de normalización</a>.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="refs-ia">Nota: estas diapositivas se elaboraron con ayuda de inteligencia artificial, específicamente Claude Opus 5.5 (Anthropic).</p>
+    </section>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="../js/shstyle.js"></script>
+<script src="../js/dl-extras.js"></script>
+<script>
+  Reveal.initialize({
+    width: 1280, height: 720, margin: 0.06,
+    hash: true, progress: true, slideNumber: 'c/t', controls: true,
+    transition: 'slide', transitionSpeed: 'fast',
+    plugins: [ RevealHighlight ]
+  }).then(() => {
+    SHStyle.init({
+      "gamma-beta": {
+        titulo: "γ y β (escala y desplazamiento)",
+        def: "Dos parámetros que se aprenden, uno de cada uno por canal. Después de normalizar, la capa calcula \\( y = \\gamma \\hat{x} + \\beta \\). Así la red puede recuperar cualquier escala que le sirva."
+      },
+      "batch": {
+        titulo: "Batch (lote)",
+        def: "El grupo de ejemplos que entra junto a la red en un paso de entrenamiento. En un tensor de imágenes es el eje N."
+      },
+      "canal": {
+        titulo: "Canal (channel)",
+        def: "Cada mapa de características de una capa convolucional. Una imagen RGB tiene 3 canales; una capa intermedia puede tener 64 o 256. Es el eje C."
+      },
+      "regularizacion": {
+        titulo: "Regularización",
+        def: "Cualquier cosa que ayuda al modelo a generalizar a datos nuevos en lugar de memorizar el entrenamiento. El ruido de las estadísticas del batch en BN tiene ese efecto."
+      },
+      "running-stats": {
+        titulo: "Estadísticas acumuladas (running mean y running var)",
+        def: "Promedios móviles de μ y σ² que Batch Norm guarda durante el entrenamiento. En PyTorch, cada paso hace <code>nueva = 0.9 · anterior + 0.1 · del batch</code>. En <code>eval()</code> se usan en lugar de las del batch."
+      },
+      "transferencia-estilo": {
+        titulo: "Transferencia de estilo (style transfer)",
+        def: "Generar una imagen con el contenido de una foto y el estilo visual de otra, por ejemplo una pintura."
+      },
+      "ajuste-fino": {
+        titulo: "Ajuste fino (fine-tuning)",
+        def: "Seguir entrenando un modelo preentrenado con datos de una tarea nueva, normalmente con una tasa de aprendizaje pequeña."
+      }
+    });
+  });
+</script>
+</body>
+</html>
