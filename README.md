@@ -10,6 +10,7 @@ This repository contains code examples, activities and external links related wi
 | De R-CNN a YOLO | [slides](https://noe-tec.github.io/machine-learning/slides/yolo/) | [¿Cómo encuentra una computadora todo lo que hay en una foto de un solo vistazo?](https://noe-tec.github.io/machine-learning/readings/yolo/) - Spanish! |
 | Segmentación semántica | [slides](https://noe-tec.github.io/machine-learning/slides/semantic-segmentation/) | — |
 | Tipos de normalización | [slides](https://noe-tec.github.io/machine-learning/slides/normalization/) | — |
+| Repaso final de deep learning | [slides](https://noe-tec.github.io/machine-learning/slides/deep-learning-recap/) | — |
 
 ## Demos
 
